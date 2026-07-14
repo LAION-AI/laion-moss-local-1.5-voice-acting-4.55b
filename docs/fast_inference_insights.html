@@ -1,0 +1,69 @@
+<style>:root{--bg:#0d1017;--panel:#141a25;--panel2:#101620;--line:#232c3b;--ink:#e7edf5;--mut:#8a95a8;
+--dim:#5f6b7e;--acc:#5fd0c4;--acc2:#e8b062;--good:#6bd08a;--bad:#e0796b;
+--mono:ui-monospace,"JetBrains Mono","SF Mono",Menlo,monospace;--sans:system-ui,-apple-system,"Segoe UI",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(1100px 460px at 82% -8%,#16202e,transparent 60%),var(--bg);
+color:var(--ink);font-family:var(--sans);line-height:1.55}.wrap{max-width:960px;margin:0 auto;padding:36px 20px 90px}
+.mono{font-family:var(--mono)}a{color:var(--acc)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--acc);margin-bottom:12px}
+h1{font-family:var(--mono);font-weight:700;font-size:26px;margin:0 0 10px;letter-spacing:-.01em;text-wrap:balance}
+h1 .hl{color:var(--acc)}h2{font-family:var(--mono);font-size:18px;margin:34px 0 10px;padding-top:8px;border-top:1px solid var(--line)}
+h3{font-family:var(--mono);font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--acc2);margin:18px 0 8px}
+.nav{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 8px}
+.nav a{font-family:var(--mono);font-size:12px;padding:6px 12px;border:1px solid var(--line);border-radius:7px;text-decoration:none;background:var(--panel)}
+.explain{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--acc);border-radius:12px;padding:18px 20px;margin:20px 0}
+.explain p{color:#cdd5e0;font-size:14px;margin:8px 0;max-width:76ch}.explain b{color:var(--ink)}
+.kpi{display:inline-block;background:var(--panel);border:1px solid var(--line);border-top:2px solid var(--acc);border-radius:10px;padding:14px 16px;margin:6px 10px 6px 0}
+.kpi b{display:block;font-family:var(--mono);font-size:22px;color:var(--acc)}.kpi span{font-size:12px;color:var(--mut)}
+table{border-collapse:collapse;width:100%;font-family:var(--mono);font-size:12.5px;font-variant-numeric:tabular-nums;margin:8px 0}
+.tw{overflow-x:auto}th,td{border:1px solid var(--line);padding:6px 10px;text-align:right;white-space:nowrap}
+th{background:var(--panel);color:var(--dim);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+td:first-child,th:first-child{text-align:left;color:var(--ink)}
+.win{color:var(--good);font-weight:700}.chart{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;margin:14px 0}
+.chart svg{width:100%;height:auto;display:block}
+.note{font-size:13.5px;color:var(--mut);border-left:2px solid var(--line);padding-left:14px;margin:14px 0;max-width:76ch}
+.pcard{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:16px 0}
+.pchd{font-family:var(--mono);font-size:13px;color:var(--ink);margin-bottom:4px}
+.tag{font-family:var(--mono);font-size:10.5px;padding:2px 7px;border-radius:5px;border:1px solid var(--line);color:var(--mut);margin-right:6px}
+.tag.cc{color:var(--acc);border-color:#274a47}.tag.noncc{color:var(--acc2);border-color:#4a3d27}
+.dia{font-size:13px;color:#c7d0dc;margin:6px 0}.dia b{color:var(--acc);font-family:var(--mono);font-size:11px}
+.variants{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:10px}
+.variant{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:10px}
+.vhd{font-family:var(--mono);font-size:11px;color:var(--acc2);margin-bottom:6px}
+.take{border-top:1px dashed #1b2432;padding:6px 0}.take:first-of-type{border-top:0}
+.tk{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:3px}
+.rk{font-family:var(--mono);color:var(--acc);font-weight:700;font-size:12px}
+.chip{font-family:var(--mono);font-size:10.5px;padding:1px 6px;border-radius:4px;background:var(--panel);border:1px solid var(--line);color:var(--ink)}
+.chip i{color:var(--dim);font-style:normal;margin-right:4px}audio{width:100%;height:32px;margin:2px 0}
+.chip.primary{border-color:#2f6d66;background:#12201e}.chip.primary i{color:var(--acc)}
+.chip.promptsim{border-color:#4a3d6b;background:#171425}.chip.promptsim i{color:#9b8cf0}
+.txt{margin:6px 0}.txt summary{cursor:pointer;font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.03em}
+.txt summary:hover{color:var(--acc)}.txt p{font-size:12.5px;color:#c3ccd8;margin:7px 0;white-space:pre-wrap;max-width:82ch}
+.txt b{color:var(--ink);font-family:var(--mono);font-size:11px}
+@media(max-width:760px){.variants{grid-template-columns:1fr}}</style>
+<div class="wrap"><div class="eyebrow">LAION · MOSS voice-acting · fast inference</div><div class="nav"><a href="production_best50.html">best-of-64 grid</a><a href="https://huggingface.co/TTS-AGI/moss-local-transformer-voice-acting">moss-local model</a></div><h1>Fast batched inference for MOSS voice-acting — <span class="hl">what actually works</span></h1><div class="explain">
+<p><b>Context (for dummies).</b> our best-of-N pipelines generate tens of thousands of takes and score every
+one. this page documents every speed lever we measured on 8×A100-80GB for the two MOSS voice-acting models
+(8B delay @24 kHz and moss-local 4.55B @48 kHz), so future runs don't rediscover them.</p></div><h2>1 · Generation: batch size is the lever; flash-attn is not (for this model)</h2><div class="tw"><table><thead><tr><th>batch size</th><th>sec / clip</th><th>peak VRAM</th><th>speedup vs bs=32</th></tr></thead><tbody><tr><td>32</td><td>0.998</td><td>20.6 GB</td><td>1.0×</td></tr><tr><td>64</td><td>0.868</td><td>24.2 GB</td><td>1.15×</td></tr><tr><td>128</td><td>0.83</td><td>31.5 GB</td><td>1.2×</td></tr></tbody></table></div><p class="note">measured: moss-local (4.55B, SDPA, bf16), ~15 s clips, one prompt repeated per batch.
+bs=64 is the sweet spot for best-of-64 groups (batch == group → perfectly homogeneous lengths, zero padding waste;
+this is also why <b>length-bucketed batching adds nothing here</b> — every sequence in the batch shares the same
+prompt and token budget. bucketing only matters if you batch <i>across</i> different prompts).</p>
+<p class="note"><b>flash-attention 2.8.3:</b> compiles and installs fine (~12 min, ninja -j62), and helps standard
+architectures — but the moss-local remote-code attention has a <b>broken FA2 reshape path</b>
+(<span class="mono">shape [64,8,4,128] invalid for 258048</span> — the packed-QKV split doesn't match the model's
+GQA head layout). SDPA is the practical ceiling for this checkpoint. the MOSS-8B delay model runs SDPA too.</p><h2>2 · Scoring: 134× from batching + one-encode-many-scores</h2><div class="tw"><table><thead><tr><th>stage</th><th>naive</th><th>optimized</th><th>speedup</th></tr></thead><tbody><tr><td>ASR / WER (Parakeet-TDT-0.6b-v3)</td><td>1.304 s (fp32, unbatched)</td><td>0.0097 s (bf16, batch 32)</td><td>134×</td></tr><tr><td>VoiceCLAP (blend + genuineness + prompt-sim)</td><td>3 separate passes</td><td>1 encode, 3 heads: 0.027 s</td><td>~3×</td></tr><tr><td>Empathic-Insight-Plus (43 heads)</td><td>—</td><td>0.24 s (one Whisper-encoder pass, all heads on the flattened states)</td><td>—</td></tr><tr><td>Sidon restoration (16→48 kHz)</td><td>0.41 s (unbatched)</td><td>0.34 s (batch 8, exact-length trim)</td><td>1.2× (DAC-decode-bound)</td></tr></tbody></table></div><p class="note">the single biggest win in the whole pipeline: <b>batched bf16 ASR</b>. the naive
+scorer made ASR ⅔ of total cost; batched, it is ~1%. corollary: after fixing ASR, <b>generation dominates
+again</b> and the EI-Plus encoder pass (0.24 s) is the next-largest scoring cost.</p><h2>3 · Pipeline shape: fuse, don't stage</h2><div class="explain">
+<p>· <b>fused worker</b> — generate → sidon → score in one process per GPU: audio flows in memory, no second
+pass over disk, the GPU never idles between stages. measured end-to-end (moss-local + sidon + 43-head scoring +
+flac write): <b>~1.1 s/clip/GPU all-inclusive</b>.</p>
+<p>· <b>merge LoRA into the weights</b> once at load (252 deltas, ~30 s) instead of running through a peft
+wrapper — zero per-token adapter overhead.</p>
+<p>· <b>reference-code caching</b>: encode each reference/voice wav once per worker, reuse across groups.</p>
+<p>· <b>resume markers at group granularity</b> (.done files + parquet flush) — a crashed 10-hour run loses at
+most one group per GPU.</p>
+<p>· <b>token budget = pacing control</b>: MOSS fills whatever frame budget you give it. words × 4.2 frames
+force-rushes (96.9% of takes hit the ceiling, truncations); words × 6.0 (~2.1 words/s) fixes cut-offs at ~40%
+more audio-seconds of cost. budget is a quality-cost dial, not a limit.</p>
+<p>· <b>what we did NOT do</b>: vLLM-style continuous batching (custom audio-head architecture, real integration
+work, ~2× more; only worth it at 1M+ clip scale), fp8/int8 quantization (unvalidated audio-quality risk for a
+quality-selection pipeline).</p></div><h2>4 · Production reference numbers (this box, 8×A100)</h2><div class="tw"><table><thead><tr><th>workload</th><th>measured</th></tr></thead><tbody><tr><td>moss-local generation (bs=64, sdpa, bf16)</td><td>0.87 s/clip/GPU</td></tr><tr><td>+ sidon (batch 8) + full scoring + flac</td><td>~1.1 s/clip/GPU</td></tr><tr><td>40 emotions × 100 prompts × 64 takes = 256k clips</td><td>≈ 78 A100-h ≈ 10 h wall on 8 GPUs</td></tr><tr><td>MOSS-8B delay for comparison (bs=100)</td><td>0.67 s/clip gen; ~0.9 s/clip fused at G=16</td></tr></tbody></table></div></div>
