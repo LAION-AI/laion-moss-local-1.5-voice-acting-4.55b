@@ -16,6 +16,9 @@ in **English and German**, at **native 48 kHz**.
 📚 **Read it:** [full experiment overview](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/overview.html)
 — every temperature/scaling, best-of-N, reward-variant (V1–V6), VoiceCLAP-small blend-scorer, FAIR-eval, character/emotion and voice-cloning study we ran with this model, with results and links to the live grids.
 
+🚀 **Serving on SGLang (A100) — setup, traps & speed:** [for-dummies guide](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/sglang.html)
+— exact `sgl-omni` install + serve command, the full `/v1/audio/speech` API (reference-less / voice-clone / streaming), every startup trap with its fix, and a measured tuning chapter: **~0.74 s TTFA**, **~4.5× single-stream**, and **~35× realtime (≈35 audio-hours per A100-hour) at concurrency 96** for offline dataset generation.
+
 Everything in this repository is **Apache-2.0** (code) / **CC-BY-4.0** (docs & sample pages).
 
 ---

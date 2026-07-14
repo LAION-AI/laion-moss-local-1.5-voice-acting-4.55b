@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Serving the 4.55B on SGLang-Omni (A100) — LAION MOSS voice-acting</title>
+<style>:root{--bg:#0d1017;--panel:#141a25;--panel2:#101620;--line:#232c3b;--ink:#e7edf5;--mut:#8a95a8;
+--dim:#5f6b7e;--acc:#5fd0c4;--acc2:#e8b062;--good:#6bd08a;--bad:#e0796b;
+--mono:ui-monospace,"JetBrains Mono","SF Mono",Menlo,monospace;--sans:system-ui,-apple-system,"Segoe UI",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(1100px 460px at 82% -8%,#16202e,transparent 60%),var(--bg);
+color:var(--ink);font-family:var(--sans);line-height:1.6}.wrap{max-width:1000px;margin:0 auto;padding:36px 20px 110px}
+.mono{font-family:var(--mono)}a{color:var(--acc)}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--acc);margin-bottom:12px}
+h1{font-family:var(--mono);font-weight:700;font-size:27px;margin:0 0 10px;letter-spacing:-.01em;text-wrap:balance}
+h1 .hl{color:var(--acc)}
+h2{font-family:var(--mono);font-size:19px;margin:40px 0 12px;padding-top:12px;border-top:1px solid var(--line)}
+h3{font-family:var(--mono);font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--acc2);margin:22px 0 8px}
+h4{font-family:var(--mono);font-size:12.5px;color:var(--ink);margin:16px 0 6px}
+p{max-width:82ch}
+.nav{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 8px}
+.nav a{font-family:var(--mono);font-size:12px;padding:6px 12px;border:1px solid var(--line);border-radius:7px;text-decoration:none;background:var(--panel)}
+.toc{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin:20px 0}
+.toc a{display:inline-block;font-family:var(--mono);font-size:12px;margin:3px 14px 3px 0;color:var(--mut);text-decoration:none}
+.toc a:hover{color:var(--acc)}
+.explain{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--acc);border-radius:12px;padding:16px 20px;margin:18px 0}
+.explain p{color:#cdd5e0;font-size:14px;margin:8px 0}.explain b{color:var(--ink)}
+.warn{border-left-color:var(--acc2)}.bad{border-left-color:var(--bad)}
+.kpi{display:inline-block;background:var(--panel);border:1px solid var(--line);border-top:2px solid var(--acc);border-radius:10px;padding:14px 16px;margin:6px 10px 6px 0;vertical-align:top}
+.kpi b{display:block;font-family:var(--mono);font-size:22px;color:var(--acc)}.kpi span{font-size:12px;color:var(--mut)}
+table{border-collapse:collapse;width:100%;font-family:var(--mono);font-size:12.5px;font-variant-numeric:tabular-nums;margin:10px 0}
+.tw{overflow-x:auto}th,td{border:1px solid var(--line);padding:6px 10px;text-align:right;white-space:nowrap}
+th{background:var(--panel);color:var(--dim);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+td:first-child,th:first-child{text-align:left;color:var(--ink)}
+.win{color:var(--good);font-weight:700}.lose{color:var(--bad)}
+.note{font-size:13.5px;color:var(--mut);border-left:2px solid var(--line);padding-left:14px;margin:14px 0;max-width:82ch}
+pre{background:#0a0e15;border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;
+font-family:var(--mono);font-size:12.5px;line-height:1.55;color:#d7dee8;margin:10px 0}
+pre .c{color:var(--dim)}pre .k{color:var(--acc)}pre .s{color:var(--acc2)}
+code{font-family:var(--mono);font-size:12px;background:#0a0e15;border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:#d7dee8}
+.trap{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:16px 0}
+.trap .sym{color:var(--bad);font-family:var(--mono);font-size:12px}
+.trap .sym b{color:var(--bad)}
+.trap h4{margin-top:0;color:var(--acc)}
+.trap dl{margin:8px 0 0}.trap dt{font-family:var(--mono);font-size:11px;color:var(--acc2);text-transform:uppercase;letter-spacing:.04em;margin-top:8px}
+.trap dd{margin:2px 0 0;font-size:13.5px;color:#cdd5e0}
+.foot{margin-top:60px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--dim)}
+ul{max-width:82ch}li{margin:5px 0}</style>
+</head>
+<body>
+<div class="wrap">
+<div class="eyebrow">LAION · MOSS voice-acting · serving guide</div>
+<div class="nav">
+<a href="https://huggingface.co/laion/moss-tts-local-transformer-4.55b-voice-acting">HF model</a>
+<a href="overview.html">experiment overview</a>
+<a href="production_best50.html">best-of-64 grid</a>
+<a href="fast_inference_insights.html">batched-inference notes</a>
+</div>
+<h1>Serving the 4.55B on <span class="hl">SGLang-Omni</span> (A100)</h1>
+<div class="explain">
+<p><b>What this page is.</b> A complete, copy-paste, for-dummies guide to serving
+<a href="https://huggingface.co/laion/moss-tts-local-transformer-4.55b-voice-acting"><code>laion/moss-tts-local-transformer-4.55b-voice-acting</code></a>
+on a single NVIDIA A100-80GB with <b>SGLang-Omni</b> — the OpenAI-compatible speech server. It covers the exact
+install, the exact launch command, every trap we hit (with the verbatim error text), the full HTTP API, and a
+measured <b>speed &amp; tuning</b> chapter with the knobs that maximize throughput for offline dataset generation.</p>
+<p>Every number on this page was measured on one A100-80GB (SXM) with torch 2.9.1+cu128, SGLang-Omni 0.5.8,
+flashinfer 0.6.1, Python 3.12. Read numbers as "per one A100"; the model is small enough that one card is the
+natural unit.</p>
+</div>
+
+<div class="toc">
+<a href="#what">1 · What SGLang-Omni is</a>
+<a href="#setup">2 · A100 setup (step-by-step)</a>
+<a href="#serve">3 · The serve command</a>
+<a href="#service">4 · Run it as a service</a>
+<a href="#api">5 · API reference</a>
+<a href="#traps">6 · Traps &amp; fixes</a>
+<a href="#speed">7 · Speed &amp; tuning</a>
+<a href="#recipes">8 · Recipes</a>
+<a href="#napkin">9 · Napkin math</a>
+</div>
+
+<h2 id="what">1 · What SGLang-Omni is, and why it is the fast path</h2>
+<p>SGLang-Omni is a serving framework for <b>omni / speech</b> models built on top of SGLang. It runs the model as
+a <b>pipeline of stages</b> and exposes them behind an OpenAI-compatible HTTP server. For this model the pipeline is:</p>
+<pre><span class="c"># three stages, one GPU</span>
+preprocessing  <span class="c"># tokenize text, encode any reference audio with the ~1B causal codec</span>
+   -&gt; tts_engine   <span class="c"># the 4.55B Qwen3 backbone + 12-codebook local-transformer, run by SGLang</span>
+   -&gt; vocoder      <span class="c"># MOSS-Audio-Tokenizer-v2 decodes RVQ codes back to 48 kHz stereo PCM</span></pre>
+<p>Why this is the fast path for the 4.55B (versus a plain <code>transformers</code> generate loop):</p>
+<ul>
+<li><b>Continuous batching.</b> The <code>tts_engine</code> stage is a real SGLang scheduler: independent requests are
+packed into a single running batch and admitted/retired token-by-token, so the GPU stays busy instead of idling
+between requests. This is the entire reason offline throughput scales to <b>tens of times realtime</b>.</li>
+<li><b>CUDA graphs.</b> Both the backbone decode <i>and</i> the per-frame local-transformer step (1 + <i>n<sub>vq</sub></i>
+micro-steps with 13 seeded sampling passes per frame) are captured as CUDA graphs. Eager, that inner loop is
+kernel-launch-bound at ~22&nbsp;ms/frame regardless of batch size; graphed, the per-frame cost drops and — crucially —
+a graphed batch of 64 costs barely more than a batch of 1, so throughput rises almost linearly with batch size.</li>
+<li><b>RadixAttention / prefix cache.</b> Shared prompt prefixes (e.g. a fixed instruction or reference) are cached
+across requests.</li>
+<li><b>Native pipeline.</b> The <code>moss_tts_local</code> architecture is implemented natively, including a seeded
+sampler that is reproducible <i>at any batch size</i> — a fixed <code>seed</code> gives the same audio at concurrency
+1 or 128.</li>
+</ul>
+
+<h2 id="setup">2 · A100 setup — step by step</h2>
+<h3>2.0 · Assumptions</h3>
+<ul>
+<li><b>GPU:</b> one NVIDIA A100-80GB (this model needs ~58–68&nbsp;GB at the throughput settings below; a 40&nbsp;GB
+card forces a smaller KV pool and lower batch).</li>
+<li><b>Driver / CUDA:</b> a recent driver exposing CUDA 12.x. Torch ships its own CUDA 12.8 runtime, so you do
+<i>not</i> need a system CUDA toolkit to <i>serve</i>. You only need a system <code>nvcc</code> if you enlarge the
+CUDA-graph batch sizes (see <a href="#trap-ninja">trap 7</a>) — the stock config does not.</li>
+<li><b>Disk:</b> ~25&nbsp;GB free for the model shards + venv. <b>Put the venv on a real disk, not <code>/tmp</code></b>
+(see <a href="#trap-tmp">trap 5</a>).</li>
+<li><b>No flash-attn.</b> This checkpoint runs on SGLang's default attention backend; flash-attn is not required and
+the remote-code attention actually has a broken FA2 reshape path. Do not install it.</li>
+</ul>
+
+<h3>2.1 · Create the venv (uv) and install SGLang-Omni</h3>
+<p>We use <a href="https://github.com/astral-sh/uv"><code>uv</code></a>. Install it once (<code>curl -LsSf
+https://astral.sh/uv/install.sh | sh</code>), then:</p>
+<pre><span class="c"># create the venv ON A REAL DISK (see trap 5) — /home, not /tmp</span>
+uv venv /home/$USER/sglang_moss_venv --python 3.12
+<span class="k">source</span> /home/$USER/sglang_moss_venv/bin/activate
+
+<span class="c"># install SGLang-Omni (this pulls torch 2.9.x+cu128, sglang, flashinfer, transformers, soundfile, ...)</span>
+uv pip install sglang-omni
+<span class="c"># soundfile is needed to decode base64 / data-URI reference audio</span>
+uv pip install soundfile</pre>
+<p>Key package versions this guide was validated against (yours may be newer):</p>
+<div class="tw"><table>
+<thead><tr><th>package</th><th>version</th><th>why it matters</th></tr></thead>
+<tbody>
+<tr><td>python</td><td>3.12</td><td>runtime</td></tr>
+<tr><td>torch</td><td>2.9.1+cu128</td><td>ships its own CUDA 12.8 runtime — no system CUDA needed to serve</td></tr>
+<tr><td>sglang-omni</td><td>0.5.8</td><td>the server + <code>moss_tts_local</code> pipeline</td></tr>
+<tr><td>flashinfer-python</td><td>0.6.1</td><td>attention kernels + CUDA-graph capture</td></tr>
+<tr><td>transformers</td><td>≥4.45 (remote-code)</td><td>the model's custom code + processor</td></tr>
+<tr><td>soundfile</td><td>latest</td><td>decode reference audio for voice cloning</td></tr>
+<tr><td>flash-attn</td><td class="lose">NOT installed</td><td>not needed; FA2 path is broken for this remote code</td></tr>
+</tbody></table></div>
+
+<h3>2.2 · Download the model</h3>
+<pre><span class="c"># the LAION 4.55B voice-acting checkpoint (merged weights, Apache-2.0, public)</span>
+hf download laion/moss-tts-local-transformer-4.55b-voice-acting
+<span class="c"># the v2 audio tokenizer / vocoder (pulled automatically on first run, or pre-fetch it)</span>
+hf download OpenMOSS-Team/MOSS-Audio-Tokenizer-v2</pre>
+<p class="note">First run also JIT-compiles a flashinfer attention kernel into <code>~/.cache/flashinfer</code> and captures
+CUDA graphs; expect the <i>first</i> startup to take a couple of minutes longer than later ones.</p>
+
+<h3>2.3 · The config file</h3>
+<p>SGLang-Omni selects the pipeline from a tiny YAML. The stock reference-less / voice-clone config is:</p>
+<pre><span class="c"># examples/configs/moss_tts_local.yaml</span>
+config_cls: MossTTSLocalPipelineConfig
+model_path: OpenMOSS-Team/MOSS-TTS-Local-Transformer-v1.5
+relay_backend: shm</pre>
+<p>The <code>model_path</code> inside the YAML only names the <i>architecture</i> family; the actual weights come from
+the <code>--model-path</code> you pass on the command line (the LAION checkpoint). The three stages
+(<code>preprocessing → tts_engine → vocoder</code>) are filled in by <code>MossTTSLocalPipelineConfig</code>'s
+defaults, so you do not have to spell them out. <code>relay_backend: shm</code> uses shared memory to move audio
+between stages (see <a href="#trap-mooncake">trap 3</a>).</p>
+
+<h2 id="serve">3 · The serve command (every flag explained)</h2>
+<pre>cd /path/to/sglang-omni          <span class="c"># repo dir that holds examples/configs/</span>
+<span class="k">env -u LD_LIBRARY_PATH</span> \        <span class="c"># TRAP 1 — strip a leaked cuDNN path or the 1st request SIGABRTs</span>
+  CUDA_VISIBLE_DEVICES=6 \        <span class="c"># pin to one GPU</span>
+  sgl-omni serve \
+    --model-path laion/moss-tts-local-transformer-4.55b-voice-acting \  <span class="c"># the LAION weights</span>
+    --config examples/configs/moss_tts_local.yaml \                      <span class="c"># the pipeline</span>
+    --port 8000</pre>
+<div class="tw"><table>
+<thead><tr><th>token</th><th>what it does</th></tr></thead>
+<tbody>
+<tr><td>env -u LD_LIBRARY_PATH</td><td>Removes an inherited <code>LD_LIBRARY_PATH</code> so stage subprocesses don't pick up a foreign cuDNN. <b>Mandatory</b> (trap 1).</td></tr>
+<tr><td>CUDA_VISIBLE_DEVICES=6</td><td>Which physical GPU to use. The process then sees it as <code>cuda:0</code>.</td></tr>
+<tr><td>--model-path</td><td>HF id or local dir of the <b>real</b> weights to load (the LAION 4.55B).</td></tr>
+<tr><td>--config</td><td>The pipeline YAML from 2.3.</td></tr>
+<tr><td>--port</td><td>HTTP port for the OpenAI-compatible API.</td></tr>
+</tbody></table></div>
+<p>When it is up you will see <code>Uvicorn running on http://0.0.0.0:8000</code> and
+<code>Application startup complete</code>. Sanity-check:</p>
+<pre>curl -s http://localhost:8000/v1/models</pre>
+<p class="note"><b>Note (trap 6):</b> <code>/v1/models</code> reports the <i>base</i> model id
+(<code>OpenMOSS-Team/MOSS-TTS-Local-Transformer-v1.5</code>) — this is cosmetic. The LAION weights you passed with
+<code>--model-path</code> are the ones actually loaded and generating.</p>
+
+<h2 id="service">4 · Run it as a persistent background service</h2>
+<p>For a long-lived server, detach it and log to a file:</p>
+<pre><span class="c"># start, fully detached, logging to a file</span>
+cd /path/to/sglang-omni
+nohup env -u LD_LIBRARY_PATH CUDA_VISIBLE_DEVICES=6 \
+  sgl-omni serve --model-path laion/moss-tts-local-transformer-4.55b-voice-acting \
+    --config examples/configs/moss_tts_local.yaml --port 8000 \
+  &gt; ~/moss_server.log 2&gt;&amp;1 &amp;
+echo $! &gt; ~/moss_server.pid          <span class="c"># remember the pid</span>
+
+<span class="c"># health / readiness</span>
+curl -s http://localhost:8000/v1/models &gt;/dev/null &amp;&amp; echo UP || echo "not ready"
+
+<span class="c"># watch the log</span>
+tail -f ~/moss_server.log
+
+<span class="c"># stop it cleanly (kills the stage subprocesses too)</span>
+kill "$(cat ~/moss_server.pid)"</pre>
+<p class="bad note"><b>Stopping gotcha.</b> The server spawns one stage subprocess that holds the GPU memory. If you
+<code>kill -9</code> only the parent, that child can survive and keep ~60&nbsp;GB pinned. Always verify with
+<code>nvidia-smi --query-compute-apps=pid,used_memory --format=csv</code> and kill any orphan before relaunching, or
+you will hit a spurious <b>CUDA out of memory</b> on the next start.</p>
+
+<h2 id="api">5 · API reference (<code>POST /v1/audio/speech</code>)</h2>
+<p>OpenAI-compatible speech endpoint. Output is <b>48 kHz stereo 16-bit WAV</b> — use it raw, no post-processing.</p>
+
+<h3>5.1 · Reference-less (no voice clone)</h3>
+<pre>curl -X POST http://localhost:8000/v1/audio/speech \
+  -H "Content-Type: application/json" \
+  -d '{"input": "The lighthouse blinked twice before the storm rolled in."}' \
+  --output out.wav</pre>
+<p>Python:</p>
+<pre><span class="k">import</span> requests
+r = requests.post("http://localhost:8000/v1/audio/speech",
+                  json={"input": "The lighthouse blinked twice before the storm rolled in."})
+r.raise_for_status()
+open("out.wav","wb").write(r.content)</pre>
+
+<h3>5.2 · Style / director instruction &amp; language</h3>
+<p>This is a <b>voice-acting</b> model: put the performance direction in <code>instructions</code>.</p>
+<pre>curl -X POST http://localhost:8000/v1/audio/speech -H "Content-Type: application/json" -d '{
+  "input": "You dare enter my lair?!",
+  "instructions": "A furious ancient dragon, low and booming, building to a roar. Includes a growl.",
+  "language": "English"
+}' --output dragon.wav</pre>
+
+<h3>5.3 · Voice cloning (reference clip + transcript)</h3>
+<p>Pass a reference clip in <code>references</code> (or the <code>ref_audio</code>/<code>ref_text</code> shorthand).
+<code>audio_path</code> may be a local path, an HTTP(S) URL, or a base64 <b>data URI</b>. <b>Supplying the transcript
+(<code>text</code>) materially improves cloning.</b></p>
+<pre>curl -X POST http://localhost:8000/v1/audio/speech -H "Content-Type: application/json" -d '{
+  "input": "Get the trust fund to the bank early.",
+  "references": [{
+    "audio_path": "https://huggingface.co/datasets/zhaochenyang20/seed-tts-eval-mini/resolve/main/en/prompt-wavs/common_voice_en_10119832.wav",
+    "text": "We asked over twenty different people, and they all said it was his."
+  }]
+}' --output clone.wav</pre>
+<p>Base64 data-URI form (decoded server-side with <code>soundfile</code>):</p>
+<pre>{"ref_audio": "data:audio/wav;base64,UklGR....", "ref_text": "Transcript of the clip."}</pre>
+
+<h3>5.4 · Streaming (Server-Sent Events)</h3>
+<p>Set <code>"stream": true</code> to receive SSE. Each event is
+<code>data: {"object":"audio.speech.chunk", "audio":{"data":"&lt;base64 WAV&gt;"}}</code>; the final event has
+<code>audio: null</code>, then <code>data: [DONE]</code>.</p>
+<pre>curl -N -X POST http://localhost:8000/v1/audio/speech -H "Content-Type: application/json" -d '{
+  "input": "This sentence is streamed back as it is generated.",
+  "stream": true
+}'</pre>
+<p class="note"><b>Streaming granularity for this model.</b> The <code>moss_tts_local</code> pipeline emits a
+<i>coarse</i> first chunk — for a one-sentence prompt the whole utterance arrives in the first audio event, so
+time-to-first-audio ≈ full generation time (see <a href="#ttfa">7.1</a>). The generic
+<code>initial_codec_chunk_frames</code> request field exists in the protocol but is <b>only honored by other TTS
+pipelines (e.g. higgs), not by <code>moss_tts_local</code></b> — we tested values 2/4/8 and the first-chunk size and
+TTFA did not change. If you need true low-latency token-by-token streaming, that knob is not (yet) wired for this
+model.</p>
+
+<h3>5.5 · Duration control</h3>
+<p>The model conditions on a target <b>codec-frame count</b>. Set it inline with <code>${token:N}</code> (stripped
+before synthesis) or with the <code>token_count</code> parameter (aliases <code>duration_tokens</code>,
+<code>tokens</code>). Larger N → longer audio. Omit it to let the model choose.</p>
+<pre>{"input": "${token:150}A sentence with an explicit duration target.", "ref_audio": "..."}</pre>
+
+<h3>5.6 · Generation parameters</h3>
+<div class="tw"><table>
+<thead><tr><th>param</th><th>default</th><th>notes</th></tr></thead>
+<tbody>
+<tr><td>input</td><td>(required)</td><td>text; may carry <code>${token:N}</code> and inline markup (<code>[pause 0.5s]</code>, IPA…)</td></tr>
+<tr><td>references / ref_audio,ref_text</td><td>null</td><td>voice-clone reference clip + transcript</td></tr>
+<tr><td>instructions (alias instruct)</td><td>null</td><td>free-text performance direction</td></tr>
+<tr><td>language</td><td>null</td><td>language hint; omit to auto-detect</td></tr>
+<tr><td>stream</td><td>false</td><td>SSE streaming</td></tr>
+<tr><td>token_count / duration_tokens</td><td>null</td><td>target duration in codec frames (&gt;0)</td></tr>
+<tr><td>temperature / top_p / top_k</td><td>0.8 / 0.8 / 30</td><td>server defaults; per-channel <code>text_*</code>/<code>audio_*</code> overrides accepted</td></tr>
+<tr><td>repetition_penalty</td><td>1.1</td><td>audio repetition penalty</td></tr>
+<tr><td>seed</td><td>null</td><td>non-negative int; reproducible <b>at any concurrency</b></td></tr>
+<tr><td>max_new_tokens</td><td>4096</td><td>hard cap on generated frames</td></tr>
+</tbody></table></div>
+
+<h2 id="traps">6 · Common traps &amp; fixes</h2>
+
+<div class="trap" id="trap-ld">
+<h4>Trap 1 — the SIGABRT on the very first request (cuDNN symbol)</h4>
+<p class="sym"><b>Symptom:</b> the server starts fine, then the <b>first</b> request kills a stage subprocess with a
+SIGABRT and an error like<br><code>undefined symbol: cudnnGetLibConfig</code> (or a cuDNN version mismatch abort).</p>
+<dl>
+<dt>Cause</dt><dd>Your login shell exports an <code>LD_LIBRARY_PATH</code> (e.g. from a conda "ml-general" env) that
+points at a <i>different</i> cuDNN. It is inherited by the stage subprocesses and collides with the cuDNN that torch
+ships, so the dynamic loader binds the wrong library and aborts on first use.</dd>
+<dt>Fix</dt><dd>Launch with <b><code>env -u LD_LIBRARY_PATH</code></b> in front of <code>sgl-omni</code> (as in §3). This
+strips the variable for the server and all its children.</dd>
+<dt>Verify</dt><dd>Send the reference-less curl from §5.1 — you get a valid <code>out.wav</code> instead of a
+500/subprocess death.</dd>
+</dl>
+</div>
+
+<div class="trap" id="trap-cookbook">
+<h4>Trap 2 — looking for the wrong cookbook file</h4>
+<p class="sym"><b>Symptom:</b> you go looking for <code>docs/cookbook/moss_tts_local.md</code> and it doesn't exist.</p>
+<dl>
+<dt>Cause</dt><dd>The upstream cookbook page is named <code>docs/cookbook/moss_tts.md</code> (it documents the MOSS-TTS
+family; the local-transformer pipeline shares the same <code>/v1/audio/speech</code> surface).</dd>
+<dt>Fix</dt><dd>Read <code>docs/cookbook/moss_tts.md</code>. There is no <code>_local</code> variant of that file.</dd>
+</dl>
+</div>
+
+<div class="trap" id="trap-mooncake">
+<h4>Trap 3 — <code>libibverbs.so.1</code> / mooncake import error (harmless)</h4>
+<p class="sym"><b>Symptom:</b> at startup:<br>
+<code>Failed to import mooncake: libibverbs.so.1: cannot open shared object file … MooncakeRelay will not work.</code></p>
+<dl>
+<dt>Cause</dt><dd>Mooncake is an optional RDMA relay backend needing InfiniBand libs you don't have.</dd>
+<dt>Fix</dt><dd><b>Ignore it.</b> The config uses <code>relay_backend: shm</code> (shared memory), which is what you
+want on a single host. Nothing to install.</dd>
+</dl>
+</div>
+
+<div class="trap" id="trap-glmasr">
+<h4>Trap 4 — glmasr import warning (harmless)</h4>
+<p class="sym"><b>Symptom:</b> <code>Ignore import error when loading sglang.srt.models.glmasr: cannot import name
+'GlmAsrConfig' from 'transformers'</code>.</p>
+<dl>
+<dt>Cause</dt><dd>SGLang tries to register an unrelated ASR model your transformers version doesn't ship.</dd>
+<dt>Fix</dt><dd><b>Ignore it.</b> It has nothing to do with TTS and the server continues loading normally.</dd>
+</dl>
+</div>
+
+<div class="trap" id="trap-tmp">
+<h4>Trap 5 — venv on <code>/tmp</code> fills up / disappears</h4>
+<p class="sym"><b>Symptom:</b> install fails with <i>no space left on device</i>, or the venv/model vanishes after a
+reboot.</p>
+<dl>
+<dt>Cause</dt><dd>On many boxes <code>/tmp</code> is a small, volatile <b>tmpfs</b> (RAM-backed). The venv + torch +
+model cache are many GB.</dd>
+<dt>Fix</dt><dd>Create the venv and set the HF cache on a <b>real disk</b> (e.g. under <code>/home</code>). Only put
+throwaway logs/outputs on <code>/tmp</code>.</dd>
+</dl>
+</div>
+
+<div class="trap" id="trap-models">
+<h4>Trap 6 — <code>/v1/models</code> shows the "wrong" model name</h4>
+<p class="sym"><b>Symptom:</b> <code>/v1/models</code> returns <code>OpenMOSS-Team/MOSS-TTS-Local-Transformer-v1.5</code>,
+not the LAION id — "did it load the wrong weights?"</p>
+<dl>
+<dt>Cause</dt><dd>The reported id is the pipeline/architecture name from the config, purely cosmetic.</dd>
+<dt>Fix</dt><dd>Nothing — the weights from <code>--model-path</code> (the LAION 4.55B) are the ones loaded and
+generating. If you want the name to match, pass <code>--model-name</code>.</dd>
+</dl>
+</div>
+
+<div class="trap" id="trap-ninja">
+<h4>Trap 7 — <code>FileNotFoundError: 'ninja'</code> only when you enlarge CUDA graphs (tuning)</h4>
+<p class="sym"><b>Symptom:</b> the stock server starts fine, but the moment you add larger
+<code>cuda_graph_bs</code> for tuning, startup dies during graph capture with<br>
+<code>FileNotFoundError: [Errno 2] No such file or directory: 'ninja'</code> (deep in a flashinfer
+<code>get_batch_prefill_module → run_ninja</code> stack).</p>
+<dl>
+<dt>Cause</dt><dd>Capturing a batch size flashinfer hasn't compiled yet triggers a JIT build of an attention kernel,
+which needs <code>ninja</code> and a real <code>nvcc</code> on <code>PATH</code>. The <i>stock</i> config's batch
+sizes are already compiled into <code>~/.cache/flashinfer</code>, so a normal serve never needs them.</dd>
+<dt>Fix</dt><dd>Only relevant if you tune graph sizes. Install ninja (<code>uv pip install ninja</code>) and put a full
+CUDA toolkit's <code>nvcc</code> on <code>PATH</code> for the launch:
+<code>PATH="$VENV/bin:/usr/local/cuda/bin:$PATH" CUDA_HOME=/usr/local/cuda sgl-omni serve …</code>. The pip
+<code>nvidia-cuda-nvcc-cu12</code> wheel ships only <code>ptxas</code>, not the full <code>nvcc</code> — you need a
+real toolkit.</dd>
+<dt>Verify</dt><dd>Startup logs show <code>Capturing batches (bs=64 …)</code> down to <code>bs=1</code> and then
+<code>Application startup complete</code>.</dd>
+</dl>
+</div>
+
+<h2 id="speed">7 · Speed &amp; tuning (measured)</h2>
+<p>All measurements: one A100-80GB, bf16, reference-less, a fixed pool of short (1-sentence) and medium (3-sentence)
+English prompts, mean clip ~9&nbsp;s. Client is the async benchmark in this repo's serving notes. We define
+<b>RTF = audio-seconds produced per wall-second</b> — numerically equal to <b>audio-hours generated per GPU-hour</b>.
+Every run is preceded by a 5-request warm-up so CUDA-graph capture and lazy init don't pollute the numbers.</p>
+
+<div>
+<span class="kpi"><b id="kpi-ttfa">0.74 s</b><span>best TTFA (stream, conc 1)</span></span>
+<span class="kpi"><b id="kpi-ss">4.5×</b><span>single-stream RTF</span></span>
+<span class="kpi"><b id="kpi-peak">35×</b><span>peak offline RTF = audio-hrs / A100-hr</span></span>
+<span class="kpi"><b id="kpi-batch">96</b><span>best offline concurrency</span></span>
+<span class="kpi"><b id="kpi-vram">~68 GB</b><span>VRAM at peak</span></span>
+</div>
+
+<h3 id="ttfa">7.1 · Time-to-first-audio (TTFA) and how to lower it</h3>
+<p>Streaming, concurrency 1, 20 requests. TTFA = wall time from request send to the first audio SSE event.</p>
+<div class="tw"><table>
+<thead><tr><th>config</th><th>TTFA min</th><th>TTFA p50</th><th>TTFA p95</th><th>first-chunk audio</th></tr></thead>
+<tbody>
+<tr><td>stock (CUDA graphs on)</td><td class="win">0.74 s</td><td>1.34 s</td><td>5.1 s</td><td>~5 s (whole short clip)</td></tr>
+<tr><td>+ initial_codec_chunk_frames=2/4/8</td><td>0.79 s</td><td>1.35 s</td><td>4.3 s</td><td>~6 s (<b>unchanged</b>)</td></tr>
+</tbody></table></div>
+<p><b>What actually moves TTFA here.</b> For a one-sentence prompt the pipeline emits the entire utterance as the
+first chunk, so <b>TTFA ≈ full generation latency</b> (~0.7–1.3&nbsp;s for a short clip). The knobs:</p>
+<ul>
+<li><b>CUDA graphs (default ON) — the one that matters.</b> They keep the per-frame decode fast; turning them off
+(<code>disable_cuda_graph</code>) reverts to the ~22&nbsp;ms/frame eager path and roughly triples per-frame time,
+inflating TTFA. Leave them on.</li>
+<li><b>Streaming first-chunk size — not exposed for this model.</b> <code>initial_codec_chunk_frames</code> is
+accepted by the API but ignored by the <code>moss_tts_local</code> vocoder (verified: first-chunk size and TTFA
+unchanged at 2/4/8). There is no config knob to make the first chunk smaller for this pipeline, so sub-500&nbsp;ms
+TTFA on long inputs is not achievable today — you'd need the vocoder to implement chunked emission.</li>
+<li><b>torch.compile, mem-fraction, chunked-prefill:</b> none measurably lower single-stream TTFA (the bottleneck is
+frames-to-generate, not prefill or memory). See 7.3.</li>
+</ul>
+<p><b>Best TTFA achieved: ~0.74&nbsp;s</b> (short prompt, conc 1, stock CUDA-graph config). The lever was CUDA graphs,
+which are already on by default.</p>
+
+<h3 id="stream">7.2 · Streaming throughput vs concurrency</h3>
+<p>Streaming, stock server (<code>max_running_requests=16</code>), 48 requests per point.</p>
+<div class="tw"><table>
+<thead><tr><th>concurrency</th><th>RTF (aud-s/s)</th><th>req/s</th><th>TTFA p50</th><th>p95 latency</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>3.86</td><td>0.47</td><td>1.34 s</td><td>3.54 s</td></tr>
+<tr><td>4</td><td>9.20</td><td>1.09</td><td>2.40 s</td><td>9.14 s</td></tr>
+<tr><td>8</td><td>12.88</td><td>1.49</td><td>4.05 s</td><td>9.88 s</td></tr>
+<tr><td>16</td><td>15.03</td><td>1.50</td><td>6.16 s</td><td>15.11 s</td></tr>
+<tr><td>32</td><td class="win">16.58</td><td>2.27</td><td>10.92 s</td><td>15.84 s</td></tr>
+<tr><td>64</td><td>16.01</td><td>2.21</td><td>12.75 s</td><td>19.52 s</td></tr>
+</tbody></table></div>
+<p>Streaming saturates around <b>16–17× realtime at concurrency 16–32</b>. Past that, aggregate RTF flattens and
+<b>TTFA balloons</b> (requests queue), so for interactive streaming keep concurrency ≤16 per GPU. Streaming caps
+lower than offline because SSE framing + the coarse chunking add per-request overhead and the stock server's AR batch
+is capped at 16.</p>
+
+<h3 id="offline">7.3 · Offline batch throughput (dataset generation) — the important one</h3>
+<p>Non-streaming, sweep the number of in-flight requests (SGLang continuous batching). Three server configs:</p>
+<ul>
+<li><b>Stock</b> — <code>max_running_requests=16</code>, CUDA graphs bs≤16, <code>mem_fraction=0.5</code>.</li>
+<li><b>+MRR only</b> — raise <code>max_running_requests</code> to 64 but leave graphs at bs≤16.</li>
+<li><b>+MRR +graphs (recommended)</b> — <code>max_running_requests=64</code> <b>and</b> capture CUDA graphs up to
+bs 64 (<code>cuda_graph_bs=[1,2,4,8,16,24,32,48,64]</code>, <code>cuda_graph_max_bs=64</code>),
+<code>mem_fraction=0.55</code>.</li>
+</ul>
+<div class="tw"><table>
+<thead><tr><th>concurrency</th><th>stock RTF</th><th>+MRR only RTF</th><th>+MRR+graphs RTF</th><th>+graphs req/s</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>4.79</td><td>3.63</td><td>4.33</td><td>0.52</td></tr>
+<tr><td>8</td><td>14.30</td><td>13.77</td><td>13.94</td><td>1.72</td></tr>
+<tr><td>16</td><td>16.01</td><td>17.74</td><td>17.79</td><td>2.01</td></tr>
+<tr><td>32</td><td>19.74</td><td>13.82</td><td>20.01</td><td>2.41</td></tr>
+<tr><td>48</td><td>—</td><td>17.83</td><td>22.07</td><td>2.57</td></tr>
+<tr><td>64</td><td>—</td><td>17.76</td><td>33.20</td><td>3.74</td></tr>
+<tr><td>96</td><td>—</td><td>16.61</td><td class="win" id="row96">35.17</td><td id="row96r">3.91</td></tr>
+<tr><td>128</td><td>—</td><td>—</td><td>30.25</td><td>3.11</td></tr>
+</tbody></table></div>
+<p class="note">The <b>+MRR+graphs</b> column at concurrency 64/96/128 is the rigorous <b>steady-state</b> run
+(384 requests per point, so start-up ramp and drain are negligible); the lower concurrencies use 96 requests. Peak is
+at concurrency 96 — concurrency 128 regresses (queue thrash / longer per-request latency for no extra throughput).</p>
+<p><b>The lesson (this is the whole game):</b></p>
+<ul>
+<li><b>Raising <code>max_running_requests</code> alone does nothing</b> — it even regresses. With CUDA graphs only
+captured up to bs 16, any running batch &gt;16 falls back to the <b>eager</b> per-frame path (~22&nbsp;ms/frame,
+kernel-launch-bound), which cancels the benefit of the extra concurrency. The "+MRR only" column plateaus at ~17–18×.</li>
+<li><b>You must raise the CUDA-graph batch sizes <i>together</i> with <code>max_running_requests</code>.</b> Once
+batches of 32/48/64 are graphed, per-frame cost stays flat while 64 sequences advance per step, and throughput climbs
+from ~18× to <b>~35× realtime</b>.</li>
+<li><b>Knobs that did NOT help / not needed:</b> <code>torch.compile</code> (no measurable gain over CUDA graphs for
+this inner loop, and long compile), <code>chunked-prefill</code> (prompts are short; prefill isn't the bottleneck),
+pushing <code>mem_fraction</code> past ~0.6 on a single card (steals memory from the two codec instances → OOM risk
+for no throughput gain). flash-attn is not usable (broken FA2 path).</li>
+</ul>
+<p><b>Peak: ~35× realtime = ~35 audio-hours generated per A100-hour</b>, at <b>concurrency 96</b> with the
++MRR+graphs config, using <b>~68&nbsp;GB VRAM</b> and pinning the GPU at ~100% utilization (steady-state, 384-request
+run; concurrency 128 regresses to ~30×). Compared with a plain
+serialized <code>transformers</code> loop (~1× realtime, one clip at a time), SGLang-Omni's continuous batching +
+graphs is a <b>~35× speedup</b> for bulk generation on the same card.</p>
+<p class="note">Applying the tuning: generate a config with the <code>tts_engine</code> stage's
+<code>factory_args.server_args_overrides</code> set to <code>{max_running_requests:64, cuda_graph_bs:[1,2,4,8,16,24,32,48,64],
+cuda_graph_max_bs:64, mem_fraction_static:0.55}</code> (and, optionally, the <code>vocoder</code> stage's
+<code>max_batch_size:16</code>), then launch with ninja + nvcc on <code>PATH</code> (trap 7). The stock YAML's typed
+<code>runtime.sglang_server_args</code> only exposes <code>mem_fraction_static</code>; the batch/graph knobs must go
+through <code>factory_args</code>.</p>
+
+<h2 id="recipes">8 · Recipes</h2>
+<h3>(a) Lowest-latency interactive TTS</h3>
+<ul>
+<li>Config: <b>stock</b> (CUDA graphs on, <code>max_running_requests=16</code>).</li>
+<li>Keep per-GPU concurrency <b>≤16</b>; use <code>stream:true</code>.</li>
+<li>Expect <b>TTFA ~0.7–1.3&nbsp;s</b> for a short line and ~16× aggregate RTF across up to 16 callers.</li>
+</ul>
+<h3>(b) Max-throughput offline dataset generation</h3>
+<ul>
+<li>Config: <b>+MRR+graphs</b> — <code>max_running_requests=64</code>, <code>cuda_graph_bs</code> up to 64,
+<code>mem_fraction_static=0.55</code> (launch with ninja+nvcc on PATH).</li>
+<li>Client: <b>no streaming</b>, keep <b>~96 requests in flight</b> (a simple async pool with a semaphore); don't
+push past ~128 — it regresses.</li>
+<li>Expect <b>~35× realtime ≈ 35 audio-hours per A100-hour</b>, ~3.9 req/s of ~9&nbsp;s clips, ~68&nbsp;GB VRAM.</li>
+<li>Set a fixed <code>seed</code> per item if you want reproducibility — it holds at any concurrency.</li>
+</ul>
+
+<h2 id="napkin">9 · Napkin math — how long / how much to make N hours of audio</h2>
+<div class="explain">
+<p>At the peak offline throughput of <b>~35 audio-hours per A100-hour</b>:</p>
+<ul>
+<li><b>Wall-clock</b> for <i>N</i> hours of audio ≈ <code>N / 35</code> A100-hours. Example: <b>1,000 hours</b> of
+audio ≈ <code>1000 / 35 ≈ 29 A100-hours</code> — about <b>1.2 days on a single A100</b>, or a few hours across 8
+cards.</li>
+<li><b>Cost</b> ≈ <code>(N / 35) × $/A100-hour</code>. At an illustrative <b>$1.50 / A100-hour</b>, 1,000 hours of
+audio ≈ <code>29 × $1.50 ≈ $43</code>. Scale linearly: 10,000 hours ≈ ~286 A100-hours ≈ ~$430.</li>
+<li><b>Rule of thumb:</b> one A100 turns roughly <b>one work-day into ~35 days of audio</b>. Plan your run count and
+node count off that single number.</li>
+</ul>
+<p class="note">These assume ~9&nbsp;s mean clips and reference-less generation. Voice cloning adds a one-time reference
+encode per unique clip (cached), which is negligible amortized over a batch. Very long clips lower RTF slightly
+(longer sequences, larger KV); very short clips raise req/s but lower audio-hours/hour.</p>
+</div>
+
+<div class="foot">
+LAION · MOSS Local-Transformer 1.5 voice-acting (4.55B, 48 kHz). Serving guide for SGLang-Omni on A100.
+Numbers measured on 1×A100-80GB, torch 2.9.1+cu128 / sglang-omni 0.5.8 / flashinfer 0.6.1.
+Everything Apache-2.0 (code) / CC-BY-4.0 (docs). See the
+<a href="https://huggingface.co/laion/moss-tts-local-transformer-4.55b-voice-acting">model card</a> and the
+<a href="overview.html">experiment overview</a>.
+</div>
+</div>
+</body>
+</html>
