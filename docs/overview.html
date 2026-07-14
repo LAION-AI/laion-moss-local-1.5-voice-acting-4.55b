@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MOSS-TTS-Local 4.55B Voice-Acting — Experiments Overview</title>
+<style>
+:root{
+ --bg:#0b0e14;--panel:#131a25;--panel2:#0f151f;--line:#233047;--ink:#e8eef7;--mut:#94a2b8;
+ --dim:#5f6d82;--acc:#5fd0c4;--acc2:#e8b062;--good:#6bd08a;--bad:#e0796b;--vio:#9b8cf0;
+ --mono:ui-monospace,"JetBrains Mono","SF Mono",Menlo,monospace;
+ --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(1200px 520px at 80% -10%,#16202e,transparent 60%),var(--bg);
+ color:var(--ink);font-family:var(--sans);line-height:1.6;font-size:15px}
+.wrap{max-width:1080px;margin:0 auto;padding:34px 22px 120px}
+a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--acc);margin-bottom:10px}
+h1{font-family:var(--mono);font-weight:700;font-size:30px;margin:0 0 12px;letter-spacing:-.01em;line-height:1.2}
+h1 .hl{color:var(--acc)}
+h2{font-family:var(--mono);font-size:20px;margin:46px 0 12px;padding-top:14px;border-top:1px solid var(--line);scroll-margin-top:16px}
+h2 .num{color:var(--acc);margin-right:8px}
+h3{font-family:var(--mono);font-size:14px;letter-spacing:.03em;color:var(--acc2);margin:24px 0 8px;text-transform:uppercase}
+p{max-width:82ch}
+.sub{color:var(--mut);font-size:15px;max-width:84ch}
+.lead{color:#c7d2e0;font-size:15.5px;max-width:84ch}
+.pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:3px 9px;border:1px solid var(--line);
+ border-radius:20px;color:var(--mut);margin:3px 6px 3px 0;background:var(--panel)}
+.pill.on{color:var(--acc);border-color:#2c5a55}
+.links{margin:16px 0 6px}
+.btn{display:inline-block;font-family:var(--mono);font-size:12.5px;padding:8px 14px;border:1px solid var(--line);
+ border-radius:9px;background:var(--panel);margin:4px 8px 4px 0;color:var(--ink)}
+.btn:hover{border-color:var(--acc);text-decoration:none}
+.btn.live{border-color:#2c5a55;color:var(--acc)}
+.btn.live:before{content:"● ";color:var(--good)}
+.tldr{background:linear-gradient(180deg,#16202e,#111823);border:1px solid #2c5a55;border-left:3px solid var(--acc);
+ border-radius:14px;padding:20px 24px;margin:26px 0}
+.tldr h3{margin-top:0;color:var(--acc)}
+.tldr ul{margin:8px 0;padding-left:20px}
+.tldr li{margin:7px 0;color:#d3dced;max-width:88ch}
+.tldr b{color:#fff}
+.toc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin:24px 0;
+ columns:2;column-gap:36px}
+.toc a{display:block;font-family:var(--mono);font-size:12.5px;padding:4px 0;color:var(--mut);break-inside:avoid}
+.toc a:hover{color:var(--acc)}
+.toc a b{color:var(--acc);margin-right:7px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:16px 0}
+.card.tested{border-left:3px solid var(--acc2)}
+.meta{font-family:var(--mono);font-size:11.5px;color:var(--dim);margin:2px 0 10px;letter-spacing:.02em}
+.finding{border-left:3px solid var(--good);background:var(--panel2);border-radius:0 10px 10px 0;padding:12px 16px;margin:14px 0}
+.finding b{color:var(--good)}
+.kpis{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+.kpi{background:var(--panel2);border:1px solid var(--line);border-top:2px solid var(--acc);border-radius:10px;padding:12px 15px;min-width:120px}
+.kpi b{display:block;font-family:var(--mono);font-size:21px;color:var(--acc);line-height:1.1}
+.kpi span{font-size:11.5px;color:var(--mut)}
+.tw{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;width:100%;font-family:var(--mono);font-size:12.5px;font-variant-numeric:tabular-nums}
+th,td{border:1px solid var(--line);padding:6px 11px;text-align:right;white-space:nowrap}
+th{background:var(--panel2);color:var(--dim);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+td:first-child,th:first-child{text-align:left;color:var(--ink)}
+.win{color:var(--good);font-weight:700}
+.lose{color:var(--bad)}
+.note{font-size:13px;color:var(--mut);border-left:2px solid var(--line);padding-left:14px;margin:12px 0;max-width:84ch}
+.warn{border-left-color:var(--acc2);color:#d8c199}
+code{font-family:var(--mono);font-size:12px;background:#0d131d;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:#cfe6e2}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.foot{margin-top:60px;padding-top:18px;border-top:1px solid var(--line);color:var(--dim);font-family:var(--mono);font-size:11.5px}
+hr.d{border:0;border-top:1px dashed var(--line);margin:22px 0}
+@media(max-width:820px){.toc{columns:1}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="eyebrow">LAION · Expressive TTS · research log</div>
+<h1>MOSS-TTS-Local <span class="hl">4.55B</span> Voice-Acting — Experiments &amp; Grids Overview</h1>
+<p class="lead">Every experiment, grid, temperature sweep, best-of-N study and reward ablation run on this
+box with the <b>4.55B MOSS-TTS-Local transformer</b> voice-acting model — the local-transformer
+(Qwen3-4B backbone, 12-codebook RVQ @ native 48&nbsp;kHz) model published on
+<a href="https://huggingface.co/laion/moss-tts-local-transformer-4.55b-voice-acting" target="_blank" rel="noopener">Hugging&nbsp;Face</a>
+and <a href="https://github.com/LAION-AI/laion-moss-local-1.5-voice-acting-4.55b" target="_blank" rel="noopener">GitHub</a>.
+This is the local <b>4.55B</b> model, <i>not</i> the 8B "delay" sibling.</p>
+<div>
+ <span class="pill on">moss_tts_local</span>
+ <span class="pill on">Qwen3-4B backbone</span>
+ <span class="pill on">12-codebook RVQ</span>
+ <span class="pill on">48 kHz native</span>
+ <span class="pill">MOSS-Audio-Tokenizer-v2</span>
+ <span class="pill">EN + DE</span>
+ <span class="pill">vocal bursts</span>
+</div>
+<div class="links">
+ <a class="btn live" href="https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/production_best50.html" target="_blank" rel="noopener">Live grid · production best-of-64 (40 emotions)</a>
+ <a class="btn live" href="https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/fast_inference_insights.html" target="_blank" rel="noopener">Live · fast-inference write-up</a>
+ <a class="btn" href="https://huggingface.co/laion/moss-tts-local-transformer-4.55b-voice-acting" target="_blank" rel="noopener">HF model</a>
+ <a class="btn" href="https://github.com/LAION-AI/laion-moss-local-1.5-voice-acting-4.55b" target="_blank" rel="noopener">GitHub repo</a>
+</div>
+
+<!-- ===================== TL;DR ===================== -->
+<div class="tldr">
+<h3>TL;DR — the load-bearing takeaways</h3>
+<ul>
+<li><b>Best sampling:</b> <code>audio_temperature 0.8</code> <b>without</b> a reference clip, <code>1.0</code> <b>with</b> a reference; fixed <code>top_p 0.95, top_k 25, repetition_penalty 1.1, text_temperature 0.7</code>. A no-reference temperature sweep (1000-take depth) confirmed <b>t=1.0 is the quality-optimal</b> point for best-of-N (invWER peaks 0.94); hotter sampling makes <i>more</i> bursts but worse intelligibility and does <b>not</b> produce better cherry-picked takes.</li>
+<li><b>Best-of-N is the single biggest quality lever.</b> Random take ≈ 0.30 blended reward → best-of-1000 ≈ 0.76 (<b>2.5×</b>). Diminishing returns knee at <b>N≈25–50</b> (captures ~73%/90% of the 5→100 gain); premium runs go to 64–128.</li>
+<li><b>Best reward for shipping:</b> intelligibility-anchored. Production uses <code>reward = invWER × (norm&nbsp;emotion + norm&nbsp;blend + norm&nbsp;genuineness)</code>. Of the V1–V6 rerank variants, <b>V4</b> (<code>1.2·10·invWER + blend</code>) is the practical sweet-spot (cleanest WER 0.052, still blends), <b>V3</b> (<code>invWER·blend</code>) maximises burst naturalness (blend 5.3/10).</li>
+<li><b>Bursts:</b> put the burst cue where training put it — as a <code>(round-bracket)</code> director note in the <b>instruction</b>, keep the spoken <b>text clean</b>. Writing bursts inline in the text ~<b>5×</b> the WER (the model reads the brackets aloud). The 100k <b>inline-LoRA, bursts-in-instruction</b> won the FAIR eval (reward 1.017 best-of-8, WER 0.067).</li>
+<li><b>Voice cloning:</b> <b>no-reference generation beats code cloning ~2×</b> on quality (BR 0.327 vs 0.136); cloning fidelity trades off against audio quality. For a <i>consistent identity</i> without a real reference, <b>Chatterbox VC (s3gen v3) + Sidon</b> imposes the target speaker at 95–100% objective win-rate.</li>
+<li><b>Post-processing:</b> this model is native 48 kHz — <b>keep the output RAW; do not run Sidon</b> (a 48→16→48 round-trip that softens it). Sidon is only for the 24 kHz 8B sibling.</li>
+<li><b>Best checkpoint:</b> the released model = V1 DramaBox full-FT + rank-256 LoRA (α=256) continued to <b>1M samples</b>, merged (252 deltas). The <b>100k inline-burst</b> variant is the dedicated burst model; the 100k <b>full fine-tune</b> is marginally the best raw burst-firer but loses on the intelligibility-anchored reward.</li>
+</ul>
+</div>
+
+<!-- ===================== TOC ===================== -->
+<div class="toc">
+ <a href="#s1"><b>1</b> The model &amp; checkpoint lineage</a>
+ <a href="#s2"><b>2</b> Temperature &amp; sampling scaling</a>
+ <a href="#s3"><b>3</b> Best-of-N &amp; reward variants (V1–V6)</a>
+ <a href="#s4"><b>4</b> VoiceCLAP-small "blend" scorer</a>
+ <a href="#s5"><b>5</b> FAIR eval — burst placement &amp; checkpoint</a>
+ <a href="#s6"><b>6</b> Character / emotion / vocal-burst generation</a>
+ <a href="#s7"><b>7</b> Voice cloning &amp; Sidon restoration</a>
+ <a href="#s8"><b>8</b> Production best-of-64 emotion grid</a>
+ <a href="#s9"><b>+</b> Fast-inference &amp; VoiceCLAP pilot (support)</a>
+</div>
+
+<!-- ===================== 1 · MODEL ===================== -->
+<h2 id="s1"><span class="num">1</span>The model &amp; checkpoint lineage</h2>
+<p class="sub">A <b>4.55B</b> parameter <code>moss_tts_local</code> model: a Qwen3-4B language backbone with a small
+per-frame local-transformer head that predicts <b>12 RVQ codebooks per 80&nbsp;ms frame</b> (12.5&nbsp;Hz),
+decoded by <a href="https://huggingface.co/OpenMOSS-Team/MOSS-Audio-Tokenizer-v2" target="_blank" rel="noopener">MOSS-Audio-Tokenizer-v2</a>
+to <b>native 48&nbsp;kHz</b>. Trained for <b>expressive voice-acting</b> (orc / dragon / fairy / goblin,
+shouting, whispering, vocal bursts) driven by natural-language director instructions, in <b>English and German</b>.</p>
+
+<div class="card">
+<h3>Checkpoint lineage (all 4.55B local; <code>/tmp/moss_train/output/</code>)</h3>
+<div class="tw"><table>
+<tr><th>Stage</th><th>Checkpoint</th><th>What</th><th>Recipe</th></tr>
+<tr><td>Upstream</td><td>MOSS-TTS-Local-Transformer-v1.5</td><td>OpenMOSS base (4.55B, 12-cb @48k)</td><td>—</td></tr>
+<tr><td>V1 base</td><td>moss_dramabox_ft / checkpoint-last</td><td>full fine-tune on DramaBox voice-acting</td><td>LR 3e-5, 2 ep, global batch 128, channelwise loss 1:2.67, warmup 0.03 linear</td></tr>
+<tr><td>1M LoRA</td><td>merged_1m (checkpoint-1m)</td><td>rank-256 LoRA → <b>released model</b></td><td>1M samples / 10 ep, LR 1e-4</td></tr>
+<tr><td>burst LoRA</td><td class="win">merged_inline</td><td>100k inline vocal-burst LoRA (primary burst model)</td><td>100k / 1 ep, LR 2e-4</td></tr>
+<tr><td>burst full-FT</td><td>moss_fullft_inline / checkpoint-last</td><td>100k full fine-tune (burst-in-text data)</td><td>all-param FT</td></tr>
+<tr><td>burst adapter</td><td>moss_lora_r256_inline</td><td>the inline LoRA adapter (pre-merge)</td><td>r256, α256</td></tr>
+</table></div>
+<p class="note">LoRA config (all revisions): <code>r=256, α=256</code> (scaling 1.0), dropout 0.05,
+targets <code>q,k,v,o,gate,up,down _proj</code> across 36 layers = 504 tensors; applied by <b>merging</b>
+<code>B@A</code> into each linear (252 deltas, ~30 s), non-destructive. Base loads with <code>audio_lm_heads.{0..11}</code>
++ <code>text_lm_head</code> reported MISSING — benign weight-tying.</p>
+<p class="note">Training data mix (50/25/25): 50% voice-acting subset (vocal-burst / strong-emotion filtered:
+<code>dramabox_gemini_ft</code> + <code>emotional_va</code> + <code>gemini_dramabox</code>), 25% Gemini-3.1-Flash-TTS
+audio-matched fixed prompts, 25% other burst-filtered (<code>ears</code> + German <code>emolia_de</code> +
+<code>character_voices</code> + <code>gemini</code>). 8×GPU DDP, bf16, gradient checkpointing.</p>
+</div>
+<div class="links">
+ <a class="btn" href="https://huggingface.co/laion/moss-tts-local-transformer-4.55b-voice-acting" target="_blank" rel="noopener">Merged model (Apache-2.0)</a>
+ <a class="btn" href="https://huggingface.co/TTS-AGI/moss-dramabox-ft" target="_blank" rel="noopener">V1 base (moss-dramabox-ft)</a>
+ <a class="btn" href="https://github.com/LAION-AI/laion-moss-local-1.5-voice-acting-4.55b" target="_blank" rel="noopener">Repo · README + data recipe</a>
+</div>
+
+<!-- ===================== 2 · TEMPERATURE ===================== -->
+<h2 id="s2"><span class="num">2</span>Temperature &amp; sampling scaling</h2>
+<p class="meta">dirs: /tmp/vbtemp (temp ablation + depth), /tmp/vbexp (4-model burst grid), /tmp/vbexp2 (burst-recovery best-of-N)</p>
+<p class="sub"><b>What was tested.</b> The temperature that maximises quality with vs without a reference clip,
+plus depth (codebook / pool depth) and top-1/3/5 variance. <b>Method:</b> fixed <code>rep-penalty 1.1, top-p 0.95, top-k 25</code>;
+deterministic per-sample seeds so temperature is a clean axis. Reward = <b>blended reward BR = invWER × (blend/10)</b>
+(blend = 0–10 MLP quality score). vbtemp: 6 burst-rich prompts, no reference — a breadth sweep (t 0.7–1.7 × 50 takes)
+→ pick best temp → <b>depth run of N=1000 takes</b> at that temp (≈5,991 scored).</p>
+
+<div class="finding"><b>Best temperature:</b> <code>audio_temperature 0.8</code> <b>without</b> a reference,
+<code>1.0</code> <b>with</b> a reference (production recipe). The no-reference sweep independently found
+<b>t=1.0 quality-optimal</b> for best-of-N: <b>invWER peaks 0.94 at t1.0</b> and degrades above; burst-detection
+rate rises monotonically with temperature (0.21 → 0.35 at t1.7) — hotter = more bursts but worse intelligibility.</div>
+
+<div class="tw"><table>
+<tr><th>temp</th><th>top10 BR</th><th>meanBR</th><th>invWER</th><th>burst rate</th><th>best blend</th></tr>
+<tr><td>0.7</td><td>0.482</td><td>0.292</td><td>0.862</td><td>0.260</td><td>6.88</td></tr>
+<tr><td>0.8</td><td>0.492</td><td>0.287</td><td>0.918</td><td>0.213</td><td>6.89</td></tr>
+<tr><td>0.9</td><td>0.530</td><td>0.310</td><td>0.936</td><td>0.213</td><td>6.97</td></tr>
+<tr class="win"><td>1.0 ◄</td><td>0.533</td><td>0.304</td><td>0.940</td><td>0.220</td><td>7.14</td></tr>
+<tr><td>1.1</td><td>0.517</td><td>0.304</td><td>0.923</td><td>0.307</td><td>7.14</td></tr>
+<tr><td>1.2</td><td>0.501</td><td>0.292</td><td>0.917</td><td>0.317</td><td>7.15</td></tr>
+<tr><td>1.3</td><td>0.504</td><td>0.297</td><td>0.938</td><td>0.327</td><td>7.05</td></tr>
+<tr><td>1.4–1.7</td><td>0.49–0.51</td><td>~0.30</td><td>~0.92</td><td>0.33–0.35</td><td>~7.1</td></tr>
+</table></div>
+
+<h3>Variance (top-1/3/5) &amp; depth scaling</h3>
+<div class="finding"><b>No "good variance" at high temperature.</b> top-1, top-3, top-5 <i>and</i> top-10 blended
+reward all peak at <b>t=1.0</b> (top-1 BR 0.686 → 0.61–0.63 by t1.7). The extra spread at high T is garbled
+takes, not occasional gems — the best cherry-picked take does <b>not</b> shift to a hotter temperature.</div>
+<div class="tw"><table>
+<tr><th>pool N (at t1.0)</th><th>5</th><th>50</th><th>100</th><th>500</th><th>1000</th></tr>
+<tr><td>top-1 BR</td><td>0.554</td><td>0.686</td><td>0.713</td><td>0.752</td><td class="win">0.759</td></tr>
+<tr><td>top-5 BR</td><td>0.326</td><td>0.593</td><td>0.638</td><td>0.700</td><td class="win">0.719</td></tr>
+<tr><td>top-1 / random-mean</td><td>1.70×</td><td>2.25×</td><td>2.38×</td><td>2.48×</td><td class="win">2.51×</td></tr>
+</table></div>
+<p class="note">Random single sample ≈ 0.30 BR → best-of-1000 ≈ 0.76 (<b>2.51×</b>). Breadth-then-depth compounds:
+top-5-of-50 at best temp (0.593) → top-5-of-1000 (0.719) = <b>+21%</b>. Depth ceiling is prompt-dependent
+(Primal-Fear best-of-1000 0.904; Orc-Shout caps ~0.61 — the model garbles the shout).</p>
+<p class="note warn"><b>Token budget = pacing dial (not a limit).</b> MOSS fills whatever frame budget you give it:
+<code>tokens = clamp(words × 6.0, 96, 1400)</code> frames (≈2.1 words/s) avoids mid-sentence cut-offs; <code>words × 4.2</code>
+force-rushes and truncates 96.9% of slow emotional takes. <code>max_new_tokens = 2.2 × tokens + 300</code>.</p>
+
+<!-- ===================== 3 · BEST-OF-N & REWARDS ===================== -->
+<h2 id="s3"><span class="num">3</span>Best-of-N reranking &amp; reward variants (V1–V6)</h2>
+<p class="meta">dirs: /tmp/vbrerank (V1–V6 rerank), /tmp/vbexp2 (best-of-N group-size + burst recovery)</p>
+<p class="sub"><b>What was tested.</b> How large a candidate pool to generate, and which reward to rank it by.
+<b>Setup:</b> 24 groups (6 prompts × 4 reference voices) × 100 candidates = 2,400 clips from the 100k inline-burst
+LoRA, scored by Parakeet-WER, VoiceCLAP cosines, the "blend" MLP (0–10), and the vocalburst-locator detector.
+Base best-of-N reward: <code>R = (cos_prompt + cos_nat + 2)·invWER</code>.</p>
+
+<h3>Best-of-N group-size (diminishing returns)</h3>
+<div class="kpis">
+ <div class="kpi"><b>25–50</b><span>sweet-spot N (73% / 90% of gain)</span></div>
+ <div class="kpi"><b>2.134</b><span>mean reward @ N=100</span></div>
+ <div class="kpi"><b>0.72→0.86</b><span>burst-prob of best pick, N 5→100</span></div>
+</div>
+<div class="tw"><table>
+<tr><th>N</th><th>5</th><th>10</th><th>15</th><th>25</th><th>50</th><th>100</th></tr>
+<tr><td>mean reward (24 cells)</td><td>1.727</td><td>1.885</td><td>1.955</td><td>2.024</td><td>2.094</td><td class="win">2.134</td></tr>
+</table></div>
+<div class="finding"><b>Reward and bursts are positively correlated</b> (at t1.2 with the <code>both</code> strategy):
+selecting harder for reward picks <i>more</i>-bursty takes — burst-prob of the best pick rises 0.72→0.86 as N
+grows, and the burst-detection rate climbs from 40% overall to <b>66% within the top-25% by reward</b>. The
+bursts↔intelligibility trade-off that plagues single takes effectively disappears under best-of-N.</div>
+
+<h3>Reward variants V1–V6 — definitions &amp; which won</h3>
+<p class="sub">Each variant re-ranks the same 100-candidate pools; the "blend" term is the VoiceCLAP-small
+scorer (§4). Blended reward shorthand = <code>invWER × (blend/10)</code>.</p>
+<div class="tw"><table>
+<tr><th>variant</th><th>definition</th><th>top-1 blend</th><th>WER</th><th>burst-det</th><th>role</th></tr>
+<tr><td>V1</td><td>top-20% by R, re-order by blend</td><td>3.94</td><td>0.130</td><td>62%</td><td>balanced</td></tr>
+<tr><td>V2</td><td>R2=(cosP+blend/20+2)·invWER</td><td>2.79</td><td>0.022</td><td>67%</td><td>blend under-weighted</td></tr>
+<tr class="win"><td>V3 ◄ max-blend</td><td>R3 = invWER · blend</td><td>5.32</td><td>0.253</td><td>54%</td><td>most natural bursts</td></tr>
+<tr class="win"><td>V4 ◄ ship</td><td>R4 = 1.2·(10·invWER)+blend</td><td>3.69</td><td>0.052</td><td>62%</td><td>cleanest WER + good blend</td></tr>
+<tr><td>V5</td><td>R5 = (10·invWER)+blend</td><td>5.06</td><td>0.177</td><td>46%</td><td>equal-weight</td></tr>
+<tr><td>V6</td><td>V5 on gated clips (dur≥mean &amp; invWER&gt;0.6)</td><td>3.53</td><td>0.041</td><td>67%</td><td>quality-gated</td></tr>
+</table></div>
+<div class="finding"><b>V4 is the recommended shipping reward</b> — cleanest WER (0.052) while still blending and
+firing a real burst 62% of the time. <b>V3 (invWER·blend) maximises burst naturalness</b> (5.3/10) at the cost
+of prompt-fidelity and WER. Bigger pools help V1 most (blend 2.57→3.94 as G 15→100); V3 already extracts the
+best-blending clip from any pool.</div>
+<p class="note"><b>Production reward family</b> (recipe): <code>reward_orig = invWER·(norm&nbsp;blend + norm&nbsp;genu)</code>,
+<code>reward_all = invWER·(norm&nbsp;prompt_sim + norm&nbsp;blend + norm&nbsp;genu)</code>,
+<code>reward_emo = invWER·(w·norm&nbsp;emotion + norm&nbsp;blend + norm&nbsp;genu)</code> (w≈1.5).
+<code>reward_orig</code> and <code>prompt_sim</code> are near-uncorrelated (r≈−0.04) — if direction-adherence matters it
+must be <i>in</i> the reward. Optional hard gate <code>WER&lt;0.1</code> for intelligibility-critical corpora.</p>
+
+<!-- ===================== 4 · BLEND SCORER ===================== -->
+<h2 id="s4"><span class="num">4</span>VoiceCLAP-small "blend" scorer</h2>
+<p class="meta">dirs: /tmp/vbblend (dataset), /tmp/vbmlp (arch ablation), /tmp/vbscale (scale-up), /tmp/vbablate (grid + decontam), /tmp/vcblend_pkg (packaged)</p>
+<p class="sub"><b>What it is.</b> A tiny MLP on frozen <b>768-d <code>laion/voiceclap-commercial</code></b> embeddings that
+predicts, 0–10, <b>how naturally a vocal burst blends into the surrounding speech</b> — a fast proxy reward for
+ranking best-of-N. <b>Ground truth:</b> Gemini-3.1-Pro ratings on a fixed rubric (0 = spliced/wrong-emotion,
+5 = fits but "performed", 10 = totally organic).</p>
+
+<div class="grid2">
+<div class="card">
+<h3>Dataset → scale</h3>
+<p class="sub">Started at <b>1,500 clips</b> (500 fresh burst-detector-positive LoRA takes + 1,000 inline-positive
+source clips), Gemini-labelled (0 errors), strongly bimodal (mean 5.37; 26% at 10, 15% at 0). Expanded with
+no-burst hard-negatives to 2,500, then scaled: Gemini-3.1-Pro annotated <b>12,998 more</b> → final
+<b>15,843 train + 110 val</b> (14,389 Gemini-labelled + 1,454 detector-confirmed hard-zeros).</p>
+</div>
+<div class="card">
+<h3>Architecture ablation</h3>
+<p class="sub">small (768-d commercial) vs large (3584-d voiceclap-large-v2) × reg (Huber) vs cls (CE), ~20k-param
+budget. <b>small-reg won</b> (val MAE 2.166, corr +0.616); the 4.7× bigger large-v2 did <b>not</b> beat it —
+"most blend signal is already in the cheap 768-d embedding". Regression &gt; classification.</p>
+</div>
+</div>
+
+<h3>Ablation grid + decontamination (the honest-eval story)</h3>
+<p class="sub">24-run grid: arch {small/base/big/deep} × dropout {0.2/0.33/0.5} × mixture {as_is/balanced}.
+Val-grid winner = <b>big_d0.2_as_is</b> (MAE 2.327). But the tiny 110-clip val was <b>rewarding overfitting</b>:
+on a fresh <b>275-clip decontaminated test</b> (no shared source audio), scaling the data <b>reversed</b> the ranking.</p>
+<div class="tw"><table>
+<tr><th>config</th><th>train n</th><th>test MAE</th><th>test corr</th></tr>
+<tr class="win"><td>base_d0.2_as_is · scaled ◄ default</td><td>15,568</td><td>2.332</td><td>+0.504</td></tr>
+<tr><td>big_d0.2 · scaled</td><td>15,568</td><td>2.392</td><td>+0.503</td></tr>
+<tr class="lose"><td>base_d0.33 · OLD 1.6k data</td><td>1,630</td><td>2.701</td><td>+0.339</td></tr>
+<tr class="lose"><td>big_d0.2 · OLD 1.6k data</td><td>1,630</td><td>2.861</td><td>+0.337</td></tr>
+</table></div>
+<div class="finding"><b>Scaling helped</b> — on the decontaminated test the scaled scorer (MAE 2.33, corr 0.50)
+clearly beats the old-recipe head (2.70 / 0.34). Mid-range blends (4–6) stay the least reliable; the frozen
+encoder is the accuracy ceiling. The final packaged default is <b>base_d0.2</b> (<code>Linear(768,25)→GELU→Drop0.2→Linear(25,1)</code>,
+~19k params), shipped in <code>/tmp/vcblend_pkg</code> as a standalone scorer.</p></div>
+
+<!-- ===================== 5 · FAIR EVAL ===================== -->
+<h2 id="s5"><span class="num">5</span>FAIR eval — burst placement &amp; checkpoint</h2>
+<p class="meta">dirs: /tmp/fair3 (2×2 burst-placement), /tmp/va_eval + /tmp/va_eval2 (harness evolution)</p>
+<p class="sub"><b>What was tested.</b> A fair 2×2: model {100k inline-LoRA, 100k full-FT} × burst placement
+{in the <b>instruction</b> only (clean text) / written inline <code>(…)</code> in the spoken <b>text</b>}.
+3 prompts × 5 ref voices × {EN,DE} × 8 takes = 240 clips/condition, temp 1.0.
+<b>Reward = (voiceclap_cos + 1) × (1 − WER)</b>, WER from Parakeet-tdt-0.6b-v3.</p>
+<div class="tw"><table>
+<tr><th>condition</th><th>μ R_prompt</th><th>μ WER</th><th>best-of-8 R</th><th>best-of-8 WER</th></tr>
+<tr class="win"><td>inline-LoRA · bursts in instruction (clean text) ◄</td><td>0.885</td><td>0.067</td><td>1.017</td><td>0.006</td></tr>
+<tr><td>inline-LoRA · bursts inline in text</td><td>0.598</td><td class="lose">0.370</td><td>0.953</td><td>0.068</td></tr>
+<tr><td>full-FT · bursts in instruction</td><td>0.754</td><td>0.202</td><td>0.998</td><td>0.005</td></tr>
+<tr><td>full-FT · bursts inline in text</td><td>0.637</td><td class="lose">0.332</td><td>1.011</td><td>0.032</td></tr>
+</table></div>
+<div class="finding"><b>Winner: the 100k inline-LoRA with bursts in the instruction only (clean text)</b> —
+highest reward (μ 0.885 / best-of-8 1.017) and lowest WER (0.067). Two robust effects: (a) writing bursts inline
+in the text roughly <b>5× the WER</b> (0.067→0.370) because the model reads the bracketed cue as words; (b) the
+full fine-tune <b>underperformed</b> the LoRA on this intelligibility-anchored reward.</div>
+<p class="note"><b>Harness evolution</b> (va_eval → va_eval2 → fair3): va_eval used <code>[square-bracket]</code> bursts
+inline in the text — the <i>opposite</i> of the training convention — which a training-data audit exposed
+(bursts live in the <b>instruction ~100%</b> of the time, dominant syntax = <b>round brackets</b> <code>()</code>,
+100% in dramabox_gemini_ft, 96% Gemini-3.1). Raw VoiceCLAP cosines proved too noisy to rank (all near 0);
+adding Parakeet-WER to the reward is what gave a clean signal.</p>
+
+<!-- ===================== 6 · CHARACTER/EMOTION ===================== -->
+<h2 id="s6"><span class="num">6</span>Character / emotion / vocal-burst generation</h2>
+<p class="meta">dirs: /tmp/vbchar (30-prompt char/emotion study), /tmp/vbexp (4-model burst grid), /tmp/vb_filter (training-data filter)</p>
+<p class="sub"><b>What was tested.</b> 30 acting prompts (15 human emotional scenes + 15 fantasy archetypes) × 50 takes
+= 1,500 clips, <b>no reference</b>, "how to say it" in the instruction and clean text (only CAPS/!/?/…). temp 1.2.
+Metric = blended reward BR = invWER × (blend/10).</p>
+<div class="kpis">
+ <div class="kpi"><b>0.299 vs 0.213</b><span>mean BR: human emotion &gt; fantasy</span></div>
+ <div class="kpi"><b>0.256</b><span>overall mean BR (invWER 0.932)</span></div>
+ <div class="kpi"><b>0.529→0.643</b><span>best-of-10 → best-of-50</span></div>
+</div>
+<div class="finding"><b>Quiet/whispered/grief-laden deliveries score far higher than loud shouting/cheerful/manic.</b>
+Best conditions: <code>zombie_whisper</code> (BR 0.522), <code>mourning_grief</code> (0.456), <code>heartbreak</code>
+(0.441), <code>primal_fear</code> (0.403), <code>orc_whisper</code> (0.399, highest burst-prob 0.833). Worst:
+<code>troll_cheerful</code> (0.071), <code>goblin_joyous</code> (0.084), <code>triumphant_pride</code> (0.094).
+invWER stays high everywhere (0.85–0.98); the differentiator is the expressiveness (blend) score, which shouting kills.</div>
+<h3>The 4-model burst grid (/tmp/vbexp) &amp; the burst problem</h3>
+<p class="sub">4 checkpoints (V1 / 1M-LoRA / inline-LoRA / full-FT) × 5 burst-placement strategies × 6 scenes,
+Gemini-judged burst_score /10. <b>Findings:</b> to get a burst at all the cue must be <b>inline in the text</b>
+(detect 37–61% vs 8–15% instruction-only) — but that raises WER; the 100k <b>full fine-tune</b> is the best raw
+burst-firer (Full-FT × <code>both</code> = 1.67/10 Gemini burst @ WER 0.146). Bursts remain unreliable (best ~1.7/10);
+the recommended fix is dedicated non-textual burst tokens + RL with reward <code>detector_burst × (1−WER)</code>.
+The FAIR eval (§5) resolved the placement question in favour of instruction-cues + clean text for intelligibility.</p>
+<h3>Training-data burst filter (/tmp/vb_filter)</h3>
+<p class="note"><b>65,459 / 138,341 records kept (47%)</b> by keyword-matching the instruction field against a
+~200-term burst/voice-quality list. Keep rates: dramabox_gemini_ft 100%, char_voices 89%, emotional_va 84%,
+gemini_dramabox 76%, ears 57%, German emolia_de 25%, gemini 17%. Top triggers: <i>breathy</i> (23k), <i>sigh</i> (15k),
+<i>high-pitched</i> (13k) — timbre terms dominate over literal bursts.</p>
+
+<!-- ===================== 7 · VOICE CLONING ===================== -->
+<h2 id="s7"><span class="num">7</span>Voice cloning &amp; Sidon restoration</h2>
+<p class="meta">dirs: /tmp/vbclone (reference-code cloning), /tmp/vcstudy (Chatterbox VC + Sidon)</p>
+<p class="sub"><b>What was tested (vbclone).</b> Does a reference voice help? 17 reference voices + a no-reference path
+× 4 emotions × 2 languages × 50 takes = 7,199 clips (temp 1.0). Cloning = encode the reference to 12-codebook
+MOSS codes (<code>refcodes.pt</code>) passed as <code>reference=[codes]</code>; VoiceCLAP embedding used only to
+score speaker-similarity.</p>
+<div class="tw"><table>
+<tr><th>setting</th><th>mean BR (random)</th><th>best-of-50 BR</th></tr>
+<tr class="win"><td>NO reference (invented voice) ◄</td><td>0.327</td><td>0.713</td></tr>
+<tr class="lose"><td>WITH reference (cloned)</td><td>0.136</td><td>0.391</td></tr>
+</table></div>
+<div class="finding"><b>No-reference generation beats code cloning ~2×</b> on quality — imposing a (often
+monstrous/cartoon) reference timbre degrades intelligibility + expressiveness. <b>Speaker-similarity trades off
+against quality:</b> <code>robot</code> spk-sim 0.777 but BR 0.046; <code>cartoon_gnome</code> 0.752 / 0.059;
+best-cloning voice for quality = <code>Old_noble_Dragon</code> (best-of-50 BR 0.656, spk-sim 0.654). German
+slightly beats English on BR (0.160 vs 0.134). Empty instruction gives the highest speaker similarity.</div>
+<h3>Chatterbox voice conversion + Sidon (/tmp/vcstudy)</h3>
+<p class="sub">Impose a <i>consistent identity</i> onto no-reference clips <b>without a real human reference</b>:
+Chatterbox VC (s3gen v1 vs v3) keeps source content/prosody, imposes a target timbre, then Sidon
+(w2v-BERT-2.0+LoRA → DAC, 16→48 kHz) restores. 152 conversions, CAMPPlus x-vector cosine metric.</p>
+<div class="tw"><table>
+<tr><th>variant</th><th>cos→target</th><th>cos→source</th><th>target&gt;source win-rate</th></tr>
+<tr><td>v1 raw</td><td>0.847</td><td>0.619</td><td>98%</td></tr>
+<tr class="win"><td>v3 raw ◄</td><td>0.838</td><td>0.610</td><td>100%</td></tr>
+<tr><td>v3 + Sidon</td><td>0.788</td><td>0.618</td><td>95%</td></tr>
+</table></div>
+<div class="finding"><b>Identity is genuinely imposed</b> (converted clips are far closer to the target speaker
+than to where their words came from), 95–100% objective win-rate, with <b>s3gen v3</b> the more consistent engine.
+Sidon costs ~0.05 cosine for studio-quality restoration.</div>
+<p class="note warn"><b>Policy for the 4.55B model: keep the output RAW, do NOT apply Sidon.</b> This model emits
+native 48 kHz; Sidon is a 48→16→48 kHz round-trip that removes real 8–16 kHz detail and adds a vocoder sheen
+(neutral for ranking, Δreward≈0; verified on a 12.9k-clip paired ablation). Sidon is only a genuine upgrade for the
+24 kHz 8B sibling.</p>
+
+<!-- ===================== 8 · PRODUCTION GRID ===================== -->
+<h2 id="s8"><span class="num">8</span>Production best-of-64 emotion grid <span style="font-size:12px;color:var(--good)">● published</span></h2>
+<p class="meta">published grid: production_best50.html · corpus: laion/moss-local-voice-acting-64x100-part1..4</p>
+<p class="sub"><b>What it is.</b> The flagship production run: <b>40 emotions × 100 prompts × 64 takes = 256k clips</b>,
+generated with this 4.55B model, raw native 48 kHz, no post-processing. Every take scored with Parakeet WER,
+VoiceCLAP blend/genuineness/prompt-sim, and the Empathic-Insight-Plus 40-emotion + arousal/valence heads.
+Ranked by the equal-weight reward <b>invWER × (norm&nbsp;target-emotion + norm&nbsp;blend + norm&nbsp;genuineness)</b>,
+min-max normalised over all 73,404 takes scored. The published page shows the top-3 takes of the 2 best groups per emotion.</p>
+<div class="kpis">
+ <div class="kpi"><b>256k</b><span>clips (40×100×64)</span></div>
+ <div class="kpi"><b>0.97</b><span>invWER (vs 0.83 for 8B)</span></div>
+ <div class="kpi"><b>~9–11 h</b><span>wall on 8×A100 (raw, measured)</span></div>
+</div>
+<p class="note">Example top take (Affection): reward 1.746, emotion 3.16, blend 6.18, genu 2.08, <b>invWER 1.00</b>,
+arousal 1.41. On identical prompts this 4.55B model reaches <b>invWER 0.97</b> vs the 8B sibling's 0.83, at higher
+bandwidth (48 kHz raw) and smaller/faster — the basis for preferring it in side-by-side listening.</p>
+<div class="links">
+ <a class="btn live" href="https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/production_best50.html" target="_blank" rel="noopener">Open the live best-of-64 grid</a>
+ <a class="btn" href="https://huggingface.co/datasets/laion/moss-local-voice-acting-64x100-part1" target="_blank" rel="noopener">Corpus (part 1–4)</a>
+</div>
+
+<!-- ===================== 9 · SUPPORT ===================== -->
+<h2 id="s9"><span class="num">+</span>Supporting studies: fast inference &amp; VoiceCLAP pilot</h2>
+<div class="grid2">
+<div class="card">
+<h3>Fast batched inference <span style="color:var(--good)">● published</span></h3>
+<p class="sub">All measured on A100-80GB. <b>Batch size is the lever, not flash-attn.</b> bs=64 → 0.87 s/clip,
+bs=128 → 0.83 s (bs=64 is the sweet-spot for best-of-64 groups: batch==group → zero padding waste). <b>SDPA + bf16
+only</b> — flash-attn 2.x has a broken reshape path in this checkpoint's remote-code attention. Batched bf16 ASR
+(Parakeet, batch 32) = <b>134× faster</b> than naive — the single biggest pipeline win. Fused generate→score
+worker sustains <b>~1.1 s/clip/GPU</b> end-to-end.</p>
+<a class="btn live" href="https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/fast_inference_insights.html" target="_blank" rel="noopener">Open the live write-up</a>
+</div>
+<div class="card">
+<h3>VoiceCLAP zero-shot pilot (/tmp/vclap_pilot)</h3>
+<p class="sub">Can VoiceCLAP do zero-shot VoiceNet-taxonomy scoring? 1,000 emolia clips, large-v2 (3584-d) vs
+commercial (768-d). <b>Short discriminative anchors ≫ long rubric paragraphs.</b> Works for high-level affective
+axes: Gender ρ −0.79, Arousal +0.57, Valence +0.52, Rec-Quality +0.50, Age +0.48 (large mean |ρ| 0.40 on
+emo-mapped dims); near-chance (|ρ|≈0.05) on fine-grained style dims. This is why the eval harnesses use VoiceCLAP
+only as a coarse signal and anchor rewards on Parakeet-WER.</p>
+</div>
+</div>
+<p class="note">Also probed: <b>/tmp/moss_grid</b> + <b>/tmp/moss_grid_qc</b> — a checkpoint QC grid (V1 / V2 /
+LoRA-100k / LoRA-1M, 7 fantasy scenarios ± reference, best-of-3). The intelligibility-only <code>vc-intel</code>
+metric could not separate the checkpoints (all ≈ +0.013…+0.017), so no expressive winner was declared by that
+metric; one QC signal is that the 1M-LoRA under-generates on short fantasy lines. The 4-model expressive
+comparison was resolved by the Gemini-judged /tmp/vbexp grid and the FAIR eval instead.</p>
+
+<div class="foot">
+Built from artifacts under <code>/tmp/{vbtemp,vbexp,vbexp2,vbrerank,vbblend,vbmlp,vbscale,vbablate,vcblend_pkg,fair3,va_eval,va_eval2,moss_grid,vclap_pilot,vbchar,vbclone,vcstudy,vb_filter,moss_train}</code>
+and the published <code>LAION-AI/laion-moss-local-1.5-voice-acting-4.55b</code> repo (README · SYNTHETIC_DATA_RECIPE.md · docs/).
+Numbers are pulled from each study's <code>*.json</code> / <code>*.log</code> / built HTML. Scope: the <b>4.55B local-transformer</b> model only — the 8B "delay" sibling is excluded.
+</div>
+
+</div>
+</body>
+</html>

@@ -12,6 +12,10 @@ in **English and German**, at **native 48 kHz**.
 🎧 **Hear it:** [production best-of-64 grid](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/production_best50.html)
 — top-3 takes per group across 40 emotions with full quality scores, generated with this model.
 
+
+📚 **Read it:** [full experiment overview](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/overview.html)
+— every temperature/scaling, best-of-N, reward-variant (V1–V6), VoiceCLAP-small blend-scorer, FAIR-eval, character/emotion and voice-cloning study we ran with this model, with results and links to the live grids.
+
 Everything in this repository is **Apache-2.0** (code) / **CC-BY-4.0** (docs & sample pages).
 
 ---
