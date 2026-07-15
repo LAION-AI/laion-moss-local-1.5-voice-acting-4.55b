@@ -24,6 +24,9 @@ original recording. Full 2,953-group dataset: [`laion/moss-local-dramabox-full-r
 🚀 **Serving on SGLang (A100) — setup, traps & speed:** [for-dummies guide](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/sglang.html)
 — exact `sgl-omni` install + serve command, the full `/v1/audio/speech` API (reference-less / voice-clone / streaming), every startup trap with its fix, and a measured tuning chapter: **~0.74 s TTFA**, **~4.5× single-stream**, and **~35× realtime (≈35 audio-hours per A100-hour) at concurrency 96** for offline dataset generation.
 
+🎭 **Character archetype prompt study:** [evolving director instructions (no reference audio)](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/archetypes.html)
+— an evolutionary search for the natural-language *performance instruction* that best embodies each of **10 character/style archetypes** (zombie, orc, fairy, mouse, dragon, goblin, ASMR man/woman, ranting, pain-scream), scored by a VoiceNet 57-dim reward (blend + genuineness + 1.5·character). ~60 listenable takes with per-clip voice profiles, the full reward method, and a consolidated **lessons playbook** (describe acoustics not labels, balance beats char-maxing, one director-burst max, escalation phrasing).
+
 Everything in this repository is **Apache-2.0** (code) / **CC-BY-4.0** (docs & sample pages).
 
 ---
