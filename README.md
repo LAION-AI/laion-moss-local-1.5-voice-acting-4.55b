@@ -14,7 +14,7 @@ in **English and German**, at **native 48 kHz**.
 
 🎭 **Reinterpretations:** [original vs top-3 side-by-side](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/dramabox_reinterpretations_preview.html)
 — 30 full DramaBox performances, each voice-cloned and re-performed 64×; the 3 best takes (ranked by
-blend + genuineness + 42-dim Empathic-Insight emotion-profile similarity to the original) next to the
+(blend + genuineness + 1.25× 42-dim Empathic-Insight emotion-profile similarity) × invWER) next to the
 original recording. Full 2,953-group dataset: [`laion/moss-local-dramabox-full-reinterpretations-64`](https://huggingface.co/datasets/laion/moss-local-dramabox-full-reinterpretations-64).
 
 
