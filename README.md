@@ -12,6 +12,11 @@ in **English and German**, at **native 48 kHz**.
 🎧 **Hear it:** [production best-of-64 grid](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/production_best50.html)
 — top-3 takes per group across 40 emotions with full quality scores, generated with this model.
 
+🎭 **Reinterpretations:** [original vs top-3 side-by-side](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/dramabox_reinterpretations_preview.html)
+— 30 full DramaBox performances, each voice-cloned and re-performed 64×; the 3 best takes (ranked by
+blend + genuineness + 42-dim Empathic-Insight emotion-profile similarity to the original) next to the
+original recording. Full 2,953-group dataset: [`laion/moss-local-dramabox-full-reinterpretations-64`](https://huggingface.co/datasets/laion/moss-local-dramabox-full-reinterpretations-64).
+
 
 📚 **Read it:** [full experiment overview](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/overview.html)
 — every temperature/scaling, best-of-N, reward-variant (V1–V6), VoiceCLAP-small blend-scorer, FAIR-eval, character/emotion and voice-cloning study we ran with this model, with results and links to the live grids.
