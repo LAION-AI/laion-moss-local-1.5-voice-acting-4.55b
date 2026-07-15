@@ -27,6 +27,9 @@ original recording. Full 2,953-group dataset: [`laion/moss-local-dramabox-full-r
 🎭 **Character archetype prompt study:** [evolving director instructions (no reference audio)](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/archetypes.html)
 — an evolutionary search for the natural-language *performance instruction* that best embodies each of **10 character/style archetypes** (zombie, orc, fairy, mouse, dragon, goblin, ASMR man/woman, ranting, pain-scream), scored by a VoiceNet 57-dim reward (blend + genuineness + 1.5·character). ~60 listenable takes with per-clip voice profiles, the full reward method, and a consolidated **lessons playbook** (describe acoustics not labels, balance beats char-maxing, one director-burst max, escalation phrasing).
 
+🎭🔥 **Round 2 — emotion-aware reward:** [directing character voices *with emotion*](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/archetypes_round2.html)
+— the same 10 archetypes re-optimized with an **EmoNet** (Empathic-Insight-Voice-Plus) emotion score added to the reward (`0.5·blend + 0.5·genu + 2.0·char_vn + 1.5·char_emo`; blend/genu halved, character pushed harder, prompts more extreme). Shows the **round-1 → round-2** jump per archetype (e.g. the **ranting** fix: char 0.65 → 0.90 with words that still land; **goblin** gains Amusement 3.5 / Malice 2.1; **zombie** gains Helplessness/Fatigue/Pain) and a new emotion-layer lessons playbook.
+
 Everything in this repository is **Apache-2.0** (code) / **CC-BY-4.0** (docs & sample pages).
 
 ---
