@@ -30,6 +30,11 @@ original recording. Full 2,953-group dataset: [`laion/moss-local-dramabox-full-r
 🎭🔥 **Round 2 — emotion-aware reward:** [directing character voices *with emotion*](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/archetypes_round2.html)
 — the same 10 archetypes re-optimized with an **EmoNet** (Empathic-Insight-Voice-Plus) emotion score added to the reward (`0.5·blend + 0.5·genu + 2.0·char_vn + 1.5·char_emo`; blend/genu halved, character pushed harder, prompts more extreme). Shows the **round-1 → round-2** jump per archetype (e.g. the **ranting** fix: char 0.65 → 0.90 with words that still land; **goblin** gains Amusement 3.5 / Malice 2.1; **zombie** gains Helplessness/Fatigue/Pain) and a new emotion-layer lessons playbook.
 
+🎭🎚️ **Round 3 — resonance · pitch · dominance:** [directing character voices with *body*](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/archetypes_round3.html)
+— the same 10 archetypes re-optimized once more, now exploiting three further families of VoiceNet dimensions: **resonance** (chest/throat/nasal/head), **pitch & register** (how high/low, how wide the pitch swings) and **dominance** (commanding vs meek). Prompts learn to name a *hollow chest groan*, *violent pitch swings*, *low flat menace* or *meek and powerless*. Shows the **round-1 → 2 → 3** char progression, the newly-rewarded dim values per take, and a resonance/pitch/dominance lessons playbook (e.g. the rant's dominance framing lifts char to 0.88; zombie 0.75 → 0.81; goblin 0.66 → 0.74).
+
+📘 **Practical cheat-sheet:** [**`PROMPTING_GUIDE.md`**](PROMPTING_GUIDE.md) — a for-dummies, per-archetype guide distilling all three rounds: copy-paste champion instructions, a short recipe for each character (which acoustic + resonance + pitch + dominance + emotion words, which bursts, what to avoid), a general principles list, and a reusable template.
+
 🎬 **DramaBox best-of-4 TTS benchmark:** [vanilla two-scene `CUT TO:` benchmark](https://projects.laion.ai/Voice-Acting-Pipeline/dramabox.html)
 — 4 reward-ranked seed variants per two-scene `CUT TO:` prompt with listenable takes, the best-of-k quality/compute trade-off, measured timing, and the full k=1..32 seed-scaling walltime table. *(Now lives in the [Voice-Acting-Pipeline](https://github.com/LAION-AI/Voice-Acting-Pipeline) repo.)*
 
