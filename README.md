@@ -161,7 +161,7 @@ this repo's model targets *quality-first batch and near-real-time* use.
 
 40 emotions × 100 prompts × 64 takes (256k clips) generated with this model, scored with
 Parakeet WER, VoiceCLAP blend/genuineness and Empathic-Insight-Plus emotion heads:
-[`laion/moss-local-voice-acting-64x100-part1..4`](https://huggingface.co/datasets/laion/moss-local-voice-acting-64x100-part1)
+[`laion/moss-local-voice-acting-64x100`](https://huggingface.co/datasets/laion/moss-local-voice-acting-64x100)
 — browse the best takes in the [audio grid](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/production_best50.html).
 
 ## Links

@@ -209,7 +209,7 @@ Storage: FLAC 48 kHz ≈ 0.8 MB / 15 s → 128k clips ≈ 105 GB. Tar per bucket
    upload-and-delete to bound disk.
 6. **Sanity gates before a long run**: (a) one-group smoke end-to-end, (b) ASR hypothesis on 4 takes
    (WER≈0 on an easy prompt proves the codec pairing is right), (c) confirm SDPA is active.
-7. **Example output corpus / reference**: [`laion/moss-local-voice-acting-64x100-part1..4`](https://huggingface.co/datasets/laion/moss-local-voice-acting-64x100-part1)
+7. **Example output corpus / reference**: [`laion/moss-local-voice-acting-64x100`](https://huggingface.co/datasets/laion/moss-local-voice-acting-64x100)
    (raw 48 kHz FLAC + per-take scores + prompt metadata per emotion tar).
 
 ## 10 · Reference implementation
@@ -219,5 +219,5 @@ uploader with per-bucket tar-and-delete, and rank/export with all four rewards �
 `bulk_pipeline/` and the production scripts described in the study pages at
 <https://projects.laion.ai/moss-8b-voice-acting/> (fast-inference write-up:
 [fast_inference_insights.html](https://projects.laion.ai/moss-8b-voice-acting/fast_inference_insights.html)).
-Example output corpus: [`laion/moss-local-voice-acting-64x100-part1..4`](https://huggingface.co/datasets/laion/moss-local-voice-acting-64x100-part1)
+Example output corpus: [`laion/moss-local-voice-acting-64x100`](https://huggingface.co/datasets/laion/moss-local-voice-acting-64x100)
 (40 emotions × 100 groups × 64 Sidon-restored takes with full scores).
