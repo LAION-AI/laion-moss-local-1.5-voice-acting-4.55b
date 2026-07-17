@@ -1,0 +1,682 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>13 Character Voices, Directed by Prompt — LAION MOSS-TTS-Local 4.55B</title>
+<meta name="description" content="The definitive showcase of a 5-round evolutionary prompt study that makes the 4.55B MOSS-TTS-Local model perform 13 distinct character voices from natural-language director instructions alone — no reference audio.">
+<style>
+:root{
+  --bg:#0b0d12; --bg2:#11141c; --card:#161a24; --card2:#1b2130; --line:#252c3b;
+  --ink:#e8ecf5; --mut:#98a2b8; --dim:#6b7590; --acc:#8b7cf0; --acc2:#5fd0c4;
+  --good:#57c98a; --warn:#f0b46a; --hot:#f07a76; --chip:#20263400;
+  --mon:#8b7cf0; --int:#f08a5d; --asmr:#5aa9f0; --grief:#7d8bd6;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(1200px 700px at 50% -200px,#1a1f2e 0,var(--bg) 60%) fixed;
+  color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
+a{color:var(--acc2);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+h1,h2,h3{line-height:1.2;margin:0}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+/* header */
+header{padding:70px 0 30px;text-align:center;border-bottom:1px solid var(--line)}
+.kick{letter-spacing:.28em;text-transform:uppercase;color:var(--acc2);font-size:12px;font-weight:700}
+h1{font-size:clamp(30px,5vw,52px);font-weight:800;margin:14px 0 6px;
+  background:linear-gradient(120deg,#fff 10%,#b9aef7 55%,#5fd0c4 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--mut);font-size:clamp(15px,2vw,19px);max-width:760px;margin:10px auto 0}
+.pills{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:24px 0 4px}
+.pill{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:13px;color:var(--mut)}
+.pill b{color:var(--ink)}
+nav{position:sticky;top:0;z-index:20;background:rgba(11,13,18,.82);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);margin-top:24px}
+nav .wrap{display:flex;gap:6px;flex-wrap:wrap;padding:10px 22px}
+nav a{color:var(--mut);font-size:13.5px;font-weight:600;padding:6px 11px;border-radius:8px}
+nav a:hover{background:var(--card);color:var(--ink);text-decoration:none}
+section{padding:52px 0;border-bottom:1px solid var(--line)}
+.h2{font-size:clamp(22px,3.4vw,34px);font-weight:800;margin-bottom:6px}
+.lead{color:var(--mut);max-width:820px;margin:8px 0 26px;font-size:16.5px}
+.eyebrow{color:var(--acc);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12px}
+/* intro cards */
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.box h3{font-size:17px;margin-bottom:8px}.box p{color:var(--mut);font-size:14.5px;margin:0}
+.box .n{font-size:12px;font-weight:800;color:var(--acc2);letter-spacing:.1em}
+/* reward formula */
+.formula{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-top:20px}
+.formula .eq{font-size:clamp(15px,2.2vw,20px);text-align:center;padding:12px 0;color:var(--ink)}
+.formula .eq b{color:var(--acc)}
+.termgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-top:16px}
+.term{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.term .t{font-weight:700;color:var(--acc2);font-size:13.5px}.term .d{color:var(--mut);font-size:13px;margin-top:3px}
+/* champ table */
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:9px 11px;text-align:left;border-bottom:1px solid var(--line)}
+th{color:var(--dim);font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;position:sticky}
+tbody tr:hover{background:var(--card)}
+td.num{font-variant-numeric:tabular-nums;font-family:ui-monospace,monospace}
+.bar{display:inline-block;height:7px;border-radius:4px;background:linear-gradient(90deg,var(--acc),var(--acc2));vertical-align:middle}
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
+.emochip{background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:2px 9px;font-size:12px;color:var(--warn);white-space:nowrap}
+/* group header */
+.grouphead{display:flex;align-items:baseline;gap:14px;margin:38px 0 18px}
+.grouphead .gt{font-size:22px;font-weight:800}.grouphead .gd{color:var(--mut);font-size:14px}
+.grouphead .bar4{width:44px;height:4px;border-radius:3px}
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(500px,1fr));gap:20px}
+@media(max-width:1060px){.cards{grid-template-columns:1fr}}
+.vcard{background:linear-gradient(180deg,var(--card),var(--bg2));border:1px solid var(--line);
+  border-radius:18px;padding:22px;position:relative;overflow:hidden}
+.vcard::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--acc)}
+.vcard.mon::before{background:linear-gradient(90deg,var(--mon),#5fd0c4)}
+.vcard.int::before{background:linear-gradient(90deg,var(--int),#f0b46a)}
+.vcard.asmr::before{background:linear-gradient(90deg,var(--asmr),#5fd0c4)}
+.vcard.grief::before{background:linear-gradient(90deg,var(--grief),#a0a8d8)}
+.chead{display:flex;align-items:center;gap:13px;margin-bottom:4px}
+.emoji{font-size:34px;line-height:1}
+.cname{font-size:22px;font-weight:800}
+.ccid{color:var(--dim);font-size:12px;font-family:ui-monospace,monospace}
+.players{margin:16px 0}
+.player{margin-bottom:12px}
+.player .plab{font-size:12px;color:var(--mut);margin-bottom:5px;display:flex;justify-content:space-between}
+.player .plab b{color:var(--acc2)}
+audio{width:100%;height:38px;border-radius:9px;filter:saturate(.9)}
+.cap{font-style:italic;color:var(--mut);font-size:13.5px;margin:2px 0 0;padding-left:12px;border-left:2px solid var(--line)}
+.scorerow{display:flex;flex-wrap:wrap;gap:7px;margin:15px 0}
+.sc{background:var(--card2);border:1px solid var(--line);border-radius:9px;padding:6px 10px;min-width:64px}
+.sc .k{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em}
+.sc .v{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
+.sc.hi .v{color:var(--good)}
+.block{margin-top:14px}
+.blab{font-size:11px;color:var(--acc);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:7px}
+.instr{background:#0d1017;border:1px solid var(--line);border-radius:11px;padding:13px 14px;font-size:13.5px;
+  color:#cdd6ea;position:relative;line-height:1.55}
+.spoken{background:#0d1017;border:1px dashed var(--line);border-radius:11px;padding:11px 13px;font-size:14px;color:#dfe6f4;font-style:italic}
+.copy{position:absolute;top:9px;right:9px;background:var(--card2);border:1px solid var(--line);color:var(--mut);
+  border-radius:7px;padding:3px 9px;font-size:11px;cursor:pointer}
+.copy:hover{color:var(--ink);border-color:var(--acc)}
+.dims{display:flex;flex-wrap:wrap;gap:6px}
+.dimchip{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:4px 9px;font-size:12px;display:flex;gap:7px;align-items:center}
+.dimchip .dn{color:var(--mut)}.dimchip .dv{font-weight:800;color:var(--acc2);font-variant-numeric:tabular-nums}
+.emos{display:flex;flex-wrap:wrap;gap:6px}
+.emochip2{background:rgba(240,180,106,.09);border:1px solid rgba(240,180,106,.3);border-radius:8px;padding:4px 9px;font-size:12px}
+.emochip2 b{color:var(--warn)}
+/* playbook */
+.principle{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:16px 18px;margin-bottom:12px}
+.principle h4{font-size:16px;margin:0 0 5px;display:flex;gap:10px;align-items:baseline}
+.principle h4 .num{color:var(--acc);font-weight:900;font-size:14px}
+.principle p{margin:0;color:var(--mut);font-size:14.5px}
+.principle .tag{font-size:11px;color:var(--acc2);border:1px solid var(--line);border-radius:6px;padding:1px 7px;margin-left:auto;font-weight:700}
+.tmpl{background:#0d1017;border:1px solid var(--line);border-radius:12px;padding:18px;white-space:pre-wrap;
+  font-family:ui-monospace,monospace;font-size:13px;color:#cdd6ea;line-height:1.7}
+.tmpl .ph{color:var(--acc)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}@media(max-width:820px){.two{grid-template-columns:1fr}}
+/* arc */
+.arccell{font-variant-numeric:tabular-nums;font-family:ui-monospace,monospace}
+.up{color:var(--good)}.flat{color:var(--dim)}
+footer{padding:56px 0 80px;text-align:center;color:var(--dim)}
+.foot-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:20px 0 30px}
+.fstat .fn{font-size:28px;font-weight:900;background:linear-gradient(120deg,#b9aef7,#5fd0c4);-webkit-background-clip:text;background-clip:text;color:transparent}
+.fstat .fl{font-size:12.5px;color:var(--mut);margin-top:2px}
+.note{color:var(--dim);font-size:13px}
+.tablearc td:first-child{font-weight:700}
+</style></head><body>
+
+<header><div class="wrap">
+  <div class="kick">LAION · MOSS-TTS-Local Voice Acting · 4.55B</div>
+  <h1>13 Character Voices,<br>Directed by Prompt</h1>
+  <p class="sub">An evolutionary search for the natural-language <b>performance instruction</b> that best makes a 4.55-billion-parameter text-to-speech model <em>become</em> a character — <b>zero-shot, no reference audio</b> — refined across <b>five rounds</b> and scored by a VoiceNet + EmoNet reward.</p>
+  <div class="pills">
+    <span class="pill"><b>13</b> characters</span>
+    <span class="pill"><b>5</b> evolutionary rounds</span>
+    <span class="pill"><b>best-of-64</b> final pick</span>
+    <span class="pill"><b>0</b> reference clips</span>
+    <span class="pill"><b>57</b>-dim VoiceNet reward</span>
+  </div>
+</div></header>
+
+<nav><div class="wrap">
+  <a href="#intro">How it works</a>
+  <a href="#reward">The reward</a>
+  <a href="#board">Champions</a>
+  <a href="#voices">The 13 voices</a>
+  <a href="#playbook">Prompting playbook</a>
+  <a href="#arc">Improvement arc</a>
+  <a href="#method">Compute &amp; method</a>
+</div></nav>
+
+<section id="intro"><div class="wrap">
+  <div class="eyebrow">What this is</div>
+  <h2 class="h2">Directing a voice with words, not a recording</h2>
+  <p class="lead">Most voice cloning needs a <em>reference recording</em> of the target voice. This study does the opposite: it writes a <b>director's instruction</b> in plain English — the way you'd brief a voice actor — and the model performs it from scratch. The challenge is finding the <em>exact wording</em> that lands each character. We searched for it automatically, one evolutionary round at a time.</p>
+  <div class="grid3">
+    <div class="box"><div class="n">01 · BEST-OF-N</div><h3>Generate many, keep the best</h3><p>For every prompt the model generates many takes (N=8 while searching, <b>N=64</b> for the final pick). The single best take is far better than the average — randomness is a feature you harvest.</p></div>
+    <div class="box"><div class="n">02 · EVOLUTION</div><h3>Mutate the winning wording</h3><p>Each round starts from the previous champion, spawns ~10 mutated prompts per generation, scores them, and breeds the winners forward — an evolutionary search over <em>language</em>, not model weights.</p></div>
+    <div class="box"><div class="n">03 · SCORE</div><h3>An automatic panel of judges</h3><p>Every take is scored by <b>VoiceNet</b> (57 acoustic dimensions) and <b>Empathic-Insight EmoNet</b> (emotion intensities), plus naturalness, vocal-burst blend and word-error rate. That number drives the search.</p></div>
+  </div>
+</div></section>
+
+<section id="reward"><div class="wrap">
+  <div class="eyebrow">The reward, in plain language</div>
+  <h2 class="h2">How a take earns its score</h2>
+  <p class="lead">Every best-of-N call is scored, then min-max normalized <em>within that call</em> (so takes only compete against their own siblings). The reward blends four signals, then multiplies by a word-error-rate factor so unintelligible takes can't win.</p>
+  <div class="formula">
+    <div class="eq">reward = <b>w<sub>blend</sub></b>·norm(blend) + <b>w<sub>genu</sub></b>·norm(genu) + <b>w<sub>vn</sub></b>·char<sub>vn</sub> + <b>w<sub>emo</sub></b>·char<sub>emo</sub> &nbsp; × &nbsp; WER factor</div>
+    <div class="termgrid">
+      <div class="term"><div class="t">char<sub>vn</sub></div><div class="d">Weighted mean of the character's key VoiceNet dimensions — resonance, pitch, dominance, timbre.</div></div>
+      <div class="term"><div class="t">char<sub>emo</sub></div><div class="d">Weighted mean of the character's target Empathic-Insight EmoNet emotion scores.</div></div>
+      <div class="term"><div class="t">blend</div><div class="d">How naturally vocal bursts (gasps, sobs, growls) fuse into speech — a VoiceCLAP head.</div></div>
+      <div class="term"><div class="t">genu</div><div class="d">Genuineness — does the performance sound real rather than read?</div></div>
+      <div class="term"><div class="t">WER factor</div><div class="d">A gate on transcription accuracy: garbled words scale the whole reward down.</div></div>
+      <div class="term"><div class="t">per-signal weights</div><div class="d">Round 5 tunes <span class="mono">vn_w</span> (per-dimension), <span class="mono">emo_w</span> (per-emotion) and per-character blend/genu weights so the search chases what defines each voice.</div></div>
+    </div>
+  </div>
+</div></section>
+
+<section id="board"><div class="wrap">
+  <div class="eyebrow">The final champions</div>
+  <h2 class="h2">13 voices, best-of-64 scoreboard</h2>
+  <p class="lead">The round-5 champion take for each character — its in-character acoustic score (<b>char</b>), its emotion score (<b>char_emo</b>), and the single strongest emotion the EmoNet panel detected.</p>
+  <div class="tblwrap"><table>
+      <thead><tr><th>Character</th><th>char</th><th>char_emo</th><th>Top firing emotion</th>
+      <th>reward</th><th>blend</th><th>genu</th><th>invWER</th></tr></thead>
+      <tbody><tr>
+          <td>🧟 <b>Zombie</b></td>
+          <td class="num">0.80 <span class="bar" style="width:43px"></span></td>
+          <td class="num">0.55</td>
+          <td><span class="emochip">Helplessness · 3.16</span></td>
+          <td class="num">3.05</td>
+          <td class="num">7.21</td>
+          <td class="num">1.73</td>
+          <td class="num">0.89</td>
+        </tr><tr>
+          <td>👹 <b>Ork</b></td>
+          <td class="num">0.67 <span class="bar" style="width:36px"></span></td>
+          <td class="num">0.93</td>
+          <td><span class="emochip">Malevolence/Malice · 2.40</span></td>
+          <td class="num">3.08</td>
+          <td class="num">2.72</td>
+          <td class="num">0.97</td>
+          <td class="num">1.00</td>
+        </tr><tr>
+          <td>👺 <b>Goblin</b></td>
+          <td class="num">0.56 <span class="bar" style="width:30px"></span></td>
+          <td class="num">0.57</td>
+          <td><span class="emochip">Malevolence/Malice · 1.45</span></td>
+          <td class="num">2.45</td>
+          <td class="num">3.25</td>
+          <td class="num">1.89</td>
+          <td class="num">0.85</td>
+        </tr><tr>
+          <td>🐉 <b>Dragon</b></td>
+          <td class="num">0.72 <span class="bar" style="width:39px"></span></td>
+          <td class="num">0.88</td>
+          <td><span class="emochip">Anger · 3.71</span></td>
+          <td class="num">3.21</td>
+          <td class="num">5.25</td>
+          <td class="num">0.81</td>
+          <td class="num">1.00</td>
+        </tr><tr>
+          <td>👻 <b>Evil Ghost</b></td>
+          <td class="num">0.68 <span class="bar" style="width:36px"></span></td>
+          <td class="num">0.75</td>
+          <td><span class="emochip">Malevolence/Malice · 2.01</span></td>
+          <td class="num">3.93</td>
+          <td class="num">6.81</td>
+          <td class="num">1.31</td>
+          <td class="num">1.00</td>
+        </tr><tr>
+          <td>🐭 <b>Cartoon Mouse</b></td>
+          <td class="num">0.81 <span class="bar" style="width:43px"></span></td>
+          <td class="num">0.89</td>
+          <td><span class="emochip">Interest · 3.17</span></td>
+          <td class="num">3.40</td>
+          <td class="num">2.66</td>
+          <td class="num">1.38</td>
+          <td class="num">1.00</td>
+        </tr><tr>
+          <td>🧚 <b>Fairy</b></td>
+          <td class="num">0.72 <span class="bar" style="width:39px"></span></td>
+          <td class="num">0.89</td>
+          <td><span class="emochip">Affection · 3.30</span></td>
+          <td class="num">3.23</td>
+          <td class="num">3.90</td>
+          <td class="num">1.01</td>
+          <td class="num">1.00</td>
+        </tr><tr>
+          <td>🗯️ <b>Ranting Fury</b></td>
+          <td class="num">0.93 <span class="bar" style="width:49px"></span></td>
+          <td class="num">0.85</td>
+          <td><span class="emochip">Anger · 5.11</span></td>
+          <td class="num">5.07</td>
+          <td class="num">0.66</td>
+          <td class="num">1.06</td>
+          <td class="num">1.00</td>
+        </tr><tr>
+          <td>😱 <b>Pain Scream</b></td>
+          <td class="num">0.69 <span class="bar" style="width:37px"></span></td>
+          <td class="num">0.92</td>
+          <td><span class="emochip">Distress · 4.07</span></td>
+          <td class="num">4.13</td>
+          <td class="num">1.23</td>
+          <td class="num">1.55</td>
+          <td class="num">0.67</td>
+        </tr><tr>
+          <td>🌙 <b>ASMR Man</b></td>
+          <td class="num">0.62 <span class="bar" style="width:33px"></span></td>
+          <td class="num">0.88</td>
+          <td><span class="emochip">Contentment · 3.26</span></td>
+          <td class="num">3.31</td>
+          <td class="num">6.94</td>
+          <td class="num">1.13</td>
+          <td class="num">1.00</td>
+        </tr><tr>
+          <td>🌙 <b>ASMR Woman</b></td>
+          <td class="num">0.82 <span class="bar" style="width:44px"></span></td>
+          <td class="num">0.56</td>
+          <td><span class="emochip">Affection · 4.05</span></td>
+          <td class="num">2.98</td>
+          <td class="num">8.73</td>
+          <td class="num">1.27</td>
+          <td class="num">0.92</td>
+        </tr><tr>
+          <td>😢 <b>Grieving Woman</b></td>
+          <td class="num">0.67 <span class="bar" style="width:36px"></span></td>
+          <td class="num">0.96</td>
+          <td><span class="emochip">Distress · 4.80</span></td>
+          <td class="num">4.41</td>
+          <td class="num">7.42</td>
+          <td class="num">2.12</td>
+          <td class="num">0.94</td>
+        </tr><tr>
+          <td>😔 <b>Grieving Man</b></td>
+          <td class="num">0.73 <span class="bar" style="width:39px"></span></td>
+          <td class="num">0.99</td>
+          <td><span class="emochip">Sadness · 4.53</span></td>
+          <td class="num">4.69</td>
+          <td class="num">6.30</td>
+          <td class="num">2.28</td>
+          <td class="num">1.00</td>
+        </tr></tbody></table></div>
+</div></section>
+
+<section id="voices"><div class="wrap">
+  <div class="eyebrow">The showcase</div>
+  <h2 class="h2">Meet the 13 voices</h2>
+  <p class="lead">Each card carries the best-of-64 champion audio, the <b>exact prompt to reuse</b>, its scores, the signature VoiceNet dimensions and firing emotions, and a fresh procedural caption generated by running all 57 VoiceNet heads on the shown clip. Press play.</p>
+  <div class="grouphead"><div class="bar4" style="background:linear-gradient(90deg,var(--mon),#5fd0c4)"></div>
+          <div class="gt">Monsters &amp; Creatures</div><div class="gd">The fantastical bestiary — timbres built from resonance, register and dominance.</div></div><div class="cards"><div class="vcard mon" id="c-zombie">
+      <div class="chead"><div class="emoji">🧟</div>
+        <div><div class="cname">Zombie</div>
+        <div class="ccid">champion prompt · <span class="mono">z_helpless</span></div></div></div>
+      <div class="players"><div class="player">
+      <div class="plab"><span>Champion take — best of 64 &nbsp;·&nbsp; reward <b>3.05</b> &nbsp; 7.8s</span><span class="mono">seed 24</span></div>
+      <audio controls preload="none" src="voices_audio/zombie_1.mp3"></audio>
+      <div class="cap">Extremely denasal and clear. Extremely unpleasant and harsh. Extremely dark and muffled. Extremely raw and vulnerable. Extremely soft and gentle in onset.</div>
+    </div><div class="player">
+      <div class="plab"><span>Runner-up take &nbsp;·&nbsp; reward <b>2.81</b> &nbsp; 11.8s</span><span class="mono">seed 7</span></div>
+      <audio controls preload="none" src="voices_audio/zombie_2.mp3"></audio>
+      <div class="cap">Extremely denasal and clear. Extremely blurry and mumbled. Extremely raw and vulnerable. Extremely unpleasant and harsh. Extremely one-dimensional in resonance.</div>
+    </div></div>
+      <div class="scorerow"><div class="sc hi"><div class="k">reward</div><div class="v">3.05</div></div><div class="sc"><div class="k">char</div><div class="v">0.80</div></div><div class="sc"><div class="k">char_emo</div><div class="v">0.55</div></div><div class="sc"><div class="k">blend</div><div class="v">7.21</div></div><div class="sc"><div class="k">genu</div><div class="v">1.73</div></div><div class="sc"><div class="k">invWER</div><div class="v">0.89</div></div></div>
+      <div class="block"><div class="blab">Signature VoiceNet dimensions (champion take)</div><div class="dims"><div class="dimchip"><span class="dn">Vulnerability</span><span class="dv">4.47</span></div><div class="dimchip"><span class="dn">Cognitive Load</span><span class="dv">4.32</span></div><div class="dimchip"><span class="dn">Disfluency</span><span class="dv">3.78</span></div><div class="dimchip"><span class="dn">Roughness</span><span class="dv">3.64</span></div><div class="dimchip"><span class="dn">Chest Resonance</span><span class="dv">2.30</span></div><div class="dimchip"><span class="dn">Throat Resonance</span><span class="dv">1.08</span></div></div></div>
+      <div class="block"><div class="blab">Firing emotions (Empathic-Insight EmoNet)</div><div class="emos"><div class="emochip2">Helplessness <b>3.16</b></div><div class="emochip2">Intoxication/Altered States <b>2.05</b></div><div class="emochip2">Fatigue/Exhaustion <b>2.02</b></div><div class="emochip2">Pain <b>0.70</b></div><div class="emochip2">Emotional Numbness <b>-0.00</b></div></div></div>
+      <div class="block"><div class="blab">The exact champion instruction — copy &amp; reuse</div>
+        <div class="instr"><button class="copy" onclick="cp(this)">copy</button><span class="itext">A pitiful half-dead zombie, utterly helpless and abandoned, whimpering and pleading, weak, trembling and vulnerable, forsaken and lost, delirious with fever and dull pain. A hollow groan from a sunken caved-in chest choking through a wet gurgling guttural throat, phlegmy rasp, decayed. Dark and dim, meek and powerless, no authority, no brightness, slurred and drained. (feeble whimper)</span></div></div>
+      <div class="block"><div class="blab">Spoken text</div><div class="spoken">So... hungry... hnngh... help me... I can&#x27;t... stop...</div></div>
+    </div><div class="vcard mon" id="c-ork">
+      <div class="chead"><div class="emoji">👹</div>
+        <div><div class="cname">Ork</div>
+        <div class="ccid">champion prompt · <span class="mono">o4_lm_immov</span></div></div></div>
+      <div class="players"><div class="player">
+      <div class="plab"><span>Champion take — best of 64 &nbsp;·&nbsp; reward <b>3.08</b> &nbsp; 7.3s</span><span class="mono">seed 25</span></div>
+      <audio controls preload="none" src="voices_audio/ork_1.mp3"></audio>
+      <div class="cap">Extremely one-dimensional in resonance. Extremely deep in throat resonance. Extremely distressed and negative. Extremely full and cinematic. Extremely guarded and armored.</div>
+    </div><div class="player">
+      <div class="plab"><span>Runner-up take &nbsp;·&nbsp; reward <b>2.67</b> &nbsp; 5.9s</span><span class="mono">seed 1</span></div>
+      <audio controls preload="none" src="voices_audio/ork_2.mp3"></audio>
+      <div class="cap">Extremely full and cinematic. Extremely rough and raspy. Extremely denasal and clear. Extremely intensely focused. Extremely distressed and negative.</div>
+    </div></div>
+      <div class="scorerow"><div class="sc hi"><div class="k">reward</div><div class="v">3.08</div></div><div class="sc"><div class="k">char</div><div class="v">0.67</div></div><div class="sc"><div class="k">char_emo</div><div class="v">0.93</div></div><div class="sc"><div class="k">blend</div><div class="v">2.72</div></div><div class="sc"><div class="k">genu</div><div class="v">0.97</div></div><div class="sc"><div class="k">invWER</div><div class="v">1.00</div></div></div>
+      <div class="block"><div class="blab">Signature VoiceNet dimensions (champion take)</div><div class="dims"><div class="dimchip"><span class="dn">Fullness</span><span class="dv">4.58</span></div><div class="dimchip"><span class="dn">Throat Resonance</span><span class="dv">4.56</span></div><div class="dimchip"><span class="dn">Chest Resonance</span><span class="dv">4.26</span></div><div class="dimchip"><span class="dn">Stance</span><span class="dv">3.73</span></div><div class="dimchip"><span class="dn">Roughness</span><span class="dv">3.54</span></div><div class="dimchip"><span class="dn">Arousal</span><span class="dv">3.41</span></div></div></div>
+      <div class="block"><div class="blab">Firing emotions (Empathic-Insight EmoNet)</div><div class="emos"><div class="emochip2">Malevolence/Malice <b>2.40</b></div><div class="emochip2">Anger <b>2.34</b></div><div class="emochip2">Contempt <b>1.89</b></div><div class="emochip2">Triumph <b>1.67</b></div></div></div>
+      <div class="block"><div class="blab">The exact champion instruction — copy &amp; reuse</div>
+        <div class="instr"><button class="copy" onclick="cp(this)">copy</button><span class="itext">An enormous brutish orc, his voice a deep chest-driven guttural bass, resonating from a massive barrel chest and gravelled throat, thick and rough, full and cavernous. Commanding, dominant and immovable, planting each word like a boot with crushing authority. Low, flat and narrow, never leaping in pitch. Boiling with hateful loathing, withering sneering contempt, cruel cold menace and dark triumph, zero brightness. Growled but every word lands. (guttural growl) High quality recording.</span></div></div>
+      <div class="block"><div class="blab">Spoken text</div><div class="spoken">You should not have come here, little one. This is where your journey ends.</div></div>
+    </div><div class="vcard mon" id="c-goblin">
+      <div class="chead"><div class="emoji">👺</div>
+        <div><div class="cname">Goblin</div>
+        <div class="ccid">champion prompt · <span class="mono">go2_evil1</span></div></div></div>
+      <div class="players"><div class="player">
+      <div class="plab"><span>Champion take — best of 64 &nbsp;·&nbsp; reward <b>2.45</b> &nbsp; 12.2s</span><span class="mono">seed 43</span></div>
+      <audio controls preload="none" src="voices_audio/goblin_1.mp3"></audio>
+      <div class="cap">Extremely raw and vulnerable. Very submissive and unassertive. Very casual and loose. Very casual and informal. Notably playful and humorous.</div>
+    </div><div class="player">
+      <div class="plab"><span>Runner-up take &nbsp;·&nbsp; reward <b>2.34</b> &nbsp; 7.3s</span><span class="mono">seed 62</span></div>
+      <audio controls preload="none" src="voices_audio/goblin_2.mp3"></audio>
+      <div class="cap">Extremely raw and vulnerable. Extremely thin in chest resonance. Extremely meek and submissive. Extremely choppy and fragmented. Extremely unpleasant and harsh.</div>
+    </div></div>
+      <div class="scorerow"><div class="sc hi"><div class="k">reward</div><div class="v">2.45</div></div><div class="sc"><div class="k">char</div><div class="v">0.56</div></div><div class="sc"><div class="k">char_emo</div><div class="v">0.57</div></div><div class="sc"><div class="k">blend</div><div class="v">3.25</div></div><div class="sc"><div class="k">genu</div><div class="v">1.89</div></div><div class="sc"><div class="k">invWER</div><div class="v">0.85</div></div></div>
+      <div class="block"><div class="blab">Signature VoiceNet dimensions (champion take)</div><div class="dims"><div class="dimchip"><span class="dn">Chest Resonance</span><span class="dv">4.35</span></div><div class="dimchip"><span class="dn">Roughness</span><span class="dv">4.16</span></div><div class="dimchip"><span class="dn">Cartoonish Style</span><span class="dv">4.13</span></div><div class="dimchip"><span class="dn">Tension</span><span class="dv">3.40</span></div><div class="dimchip"><span class="dn">Fullness</span><span class="dv">3.13</span></div><div class="dimchip"><span class="dn">Warmth</span><span class="dv">2.58</span></div></div></div>
+      <div class="block"><div class="blab">Firing emotions (Empathic-Insight EmoNet)</div><div class="emos"><div class="emochip2">Malevolence/Malice <b>1.45</b></div><div class="emochip2">Contempt <b>0.82</b></div><div class="emochip2">Teasing <b>0.79</b></div><div class="emochip2">Bitterness <b>0.01</b></div><div class="emochip2">Anger <b>0.00</b></div></div></div>
+      <div class="block"><div class="blab">The exact champion instruction — copy &amp; reuse</div>
+        <div class="instr"><button class="copy" onclick="cp(this)">copy</button><span class="itext">A truly evil, malevolent little goblin, extremely nasal, pinched and reedy, buzzing and grating high through the nose. Cold sadistic cruelty in every hissing word, wicked, vicious and remorseless, menacing and threatening, gloating over pain, pure malice to the core. The whiny pitch cracks and skitters higher and shriller with wicked glee, snickering and jeering. A weak cowardly nobody, no authority. No chest, no warmth, no fullness. Nasty but every word lands. (malicious hiss) High quality recording.</span></div></div>
+      <div class="block"><div class="blab">Spoken text</div><div class="spoken">Heh heh, what have we here? A lost little traveler with shiny pockets?</div></div>
+    </div><div class="vcard mon" id="c-dragon">
+      <div class="chead"><div class="emoji">🐉</div>
+        <div><div class="cname">Dragon</div>
+        <div class="ccid">champion prompt · <span class="mono">d_chdram</span></div></div></div>
+      <div class="players"><div class="player">
+      <div class="plab"><span>Champion take — best of 64 &nbsp;·&nbsp; reward <b>3.21</b> &nbsp; 6.6s</span><span class="mono">seed 8</span></div>
+      <audio controls preload="none" src="voices_audio/dragon_1.mp3"></audio>
+      <div class="cap">Extremely full and cinematic. Extremely deep in throat resonance. Extremely distressed and negative. Extremely rough and raspy. Extremely thin in head resonance.</div>
+    </div><div class="player">
+      <div class="plab"><span>Runner-up take &nbsp;·&nbsp; reward <b>3.18</b> &nbsp; 7.1s</span><span class="mono">seed 0</span></div>
+      <audio controls preload="none" src="voices_audio/dragon_2.mp3"></audio>
+      <div class="cap">Extremely rough and raspy. Extremely full and cinematic. Extremely deep in throat resonance. Extremely denasal and clear. Extremely thin in mask resonance.</div>
+    </div></div>
+      <div class="scorerow"><div class="sc hi"><div class="k">reward</div><div class="v">3.21</div></div><div class="sc"><div class="k">char</div><div class="v">0.72</div></div><div class="sc"><div class="k">char_emo</div><div class="v">0.88</div></div><div class="sc"><div class="k">blend</div><div class="v">5.25</div></div><div class="sc"><div class="k">genu</div><div class="v">0.81</div></div><div class="sc"><div class="k">invWER</div><div class="v">1.00</div></div></div>
+      <div class="block"><div class="blab">Signature VoiceNet dimensions (champion take)</div><div class="dims"><div class="dimchip"><span class="dn">Fullness</span><span class="dv">5.72</span></div><div class="dimchip"><span class="dn">Throat Resonance</span><span class="dv">4.64</span></div><div class="dimchip"><span class="dn">Chest Resonance</span><span class="dv">4.30</span></div><div class="dimchip"><span class="dn">Dramatic Style</span><span class="dv">4.12</span></div><div class="dimchip"><span class="dn">Voice Age</span><span class="dv">3.85</span></div><div class="dimchip"><span class="dn">Stance</span><span class="dv">3.48</span></div></div></div>
+      <div class="block"><div class="blab">Firing emotions (Empathic-Insight EmoNet)</div><div class="emos"><div class="emochip2">Anger <b>3.71</b></div><div class="emochip2">Malevolence/Malice <b>2.90</b></div><div class="emochip2">Contempt <b>2.49</b></div><div class="emochip2">Pride <b>2.46</b></div><div class="emochip2">Triumph <b>1.71</b></div></div></div>
+      <div class="block"><div class="blab">The exact champion instruction — copy &amp; reuse</div>
+        <div class="instr"><button class="copy" onclick="cp(this)">copy</button><span class="itext">A primordial, colossal dragon pronouncing a grand decree of judgement, voice an impossibly deep subterranean bass at the floor of the register, flat and unwavering, slow, grand and thunderous. Immense subharmonic chest resonance booming from a vast cavern of a chest, deep guttural throat rumble grinding beneath, seismic, dark and full, every word a dramatic proclamation. Utterly dominant and immovable, crushing ancient authority, seething with wrathful contempt and prideful triumphant scorn. No brightness, no high notes. (deep rumble) High quality recording.</span></div></div>
+      <div class="block"><div class="blab">Spoken text</div><div class="spoken">You dare enter my lair, mortal? Your bones will join the others.</div></div>
+    </div><div class="vcard mon" id="c-evil_ghost">
+      <div class="chead"><div class="emoji">👻</div>
+        <div><div class="cname">Evil Ghost</div>
+        <div class="ccid">champion prompt · <span class="mono">eg_hush</span></div></div></div>
+      <div class="players"><div class="player">
+      <div class="plab"><span>Champion take — best of 64 &nbsp;·&nbsp; reward <b>3.93</b> &nbsp; 7.1s</span><span class="mono">seed 14</span></div>
+      <audio controls preload="none" src="voices_audio/evil_ghost_1.mp3"></audio>
+      <div class="cap">Extremely rough and raspy. Extremely full and cinematic. Extremely elderly-sounding. Extremely distressed and negative. Extremely deep in throat resonance.</div>
+    </div><div class="player">
+      <div class="plab"><span>Runner-up take &nbsp;·&nbsp; reward <b>3.86</b> &nbsp; 12.3s</span><span class="mono">seed 42</span></div>
+      <audio controls preload="none" src="voices_audio/evil_ghost_2.mp3"></audio>
+      <div class="cap">Extremely denasal and clear. Extremely dark and muffled. Extremely raw and vulnerable. Extremely noisy and aperiodic. Extremely one-dimensional in resonance.</div>
+    </div></div>
+      <div class="scorerow"><div class="sc hi"><div class="k">reward</div><div class="v">3.93</div></div><div class="sc"><div class="k">char</div><div class="v">0.68</div></div><div class="sc"><div class="k">char_emo</div><div class="v">0.75</div></div><div class="sc"><div class="k">blend</div><div class="v">6.81</div></div><div class="sc"><div class="k">genu</div><div class="v">1.31</div></div><div class="sc"><div class="k">invWER</div><div class="v">1.00</div></div></div>
+      <div class="block"><div class="blab">Signature VoiceNet dimensions (champion take)</div><div class="dims"><div class="dimchip"><span class="dn">Fullness</span><span class="dv">5.56</span></div><div class="dimchip"><span class="dn">Roughness</span><span class="dv">4.98</span></div><div class="dimchip"><span class="dn">Whisper-Talk Style</span><span class="dv">4.61</span></div><div class="dimchip"><span class="dn">Warmth</span><span class="dv">4.38</span></div><div class="dimchip"><span class="dn">Respiration</span><span class="dv">3.90</span></div><div class="dimchip"><span class="dn">Tension</span><span class="dv">2.83</span></div></div></div>
+      <div class="block"><div class="blab">Firing emotions (Empathic-Insight EmoNet)</div><div class="emos"><div class="emochip2">Malevolence/Malice <b>2.01</b></div><div class="emochip2">Fear <b>1.76</b></div><div class="emochip2">Contempt <b>1.46</b></div><div class="emochip2">Bitterness <b>0.94</b></div></div></div>
+      <div class="block"><div class="blab">The exact champion instruction — copy &amp; reuse</div>
+        <div class="instr"><button class="copy" onclick="cp(this)">copy</button><span class="itext">A hushed evil ghost whispering doom, breathy and hollow, all air and no chest, a cold ethereal whisper, clean and clear, sinister and menacing. Seething with quiet malice and contempt, a dreadful whispered threat, tense and controlled. Wicked, cruel and full of dread. No warmth, no fullness, no brightness. (soft hiss) High quality recording.</span></div></div>
+      <div class="block"><div class="blab">Spoken text</div><div class="spoken">You should not have come here... this house feeds on the living.</div></div>
+    </div><div class="vcard mon" id="c-mouse">
+      <div class="chead"><div class="emoji">🐭</div>
+        <div><div class="cname">Cartoon Mouse</div>
+        <div class="ccid">champion prompt · <span class="mono">m_ceil2</span></div></div></div>
+      <div class="players"><div class="player">
+      <div class="plab"><span>Champion take — best of 64 &nbsp;·&nbsp; reward <b>3.40</b> &nbsp; 11.7s</span><span class="mono">seed 4</span></div>
+      <audio controls preload="none" src="voices_audio/mouse_1.mp3"></audio>
+      <div class="cap">Extremely one-dimensional in resonance. Extremely thin in chest resonance. Extremely wide in dynamic swell. Extremely strongly emphasized. Extremely choppy and fragmented.</div>
+    </div><div class="player">
+      <div class="plab"><span>Runner-up take &nbsp;·&nbsp; reward <b>3.12</b> &nbsp; 8.2s</span><span class="mono">seed 63</span></div>
+      <audio controls preload="none" src="voices_audio/mouse_2.mp3"></audio>
+      <div class="cap">Extremely high in vocal register. Very thin in chest resonance. Very bright and ringing. Very strongly emphasized. Very cold and sterile.</div>
+    </div></div>
+      <div class="scorerow"><div class="sc hi"><div class="k">reward</div><div class="v">3.40</div></div><div class="sc"><div class="k">char</div><div class="v">0.81</div></div><div class="sc"><div class="k">char_emo</div><div class="v">0.89</div></div><div class="sc"><div class="k">blend</div><div class="v">2.66</div></div><div class="sc"><div class="k">genu</div><div class="v">1.38</div></div><div class="sc"><div class="k">invWER</div><div class="v">1.00</div></div></div>
+      <div class="block"><div class="blab">Signature VoiceNet dimensions (champion take)</div><div class="dims"><div class="dimchip"><span class="dn">Pitch Range</span><span class="dv">4.33</span></div><div class="dimchip"><span class="dn">Register</span><span class="dv">4.26</span></div><div class="dimchip"><span class="dn">Cartoonish Style</span><span class="dv">3.71</span></div><div class="dimchip"><span class="dn">Nasal Resonance</span><span class="dv">3.53</span></div><div class="dimchip"><span class="dn">Brightness</span><span class="dv">3.20</span></div><div class="dimchip"><span class="dn">Tension</span><span class="dv">3.16</span></div></div></div>
+      <div class="block"><div class="blab">Firing emotions (Empathic-Insight EmoNet)</div><div class="emos"><div class="emochip2">Interest <b>3.17</b></div><div class="emochip2">Astonishment/Surprise <b>2.69</b></div><div class="emochip2">Elation <b>2.67</b></div><div class="emochip2">Amusement <b>2.02</b></div></div></div>
+      <div class="block"><div class="blab">The exact champion instruction — copy &amp; reuse</div>
+        <div class="instr"><button class="copy" onclick="cp(this)">copy</button><span class="itext">A teeny cartoon mouse squeaking right at the very ceiling of the register, extremely high and tiny, thin and pinched, a bright glassy ringing head voice buzzing through the nose, tense and piercing. The pitch skitters and leaps giddily way up to the top and darts back down, wide and darting. Amazed, wide-eyed, astonished, delighted and eagerly curious. Weightless and baby-young, no chest, no fullness, no depth, meek, no authority. Piercing but clean and cute, every squeak crisp and clear. (astonished gasp) High quality recording.</span></div></div>
+      <div class="block"><div class="blab">Spoken text</div><div class="spoken">Eee, wait, wait! Ooh, did you see it? Did you see how teeny-tiny it was?</div></div>
+    </div><div class="vcard mon" id="c-fairy">
+      <div class="chead"><div class="emoji">🧚</div>
+        <div><div class="cname">Fairy</div>
+        <div class="ccid">champion prompt · <span class="mono">f_love</span></div></div></div>
+      <div class="players"><div class="player">
+      <div class="plab"><span>Champion take — best of 64 &nbsp;·&nbsp; reward <b>3.23</b> &nbsp; 6.7s</span><span class="mono">seed 48</span></div>
+      <audio controls preload="none" src="voices_audio/fairy_1.mp3"></audio>
+      <div class="cap">Very cold and sterile. Very storytelling in style. Very strongly emphasized. Very high in vocal register. Very joyful and positive.</div>
+    </div><div class="player">
+      <div class="plab"><span>Runner-up take &nbsp;·&nbsp; reward <b>3.12</b> &nbsp; 6.6s</span><span class="mono">seed 57</span></div>
+      <audio controls preload="none" src="voices_audio/fairy_2.mp3"></audio>
+      <div class="cap">Extremely thin in chest resonance. Extremely high in vocal register. Very meek and submissive. Very storytelling in style. Very effortless and fluent.</div>
+    </div></div>
+      <div class="scorerow"><div class="sc hi"><div class="k">reward</div><div class="v">3.23</div></div><div class="sc"><div class="k">char</div><div class="v">0.72</div></div><div class="sc"><div class="k">char_emo</div><div class="v">0.89</div></div><div class="sc"><div class="k">blend</div><div class="v">3.90</div></div><div class="sc"><div class="k">genu</div><div class="v">1.01</div></div><div class="sc"><div class="k">invWER</div><div class="v">1.00</div></div></div>
+      <div class="block"><div class="blab">Signature VoiceNet dimensions (champion take)</div><div class="dims"><div class="dimchip"><span class="dn">Register</span><span class="dv">4.51</span></div><div class="dimchip"><span class="dn">Pitch Range</span><span class="dv">3.91</span></div><div class="dimchip"><span class="dn">Brightness</span><span class="dv">3.54</span></div><div class="dimchip"><span class="dn">Head Resonance</span><span class="dv">2.52</span></div><div class="dimchip"><span class="dn">Roughness</span><span class="dv">2.16</span></div><div class="dimchip"><span class="dn">Esthetics</span><span class="dv">1.51</span></div></div></div>
+      <div class="block"><div class="blab">Firing emotions (Empathic-Insight EmoNet)</div><div class="emos"><div class="emochip2">Affection <b>3.30</b></div><div class="emochip2">Elation <b>2.71</b></div><div class="emochip2">Contentment <b>2.31</b></div><div class="emochip2">Amusement <b>1.58</b></div></div></div>
+      <div class="block"><div class="blab">The exact champion instruction — copy &amp; reuse</div>
+        <div class="instr"><button class="copy" onclick="cp(this)">copy</button><span class="itext">A sweet little fairy brimming with warm loving affection and giddy joy, feather-light and airy, very bright and glassy, floating high in a sparkling register with a lilting sing-song pitch swooping sweetly up and down. Tender, adoring and radiant, bubbling with elated delight. Pure head resonance, no chest, gentle and unassuming, never commanding. (delighted giggle) High quality recording.</span></div></div>
+      <div class="block"><div class="blab">Spoken text</div><div class="spoken">Oh, hello there, little one! What a wonderful day to make a new friend!</div></div>
+    </div></div><div class="grouphead"><div class="bar4" style="background:linear-gradient(90deg,var(--int),#f0b46a)"></div>
+          <div class="gt">Intense &amp; High-Arousal</div><div class="gd">Voices at the edge of control, where a second affect-burst pays off.</div></div><div class="cards"><div class="vcard int" id="c-ranting">
+      <div class="chead"><div class="emoji">🗯️</div>
+        <div><div class="cname">Ranting Fury</div>
+        <div class="ccid">champion prompt · <span class="mono">r_en_dare</span></div></div></div>
+      <div class="players"><div class="player">
+      <div class="plab"><span>Champion take — best of 64 &nbsp;·&nbsp; reward <b>5.07</b> &nbsp; 10.3s</span><span class="mono">seed 59</span></div>
+      <audio controls preload="none" src="voices_audio/ranting_1.mp3"></audio>
+      <div class="cap">Extremely bright in oral resonance. Extremely dominant and commanding. Extremely metallic and ringing. Extremely strongly emphasized. Extremely fast and rapid in tempo.</div>
+    </div><div class="player">
+      <div class="plab"><span>Runner-up take &nbsp;·&nbsp; reward <b>4.73</b> &nbsp; 11.8s</span><span class="mono">seed 3</span></div>
+      <audio controls preload="none" src="voices_audio/ranting_2.mp3"></audio>
+      <div class="cap">Extremely dominant and commanding. Extremely distressed and negative. Extremely cold and sterile. Extremely darkening in mood. Extremely guarded and armored.</div>
+    </div></div>
+      <div class="scorerow"><div class="sc hi"><div class="k">reward</div><div class="v">5.07</div></div><div class="sc"><div class="k">char</div><div class="v">0.93</div></div><div class="sc"><div class="k">char_emo</div><div class="v">0.85</div></div><div class="sc"><div class="k">blend</div><div class="v">0.66</div></div><div class="sc"><div class="k">genu</div><div class="v">1.06</div></div><div class="sc"><div class="k">invWER</div><div class="v">1.00</div></div></div>
+      <div class="block"><div class="blab">Signature VoiceNet dimensions (champion take)</div><div class="dims"><div class="dimchip"><span class="dn">Emphasis</span><span class="dv">5.63</span></div><div class="dimchip"><span class="dn">Stance</span><span class="dv">5.55</span></div><div class="dimchip"><span class="dn">Volatility</span><span class="dv">4.96</span></div><div class="dimchip"><span class="dn">Arousal</span><span class="dv">4.91</span></div><div class="dimchip"><span class="dn">Pitch Range</span><span class="dv">4.73</span></div><div class="dimchip"><span class="dn">Attack</span><span class="dv">4.25</span></div></div></div>
+      <div class="block"><div class="blab">Firing emotions (Empathic-Insight EmoNet)</div><div class="emos"><div class="emochip2">Anger <b>5.11</b></div><div class="emochip2">Impatience and Irritability <b>4.57</b></div><div class="emochip2">Contempt <b>3.26</b></div><div class="emochip2">Malevolence/Malice <b>2.35</b></div><div class="emochip2">Bitterness <b>2.35</b></div></div></div>
+      <div class="block"><div class="blab">The exact champion instruction — copy &amp; reuse</div>
+        <div class="instr"><button class="copy" onclick="cp(this)">copy</button><span class="itext">A furious ranting tirade at the breaking point, haranguing and browbeating, voice shredding and cracking, about to snap, seething with rage and named loathing, spitting venom, screaming hatred and withering contempt in your face, domineering, refusing to yield an inch. Harsh, tense, violently volatile, maximum arousal, explosive pounding consonants, hammering relentless emphasis, the pitch lurching violently high to low, escalating and more vicious. Roaring but every word still lands. (enraged shout)(seething snarl) High quality recording.</span></div></div>
+      <div class="block"><div class="blab">Spoken text</div><div class="spoken">Enough! I am sick to death of this! You pathetic, spineless fool, how dare you, how DARE you waste my time again and again!</div></div>
+    </div><div class="vcard int" id="c-pain_scream">
+      <div class="chead"><div class="emoji">😱</div>
+        <div><div class="cname">Pain Scream</div>
+        <div class="ccid">champion prompt · <span class="mono">pa_ceilsob2</span></div></div></div>
+      <div class="players"><div class="player">
+      <div class="plab"><span>Champion take — best of 64 &nbsp;·&nbsp; reward <b>4.13</b> &nbsp; 10.5s</span><span class="mono">seed 45</span></div>
+      <audio controls preload="none" src="voices_audio/pain_scream_1.mp3"></audio>
+      <div class="cap">Extremely one-dimensional in resonance. Extremely unpleasant and harsh. Extremely ranting and angry. Extremely jerky and uneven in rhythm. Extremely choppy and fragmented.</div>
+    </div><div class="player">
+      <div class="plab"><span>Runner-up take &nbsp;·&nbsp; reward <b>4.03</b> &nbsp; 10.5s</span><span class="mono">seed 58</span></div>
+      <audio controls preload="none" src="voices_audio/pain_scream_2.mp3"></audio>
+      <div class="cap">Extremely one-dimensional in resonance. Extremely jerky and uneven in rhythm. Extremely unpleasant and harsh. Extremely raw and vulnerable. Extremely poor in recording quality.</div>
+    </div></div>
+      <div class="scorerow"><div class="sc hi"><div class="k">reward</div><div class="v">4.13</div></div><div class="sc"><div class="k">char</div><div class="v">0.69</div></div><div class="sc"><div class="k">char_emo</div><div class="v">0.92</div></div><div class="sc"><div class="k">blend</div><div class="v">1.23</div></div><div class="sc"><div class="k">genu</div><div class="v">1.55</div></div><div class="sc"><div class="k">invWER</div><div class="v">0.67</div></div></div>
+      <div class="block"><div class="blab">Signature VoiceNet dimensions (champion take)</div><div class="dims"><div class="dimchip"><span class="dn">Ranting/Angry Style</span><span class="dv">5.07</span></div><div class="dimchip"><span class="dn">Volatility</span><span class="dv">4.79</span></div><div class="dimchip"><span class="dn">Arousal</span><span class="dv">4.77</span></div><div class="dimchip"><span class="dn">Tension</span><span class="dv">3.67</span></div><div class="dimchip"><span class="dn">Roughness</span><span class="dv">3.25</span></div><div class="dimchip"><span class="dn">Arousal Shift</span><span class="dv">1.28</span></div></div></div>
+      <div class="block"><div class="blab">Firing emotions (Empathic-Insight EmoNet)</div><div class="emos"><div class="emochip2">Distress <b>4.07</b></div><div class="emochip2">Helplessness <b>3.29</b></div><div class="emochip2">Pain <b>3.05</b></div><div class="emochip2">Fear <b>2.84</b></div></div></div>
+      <div class="block"><div class="blab">The exact champion instruction — copy &amp; reuse</div>
+        <div class="instr"><button class="copy" onclick="cp(this)">copy</button><span class="itext">Maximum raw screaming in blind terror and unbearable physical agony, throat tearing, voice shredded, guttural and harsh, grating rasp ripping raw, each scream cracking higher and more frantic, breaking into gasping sobs between screams. Panic-stricken, terrified and helpless, thrashing, drowning in pain. Extreme, maximum arousal, extreme tension, violently volatile and completely out of control. Raw agonized screaming, throat tearing apart. (agonized scream) (sobbing gasp) High quality recording.</span></div></div>
+      <div class="block"><div class="blab">Spoken text</div><div class="spoken">Aaargh! No! No! Au— it hurts— aaah— nngh— get it off me!</div></div>
+    </div></div><div class="grouphead"><div class="bar4" style="background:linear-gradient(90deg,var(--asmr),#5fd0c4)"></div>
+          <div class="gt">Intimate (ASMR)</div><div class="gd">The whisper archetypes — soft, breathy, meek, warm.</div></div><div class="cards"><div class="vcard asmr" id="c-asmr_man">
+      <div class="chead"><div class="emoji">🌙</div>
+        <div><div class="cname">ASMR Man</div>
+        <div class="ccid">champion prompt · <span class="mono">am_tender_peace</span></div></div></div>
+      <div class="players"><div class="player">
+      <div class="plab"><span>Champion take — best of 64 &nbsp;·&nbsp; reward <b>3.31</b> &nbsp; 8.3s</span><span class="mono">seed 29</span></div>
+      <audio controls preload="none" src="voices_audio/asmr_man_1.mp3"></audio>
+      <div class="cap">Extremely meek and submissive. Extremely blurry and mumbled. Extremely soft and gentle in onset. Extremely denasal and clear. Extremely relaxed and loose.</div>
+    </div><div class="player">
+      <div class="plab"><span>Runner-up take &nbsp;·&nbsp; reward <b>3.08</b> &nbsp; 7.0s</span><span class="mono">seed 46</span></div>
+      <audio controls preload="none" src="voices_audio/asmr_man_2.mp3"></audio>
+      <div class="cap">Extremely warm and enveloping. Extremely dark and muffled. Extremely flat and monotone. Extremely soft and gentle in onset. Extremely relaxed and loose.</div>
+    </div></div>
+      <div class="scorerow"><div class="sc hi"><div class="k">reward</div><div class="v">3.31</div></div><div class="sc"><div class="k">char</div><div class="v">0.62</div></div><div class="sc"><div class="k">char_emo</div><div class="v">0.88</div></div><div class="sc"><div class="k">blend</div><div class="v">6.94</div></div><div class="sc"><div class="k">genu</div><div class="v">1.13</div></div><div class="sc"><div class="k">invWER</div><div class="v">1.00</div></div></div>
+      <div class="block"><div class="blab">Signature VoiceNet dimensions (champion take)</div><div class="dims"><div class="dimchip"><span class="dn">Warmth</span><span class="dv">4.16</span></div><div class="dimchip"><span class="dn">Esthetics</span><span class="dv">3.35</span></div><div class="dimchip"><span class="dn">Vulnerability</span><span class="dv">3.25</span></div><div class="dimchip"><span class="dn">Whisper-Talk Style</span><span class="dv">3.09</span></div><div class="dimchip"><span class="dn">Respiration</span><span class="dv">2.43</span></div><div class="dimchip"><span class="dn">ASMR Style</span><span class="dv">2.17</span></div></div></div>
+      <div class="block"><div class="blab">Firing emotions (Empathic-Insight EmoNet)</div><div class="emos"><div class="emochip2">Contentment <b>3.26</b></div><div class="emochip2">Relief <b>2.60</b></div><div class="emochip2">Affection <b>2.09</b></div></div></div>
+      <div class="block"><div class="blab">The exact champion instruction — copy &amp; reuse</div>
+        <div class="instr"><button class="copy" onclick="cp(this)">copy</button><span class="itext">A deep, soothing man whispering tenderly, soft and breathy, intimate close-mic, slow and gentle, a warm low chest resonance cushioning each word. Overflowing with tender affection, loving and reassuring, every worry melting away, wrapped in calm and drifting, deeply content, serene and utterly at peace, breathing out a soft sigh of relief. Utterly gentle and unassuming, meek, yielding, no authority whatsoever. Clear whispered words. (soft breath) High quality recording.</span></div></div>
+      <div class="block"><div class="blab">Spoken text</div><div class="spoken">Just relax now, let it all go. You are safe here, close your eyes.</div></div>
+    </div><div class="vcard asmr" id="c-asmr_woman">
+      <div class="chead"><div class="emoji">🌙</div>
+        <div><div class="cname">ASMR Woman</div>
+        <div class="ccid">champion prompt · <span class="mono">aw_final (SFcradle_there)</span></div></div></div>
+      <div class="players"><div class="player">
+      <div class="plab"><span>Champion take — best of 64 &nbsp;·&nbsp; reward <b>2.98</b> &nbsp; 7.3s</span><span class="mono">seed 63</span></div>
+      <audio controls preload="none" src="voices_audio/asmr_woman_1.mp3"></audio>
+      <div class="cap">Extremely warm and enveloping. Extremely full and cinematic. Extremely raw and vulnerable. Extremely dark and muffled. Extremely soft and gentle in onset.</div>
+    </div><div class="player">
+      <div class="plab"><span>Runner-up take &nbsp;·&nbsp; reward <b>2.90</b> &nbsp; 9.1s</span><span class="mono">seed 11</span></div>
+      <audio controls preload="none" src="voices_audio/asmr_woman_2.mp3"></audio>
+      <div class="cap">Extremely denasal and clear. Extremely dark and muffled. Extremely blurry and mumbled. Extremely soft and gentle in onset. Extremely meek and submissive.</div>
+    </div></div>
+      <div class="scorerow"><div class="sc hi"><div class="k">reward</div><div class="v">2.98</div></div><div class="sc"><div class="k">char</div><div class="v">0.82</div></div><div class="sc"><div class="k">char_emo</div><div class="v">0.56</div></div><div class="sc"><div class="k">blend</div><div class="v">8.73</div></div><div class="sc"><div class="k">genu</div><div class="v">1.27</div></div><div class="sc"><div class="k">invWER</div><div class="v">0.92</div></div></div>
+      <div class="block"><div class="blab">Signature VoiceNet dimensions (champion take)</div><div class="dims"><div class="dimchip"><span class="dn">Warmth</span><span class="dv">5.56</span></div><div class="dimchip"><span class="dn">Whisper-Talk Style</span><span class="dv">5.52</span></div><div class="dimchip"><span class="dn">Perceived Gender</span><span class="dv">4.88</span></div><div class="dimchip"><span class="dn">ASMR Style</span><span class="dv">4.49</span></div><div class="dimchip"><span class="dn">Vulnerability</span><span class="dv">4.05</span></div><div class="dimchip"><span class="dn">Esthetics</span><span class="dv">3.84</span></div></div></div>
+      <div class="block"><div class="blab">Firing emotions (Empathic-Insight EmoNet)</div><div class="emos"><div class="emochip2">Affection <b>4.05</b></div><div class="emochip2">Contentment <b>2.11</b></div><div class="emochip2">Relief <b>1.70</b></div></div></div>
+      <div class="block"><div class="blab">The exact champion instruction — copy &amp; reuse</div>
+        <div class="instr"><button class="copy" onclick="cp(this)">copy</button><span class="itext">A loving mother cradling her child to sleep, cheek to cheek, breathing love into every word. Extremely soft, breathy, intimate close-mic whisper, slow, hushed and quiet, a beautiful silken velvety-smooth tone, unmistakably and softly feminine, silvery light and delicate. Warm, tender, adoring and maternal, full of affection and serene contentment, a soft sigh of relief. Meek, gentle and yielding, never bossy or commanding. Whispered but every word clear. (soft breath) High quality recording.</span></div></div>
+      <div class="block"><div class="blab">Spoken text</div><div class="spoken">There now, my love. Close your eyes. I have you, safe and warm.</div></div>
+    </div></div><div class="grouphead"><div class="bar4" style="background:linear-gradient(90deg,var(--grief),#a0a8d8)"></div>
+          <div class="gt">Grief</div><div class="gd">Overt crying, split into male and female by a single gender phrase.</div></div><div class="cards"><div class="vcard grief" id="c-sad_woman">
+      <div class="chead"><div class="emoji">😢</div>
+        <div><div class="cname">Grieving Woman</div>
+        <div class="ccid">champion prompt · <span class="mono">smf_rise</span></div></div></div>
+      <div class="players"><div class="player">
+      <div class="plab"><span>Champion take — best of 64 &nbsp;·&nbsp; reward <b>4.41</b> &nbsp; 12.0s</span><span class="mono">seed 58</span></div>
+      <audio controls preload="none" src="voices_audio/sad_woman_1.mp3"></audio>
+      <div class="cap">Extremely raw and vulnerable. Extremely denasal and clear. Extremely unpleasant and harsh. Extremely blurry and mumbled. Extremely noisy and aperiodic.</div>
+    </div><div class="player">
+      <div class="plab"><span>Runner-up take &nbsp;·&nbsp; reward <b>3.92</b> &nbsp; 12.1s</span><span class="mono">seed 36</span></div>
+      <audio controls preload="none" src="voices_audio/sad_woman_2.mp3"></audio>
+      <div class="cap">Extremely raw and vulnerable. Extremely denasal and clear. Extremely unpleasant and harsh. Extremely blurry and mumbled. Extremely meek and submissive.</div>
+    </div></div>
+      <div class="scorerow"><div class="sc hi"><div class="k">reward</div><div class="v">4.41</div></div><div class="sc"><div class="k">char</div><div class="v">0.67</div></div><div class="sc"><div class="k">char_emo</div><div class="v">0.96</div></div><div class="sc"><div class="k">blend</div><div class="v">7.42</div></div><div class="sc"><div class="k">genu</div><div class="v">2.12</div></div><div class="sc"><div class="k">invWER</div><div class="v">0.94</div></div></div>
+      <div class="block"><div class="blab">Signature VoiceNet dimensions (champion take)</div><div class="dims"><div class="dimchip"><span class="dn">Vulnerability</span><span class="dv">5.74</span></div><div class="dimchip"><span class="dn">Perceived Gender</span><span class="dv">3.69</span></div><div class="dimchip"><span class="dn">Respiration</span><span class="dv">3.25</span></div><div class="dimchip"><span class="dn">Roughness</span><span class="dv">2.18</span></div><div class="dimchip"><span class="dn">Tension</span><span class="dv">1.21</span></div><div class="dimchip"><span class="dn">Arousal</span><span class="dv">0.48</span></div></div></div>
+      <div class="block"><div class="blab">Firing emotions (Empathic-Insight EmoNet)</div><div class="emos"><div class="emochip2">Distress <b>4.80</b></div><div class="emochip2">Sadness <b>3.99</b></div><div class="emochip2">Helplessness <b>3.88</b></div><div class="emochip2">Disappointment <b>3.17</b></div><div class="emochip2">Longing <b>2.63</b></div></div></div>
+      <div class="block"><div class="blab">The exact champion instruction — copy &amp; reuse</div>
+        <div class="instr"><button class="copy" onclick="cp(this)">copy</button><span class="itext">A grieving young woman, unmistakably and softly feminine, her crying rising into a shaking wail, sobbing hard, shaking and cracking, thick with tears, wet and trembling, wailing between broken words. Heartbroken and inconsolable, drowning in sorrow, helpless and aching with loss. Raw and vulnerable, breaking apart. (sob) High quality recording.</span></div></div>
+      <div class="block"><div class="blab">Spoken text</div><div class="spoken">No... no, please... don&#x27;t leave me too... I can&#x27;t— I can&#x27;t lose anyone else...</div></div>
+    </div><div class="vcard grief" id="c-sad_man">
+      <div class="chead"><div class="emoji">😔</div>
+        <div><div class="cname">Grieving Man</div>
+        <div class="ccid">champion prompt · <span class="mono">sm4_gasp_wail</span></div></div></div>
+      <div class="players"><div class="player">
+      <div class="plab"><span>Champion take — best of 64 &nbsp;·&nbsp; reward <b>4.69</b> &nbsp; 12.1s</span><span class="mono">seed 15</span></div>
+      <audio controls preload="none" src="voices_audio/sad_man_1.mp3"></audio>
+      <div class="cap">Extremely raw and vulnerable. Extremely one-dimensional in resonance. Extremely collapsing in energy. Extremely blurry and mumbled. Extremely jerky and uneven in rhythm.</div>
+    </div><div class="player">
+      <div class="plab"><span>Runner-up take &nbsp;·&nbsp; reward <b>3.92</b> &nbsp; 6.8s</span><span class="mono">seed 18</span></div>
+      <audio controls preload="none" src="voices_audio/sad_man_2.mp3"></audio>
+      <div class="cap">Extremely raw and vulnerable. Extremely denasal and clear. Extremely unpleasant and harsh. Extremely blurry and mumbled. Extremely darkening in mood.</div>
+    </div></div>
+      <div class="scorerow"><div class="sc hi"><div class="k">reward</div><div class="v">4.69</div></div><div class="sc"><div class="k">char</div><div class="v">0.73</div></div><div class="sc"><div class="k">char_emo</div><div class="v">0.99</div></div><div class="sc"><div class="k">blend</div><div class="v">6.30</div></div><div class="sc"><div class="k">genu</div><div class="v">2.28</div></div><div class="sc"><div class="k">invWER</div><div class="v">1.00</div></div></div>
+      <div class="block"><div class="blab">Signature VoiceNet dimensions (champion take)</div><div class="dims"><div class="dimchip"><span class="dn">Vulnerability</span><span class="dv">5.60</span></div><div class="dimchip"><span class="dn">Perceived Gender</span><span class="dv">3.49</span></div><div class="dimchip"><span class="dn">Respiration</span><span class="dv">3.48</span></div><div class="dimchip"><span class="dn">Roughness</span><span class="dv">2.52</span></div><div class="dimchip"><span class="dn">Arousal</span><span class="dv">1.84</span></div><div class="dimchip"><span class="dn">Tension</span><span class="dv">1.44</span></div></div></div>
+      <div class="block"><div class="blab">Firing emotions (Empathic-Insight EmoNet)</div><div class="emos"><div class="emochip2">Sadness <b>4.53</b></div><div class="emochip2">Distress <b>4.18</b></div><div class="emochip2">Disappointment <b>3.59</b></div><div class="emochip2">Helplessness <b>3.16</b></div><div class="emochip2">Longing <b>2.68</b></div></div></div>
+      <div class="block"><div class="blab">The exact champion instruction — copy &amp; reuse</div>
+        <div class="instr"><button class="copy" onclick="cp(this)">copy</button><span class="itext">A man breaking down in tears, his voice cracking, keening and choking, gasping and hitching between words, hard sobs catching in his throat, wet and shaking, barely able to speak. Devastated and guilt-stricken, drowning in grief and longing, helpless and lost. A man&#x27;s low, masculine voice, raw and vulnerable, sobbing uncontrollably. (anguished sob) High quality recording.</span></div></div>
+      <div class="block"><div class="blab">Spoken text</div><div class="spoken">It&#x27;s my fault... I-I should have been there... I should have saved her.</div></div>
+    </div></div>
+</div></section>
+
+<section id="playbook"><div class="wrap">
+  <div class="eyebrow">The complete playbook</div>
+  <h2 class="h2">How to prompt any character voice</h2>
+  <p class="lead">The most valuable output of the whole study: everything five rounds taught us about writing a director instruction that lands. Read the principles, steal the template, use the lookup table.</p>
+  <h3 style="font-size:19px;margin:14px 0 14px">The 13 principles</h3>
+  <div class="principle"><h4><span class="num">01</span> Describe the acoustics, not the label<span class="tag">R1</span></h4><p>“cartoon mouse voice” loses to “extremely high, thin, pinched, buzzing nasal, bright piercing head voice.” The model listens to the <em>description</em> — spell out how it sounds, never just what it is.</p></div><div class="principle"><h4><span class="num">02</span> Name the emotion explicitly<span class="tag">R2</span></h4><p>A perfect zombie rasp that sounds bored is a bad zombie. Put the feeling in words — <em>helpless, murderous glee, seething contempt, giddy delight, drowning in pain</em>. Adding an EmoNet emotion reward was round 2's single biggest lever.</p></div><div class="principle"><h4><span class="num">03</span> Say where the voice resonates<span class="tag">R3</span></h4><p>Not just “deep” or “bright” — name the cavity: <b>chest</b> (hollow/warm), <b>throat</b> (guttural/raspy), <b>nose</b> (nasal/buzzing), <b>head</b> (glassy/light). Resonances stack: a zombie can have a hollow chest groan <em>and</em> a wet throat rasp. Naming the cavity as a place (“a vast cavern of a chest”) beats the adjective “deep.”</p></div><div class="principle"><h4><span class="num">04</span> Control pitch with two words: register and range<span class="tag">R3</span></h4><p><b>Register</b> = how high/low it sits (“subterranean bass” vs “sparkling high register”). <b>Range</b> = how far it moves (“flat and unwavering” vs “swooping wildly”). Wide swings read as mania/fury/excitement; flat narrow pitch reads as menace/authority/deadness.</p></div><div class="principle"><h4><span class="num">05</span> Set dominance — commanding vs meek<span class="tag">R3</span></h4><p>“Commanding, immovable, planting each word with authority” pushes authority up (ork, dragon, rant). “Feeble, powerless, meek, no authority whatsoever” pushes it down (zombie, goblin, fairy, ASMR). <b>Meekness is a real, rewardable direction</b> — negating dominance is as useful as asserting it.</p></div><div class="principle"><h4><span class="num">06</span> Emotion, dominance and resonance ride ON TOP of the character core<span class="tag">R2–R3</span></h4><p>Naming authority alone (“an orc warlord, commanding”) made a clean commander, not a monster — character collapsed to ~0.30. Keep the guttural/nasal/whisper timbre and <em>append</em> the new layer. Over-describing resonance (a second “immense chest” clause) actively craters emotion and blend.</p></div><div class="principle"><h4><span class="num">07</span> Write the affect into the spoken TEXT — it does what the instruction can't<span class="tag">R4–R5</span></h4><p>Squeaky interjections (“Eee… Ooh… Wow!”) lift the mouse's Amusement/Astonishment; screamed “Aaargh!… it hurts” drives pain-scream's Distress to ~4; a stammer (“I-I should have been there…”) induces audible cracking in the grieving man; broken “I can't— I can't” keeps the grieving woman's blend high. The text carries affect the instruction cannot.</p></div><div class="principle"><h4><span class="num">08</span> One affect-burst by default; a second only for high-arousal<span class="tag">R2–R5</span></h4><p>A single emotion-matched burst — <span class='mono'>(agonized moan)</span>, <span class='mono'>(delighted giggle)</span> — reliably helps. A second usually hurts, <em>except</em> for the highest-arousal voices: ranting uses <span class='mono'>(enraged shout)(seething snarl)</span> and pain-scream's paired <span class='mono'>(agonized scream)(sobbing gasp)</span> is exactly what broke its char-vs-emotion tradeoff.</p></div><div class="principle"><h4><span class="num">09</span> Emotion/affect must ride on an intact acoustic core — over-stacking craters blend<span class="tag">R5</span></h4><p>Extra “weightless / gossamer / crystalline” on the fairy, a second “immense chest resonance” on the ork/dragon, or over-stacked hollow/numbness on the zombie all added variance without adding reward. The leanest prompt that keeps the core intact wins the same-call playoff.</p></div><div class="principle"><h4><span class="num">10</span> Balance beats character-maxing — keep an intelligibility clause<span class="tag">R1–R5</span></h4><p>Pushing one dimension to the extreme (“ear-splitting volume”, “impossibly high”) garbles words or thins the voice. Keep a safety clause — <em>“roaring but the words still land” / “whispered but every word clear”</em> — to protect the WER-gated archetypes. It structurally raises the reward ceiling (asmr_woman: dropping a mis-heard “Shhh” lifted invWER 0.79→1.00).</p></div><div class="principle"><h4><span class="num">11</span> Malevolence and jackpots need best-of-N to surface<span class="tag">R4–R5</span></h4><p>The goblin's Malevolence fires as a rare per-take spike (most takes ~0.05, ~1-in-8 jumps to 1–2.5). best-of-8 mean is a noisy selector; only best-of-64 reliably catches a clean malicious jackpot. Concentrate on one emotion — diluting malice with “contempt/bitter” killed the Malevolence head entirely.</p></div><div class="principle"><h4><span class="num">12</span> Per-call normalized reward — pick in same-call playoffs<span class="tag">R1–R5</span></h4><p>The reward is min-max normalized <em>within</em> each best-of-N run, so a 2.4 in one run ≠ a 2.4 in another. Compare finalists by putting them in one shared run; search at best-of-8, decide the final champion at best-of-64.</p></div><div class="principle"><h4><span class="num">13</span> Tune the per-dimension and per-emotion weights<span class="tag">R4–R5</span></h4><p>Round 4–5 added <span class='mono'>vn_w</span> (per-dimension) and <span class='mono'>emo_w</span> (per-emotion) weights plus per-character blend/genu weights, so the search chases the 2–3 signals that <em>define</em> a character — the mouse's pitch (RANG ×2.5, REGS ×2.0), the goblin's Malevolence (×2.5), the grieving man's Sadness (×3.0), evil-ghost's whisper (S_WHIS ×2.5).</p></div>
+  <div class="two" style="margin-top:26px">
+    <div>
+      <h3 style="font-size:19px;margin:0 0 12px">The reusable template</h3>
+      <div class="tmpl"><span class="ph">&lt;CHARACTER + one-line framing / simile&gt;</span>.
+<span class="ph">&lt;ACOUSTIC timbre&gt;</span>: rough / smooth, breathy / full, wet / dry…
+<span class="ph">&lt;RESONANCE&gt;</span>: which cavity — chest / throat / nasal / head (stack if needed).
+<span class="ph">&lt;PITCH&gt;</span>: register (how high / low) + range (how wide it swings).
+<span class="ph">&lt;DOMINANCE&gt;</span>: commanding &amp; immovable  — or —  meek &amp; powerless.
+<span class="ph">&lt;EMOTION words&gt;</span> matched to the character.  <span class="ph">&lt;negate the penalized dims&gt;</span>.
+<span class="ph">&lt;safety clause&gt;</span>: “but the words still land” / “every word clear” for clean voices.
+<span class="ph">(ONE emotion-matched burst)</span>   [ second burst only for very high-arousal rage / screaming ]
+High quality recording.</div>
+      <p class="note" style="margin-top:10px">Bursts go in the instruction, in round brackets — never inside the spoken text. Search at best-of-8, decide the champion at best-of-64, and compare finalists in one shared run.</p>
+    </div>
+    <div>
+      <h3 style="font-size:19px;margin:0 0 12px">Effect → words lookup</h3>
+      <div class="tblwrap"><table>
+      <thead><tr><th>Desired effect</th><th>Words to push</th><th>Dimensions / emotions</th><th>Used by</th></tr></thead>
+      <tbody><tr><td><b>Menace / authority</b></td><td>low flat narrow pitch · commanding, immovable, planting each word</td><td class='mono' style='color:var(--acc2)'>S_AUTH, STNC ↑ · RANG ↓</td><td class='note'>ork, dragon</td></tr><tr><td><b>Meek / pitiful</b></td><td>feeble, powerless, meek, no authority whatsoever, yielding</td><td class='mono' style='color:var(--acc2)'>S_AUTH ↓ · VULN ↑</td><td class='note'>zombie, goblin, ASMR, fairy</td></tr><tr><td><b>Mania / fury / excitement</b></td><td>pitch swinging violently / darting giddily up and down</td><td class='mono' style='color:var(--acc2)'>RANG, VOLT, AROU ↑</td><td class='note'>ranting, mouse, goblin</td></tr><tr><td><b>Deep body</b></td><td>booming from a vast cavern of a chest; deep guttural throat rumble</td><td class='mono' style='color:var(--acc2)'>R_CHST, R_THRT, FULL ↑</td><td class='note'>ork, dragon</td></tr><tr><td><b>Thin / piercing</b></td><td>extremely high thin pinched buzzing nasal head voice; no chest</td><td class='mono' style='color:var(--acc2)'>R_NASL, R_HEAD, BRGT ↑ · R_CHST ↓</td><td class='note'>mouse, goblin, fairy</td></tr><tr><td><b>Intimacy</b></td><td>soft breathy intimate close-mic whisper, warm chest underneath</td><td class='mono' style='color:var(--acc2)'>S_WHIS, S_ASMR, WARM ↑</td><td class='note'>ASMR man/woman, evil-ghost</td></tr><tr><td><b>Grief / crying</b></td><td>breaking down, gasping and hitching, hard sobs, rising into a wail</td><td class='mono' style='color:var(--acc2)'>Sadness, AROU ↑</td><td class='note'>grieving man/woman</td></tr><tr><td><b>Evil / malice</b></td><td>truly evil, sadistic, cruel, remorseless, pure malice to the core</td><td class='mono' style='color:var(--acc2)'>Malevolence, Contempt ↑</td><td class='note'>goblin, evil-ghost</td></tr><tr><td><b>Joy / warmth</b></td><td>brimming with warm loving affection and giddy joy, radiant delight</td><td class='mono' style='color:var(--acc2)'>Affection, Elation ↑</td><td class='note'>fairy, ASMR</td></tr><tr><td><b>Keep it clean</b></td><td>but every word lands / whispered but every word clear</td><td class='mono' style='color:var(--acc2)'>invWER ↑ (protects blend/genu)</td><td class='note'>all WER-gated voices</td></tr></tbody></table></div>
+    </div>
+  </div>
+  <h3 style="font-size:19px;margin:30px 0 14px">Per-character recipes — what won in round 5</h3>
+  <details class="principle"><summary style="cursor:pointer;font-weight:800;font-size:16px">🧟 Zombie — what won in round 5</summary>
+          <ul style="color:var(--mut);font-size:14px;margin:10px 0 0;padding-left:20px"><li>Naming HELPLESSNESS/abandonment + pleading and moving the affect into the spoken text (pleading fragments like &quot;help me... I can&#x27;t... stop&quot;) lifted char_emo above the round-3 meek/powerless framing while keeping the hollow caved-in chest + wet gurgling throat core intact.</li><li>A softer single burst — (faint whimper)/(soft moan) — beat both the round-3 (feeble whimper) and any second-burst stacking; extra bursts and over-stacking numbness/hollow/fade wording nudged char up but craterd blend, so the leanest helpless-pleading prompt won the same-call playoff.</li></ul></details><details class="principle"><summary style="cursor:pointer;font-weight:800;font-size:16px">👹 Ork — what won in round 5</summary>
+          <ul style="color:var(--mut);font-size:14px;margin:10px 0 0;padding-left:20px"><li>Refined the round-3 champion (o_deepchest) toward HATEFUL menace: &#x27;Boiling with hateful loathing, withering sneering contempt, cruel cold menace and dark triumph&#x27; replaced the plainer &#x27;Seething hatred and sneering contempt, dark triumphant menace&#x27;. This lifted char_emo (Anger/Malevolence/Contempt/Triumph) to 0.93 on the best-of-64 top take while holding invWER at 1.0.</li><li>Dominance phrased as a concrete image beat abstract authority: &#x27;planting each word like a boot with crushing authority&#x27; (o4_lm_immov) won both the playoff-by-mean and the best-of-64 single take, edging the flatter &#x27;planting each word with authority&#x27;.</li><li>Hateful-loathing + withering-contempt wording (&#x27;Dripping with&#x27; -&gt; &#x27;Boiling with ... cruel cold menace&#x27;) was the strongest emotion lever; every generation&#x27;s winner carried it, riding ON TOP of the intact deep-chest guttural-bass core.</li><li>Keeping the exact acoustic core (deep chest-driven guttural bass, massive barrel chest + gravelled throat, low/flat/narrow pitch, zero brightness) unchanged across all mutations kept char stable ~0.6-0.7 and invWER at 1.0 under the soft gate.</li></ul></details><details class="principle"><summary style="cursor:pointer;font-weight:800;font-size:16px">👺 Goblin — what won in round 5</summary>
+          <ul style="color:var(--mut);font-size:14px;margin:10px 0 0;padding-left:20px"><li>Malevolence fires as a rare per-take SPIKE (most takes ~0.05, ~1-in-8 spikes to 1-2.5). best-of-64 is what reliably catches it: the champion take spiked Malevolence to 1.45 AND stayed clean (blend 3.25, genu 1.89), reward 3.012 -- vs round-4&#x27;s best-of-64 top of reward 2.465 / malice 1.25 / blend 0.94. So round 5 is BOTH more malevolent and much cleaner.</li><li>The winning lineage concentrates malice: &#x27;A truly evil, malevolent little goblin ... pure malice to the core&#x27; plus a single (malicious hiss) burst. Concentrated evil/sadistic/vicious/remorseless adjectives raise the malice-spike probability.</li><li>Raising blend/genu weight to 0.9 rewarded a clean-ish grating goblin: adding the clause &#x27;but every venomous word lands clear/lands&#x27; kept intelligibility (invWER ~0.85) and lifted blend/genu without killing the buzz.</li><li>Diluting the malice with OTHER emotions killed the Malevolence head: adding &#x27;sneering contempt / bitter&#x27; (g_contempt) or going &#x27;quiet, controlled menace&#x27; (g_cold) dropped Malevolence to ~0.06 while raising char -- you must concentrate on malice, not spread across the emotion set.</li></ul><div class='note' style='margin-top:8px'><b>Reward config:</b> +[R_NASL, ROUG, S_CART, TENS, ARSH, RANG] &nbsp;–[FULL, R_CHST, WARM, S_AUTH] &nbsp;emotions: Malevolence/Malice, Contempt, Bitterness, Anger, Teasing</div></details><details class="principle"><summary style="cursor:pointer;font-weight:800;font-size:16px">🐉 Dragon — what won in round 5</summary>
+          <ul style="color:var(--mut);font-size:14px;margin:10px 0 0;padding-left:20px"><li>Naming the resonance CAVITY concretely was the biggest lever: &#x27;immense subharmonic chest resonance booming from a vast cavern of a chest, deep guttural throat rumble grinding beneath&#x27; (d_chest, gen2 winner 2.514) beat the round-3 champion&#x27;s generic &#x27;enormous chest resonance&#x27;. Deep chest/throat bass is best evoked by the cavity-as-a-place image, not by adjectives like &#x27;deep/bass&#x27; alone.</li><li>&#x27;every word a dramatic proclamation&#x27; + &#x27;grand theatrical decree&#x27; (S_DRAM) lifted both char and emotion hard: d_dramthrt reached char_emo 0.981 / char 0.785 in the playoff, and d_chdram carried char_emo ~0.88 into best-of-64 — dramatic-proclamation framing packages the wrathful contempt / prideful triumphant scorn better than listing the emotions flat.</li><li>Over-stacking DOMINANCE words cratered character: d_auth (&#x27;crushing, absolute authority, towering and sovereign&#x27;) dropped char to 0.508 and d_all (kitchen-sink of every lever) to the bottom — authority must ride on top of the acoustic core, not be piled on. One affect burst (&#x27;(deep rumble)&#x27;) beat multiple; (low guttural growl) underperformed.</li></ul></details><details class="principle"><summary style="cursor:pointer;font-weight:800;font-size:16px">👻 Evil Ghost — what won in round 5</summary>
+          <ul style="color:var(--mut);font-size:14px;margin:10px 0 0;padding-left:20px"><li>Pushed the whisper much harder (S_WHIS x2.5) but added explicit CLEANLINESS clauses (&#x27;clean and clear&#x27;, &#x27;every word clear&#x27;, &#x27;never breaking into noise&#x27;, &#x27;controlled&#x27;) so the higher-weighted blend/genu are not sacrificed -- a hollow airy ghost-whisper that is still eerily intelligible.</li><li>Pairing &#x27;a cold ethereal whisper, clean and clear&#x27; with &#x27;(soft hiss)&#x27; hit the new weights precisely: champion best take S_WHIS 4.61 (round-4 champ was 1.85), RESP 3.9, TENS 2.83, invwer 1.0, blend 6.8. char 0.592 -&gt; 0.676, char_emo 0.583 -&gt; 0.748, reward 3.276 -&gt; 3.934.</li><li>&#x27;tense and controlled&#x27; + penalizing warmth/fullness/brightness kept the malice cold (Malevolence 2.0-2.56, Fear 1.76, Contempt 1.46) without the whisper collapsing into breathy noise -- the clean-whisper clause protected blend/genu under their higher weights.</li><li>Softer bursts alone (breathy whisper / cold breath) drove RESP but not S_WHIS as high; the (soft hiss) burst on eg_hush gave the best whisper/clean balance.</li></ul><div class='note' style='margin-top:8px'><b>Reward config:</b> +[S_WHIS, RESP, TENS, ARSH, ROUG] &nbsp;–[WARM, FULL, BRGT] &nbsp;emotions: Malevolence/Malice, Contempt, Fear, Bitterness</div></details><details class="principle"><summary style="cursor:pointer;font-weight:800;font-size:16px">🐭 Cartoon Mouse — what won in round 5</summary>
+          <ul style="color:var(--mut);font-size:14px;margin:10px 0 0;padding-left:20px"><li>Squeaky/astonished interjections written INTO the text (Eee.../Ooh.../Wow!) lift char_emo (Astonishment/Amusement/Elation) AND S_CART noticeably vs a plain excited line — writing the affect into the spoken words does what the instruction cannot.</li><li>&#x27;right at the very ceiling of the register&#x27; + &#x27;skitters/leaps/darts giddily up to the top and back&#x27; maximizes the two highest-weighted dims (REGS 2.0, RANG 2.5): the final-64 top take hit RANG 4.33 / REGS 4.26 / BRGT 3.2, higher pitch than the round-4 champion.</li><li>&#x27;impossibly high&#x27; and over-stacked shrillness crater blend/genu (now weighted 0.9 each); a &#x27;clean/cute/crisp, every squeak clear as a bell&#x27; safety clause + &#x27;baby-young&#x27; (suppresses AGEV, best takes ~0.4) keeps it clean-cute not shrill-noise while staying piercing.</li></ul><div class='note' style='margin-top:8px'><b>Reward config:</b> mouse CFG: pos BRGT,R_HEAD,R_NASL,S_CART,TENS,RANG,REGS; neg AGEV,R_CHST,FULL,S_AUTH; vn_w RANG2.5/REGS2.0/BRGT1.8/R_HEAD1.5; emo Amusement/Elation/Interest/Astonishment; w_vn2.0 w_emo1.5 w_blend0.9 w_genu0.9; wer soft.</div></details><details class="principle"><summary style="cursor:pointer;font-weight:800;font-size:16px">🧚 Fairy — what won in round 5</summary>
+          <ul style="color:var(--mut);font-size:14px;margin:10px 0 0;padding-left:20px"><li>Front-loaded the JOY/LOVE emotion (&#x27;a sweet little fairy brimming with warm loving affection and giddy joy ... tender, adoring and radiant, bubbling with elated delight&#x27;) instead of burying affect at the end, while keeping the round-3 register + lilting-sing-song + head-resonance core.</li><li>Leading with &#x27;warm loving affection and giddy joy&#x27; + &#x27;radiant with elated delight&#x27; lifted the emotion head hard: best take Affection 3.30 / Elation 2.71, char_emo 0.782 (round 3) -&gt; 0.888 (round 5), the biggest gain.</li><li>Keeping &#x27;feather-light and airy, very bright and glassy, floating high in a sparkling register with a lilting sing-song pitch&#x27; preserved the timbre: char 0.711 -&gt; 0.724, and invwer stayed 1.0 (clean, intelligible).</li><li>Extra &#x27;weightless / gossamer / crystalline&#x27; stacking (gen-3 mutations) added variance without beating f_love; the plain love-forward champion won.</li></ul><div class='note' style='margin-top:8px'><b>Reward config:</b> +[BRGT, R_HEAD, RANG, WARM, ESTH, REGS] &nbsp;–[ROUG, AGEV, R_CHST, S_AUTH] &nbsp;emotions: Elation, Amusement, Affection, Contentment</div></details><details class="principle"><summary style="cursor:pointer;font-weight:800;font-size:16px">🗯️ Ranting Fury — what won in round 5</summary>
+          <ul style="color:var(--mut);font-size:14px;margin:10px 0 0;padding-left:20px"><li>Explicit &#x27;ranting/raving/haranguing tirade&#x27; language lifted S_RANT (weighted 1.8) from ~1.2 (round-4 champion) to ~2.0-2.8 on the best takes — naming the DELIVERY MODE, not just the rage, feeds the rant-specific dim the round-4 prompt was starving.</li><li>Writing named contempt + escalation INTO the spoken text (&#x27;You pathetic, spineless fool, how dare you, how DARE you...&#x27;) beat putting it only in the instruction: it drove Contempt/Anger emo heads (Anger up to 5.4) AND the repetition/caps pushed EMPH 5.63, STNC 5.55 while WER stayed perfect (inv 1.0).</li><li>&#x27;at the breaking point / about to snap / maximum arousal, screaming&#x27; plus keeping the round-4 two-burst formula (enraged shout)(seething snarl) and the &#x27;every word still lands&#x27; clause raised the final-64 peak to reward 5.066 (char 0.925, char_emo 0.853, AROU 4.91) vs round-4&#x27;s 4.559 — pushing arousal harder still stayed fully intelligible.</li></ul><div class='note' style='margin-top:8px'><b>Reward config:</b> ranting CFG: pos S_RANT,AROU,TENS,VOLT,ATCK,EMPH,S_AUTH,STNC,RANG; neg none; vn_w AROU2.5/S_RANT1.8/TENS1.5/VOLT1.5; emo Anger/Impatience/Contempt/Bitterness/Malevolence; w_vn3.0 w_emo2.5 (blend/genu default 0.5); wer soft.</div></details><details class="principle"><summary style="cursor:pointer;font-weight:800;font-size:16px">😱 Pain Scream — what won in round 5</summary>
+          <ul style="color:var(--mut);font-size:14px;margin:10px 0 0;padding-left:20px"><li>A SECOND affect burst decisively paid off here (as the brief predicted): the paired &#x27;(agonized scream) (sobbing gasp)&#x27; double burst -- scream + emotional sob -- beat any single burst. It was the exact lever that broke the round-4 char vs char_emo tradeoff, letting the winner hit BOTH char 0.69 and char_emo 0.92 with AROU ~4.8 (round-4 champ topped out at char_emo 0.94 but only when char collapsed).</li><li>MORE emotion came from adding &#x27;breaking into gasping sobs between screams&#x27; in the instruction + denser screamed interjections in the text (Aaargh!/Au!/Aaah!/Nngh!/it hurts). With WER gate off, the screams pass unpenalized and drove Distress ~4.1, Pain ~3.0, Helplessness ~3.3 -- best-of-64 top reward rose to 4.13 vs round-4&#x27;s 3.48.</li><li>The char (acoustic scream, AROU-weighted 3.5x) and char_emo (pain/sob) axes are strongly ANTI-correlated per take: pure top-of-lungs screaming (pa_terror char 0.90) tanks emotion (0.47), and heavy sobbing/begging (pa_terrtop char_emo 0.996) tanks arousal (char 0.33). Only the &#x27;maximum arousal + out of control&#x27; framing WITH the scream+sob double burst kept both high at once.</li><li>Screamed text reliably craters blend (often &lt;1), but with blend at only 0.5 weight and the pain/arousal dims at 2.5x/2.2x, that trade is strongly worth taking.</li></ul></details><details class="principle"><summary style="cursor:pointer;font-weight:800;font-size:16px">🌙 ASMR Man — what won in round 5</summary>
+          <ul style="color:var(--mut);font-size:14px;margin:10px 0 0;padding-left:20px"><li>Added an explicit EMOTION-narrative layer to the spoken-affect description: &#x27;every worry melting away, wrapped in calm and drifting, deeply content, serene and utterly at peace, breathing out a soft sigh of relief&#x27;. This drove the EmoNet Affection/Contentment/Relief heads hard, lifting best-of-64 char_emo from 0.669 (round 3) to 0.884 while keeping WER perfect.</li><li>&#x27;Overflowing with tender affection&#x27; up front (from the am_warm/am_tender line) was the single strongest recurring lever across generations — it won gen3 and seeded every playoff/final finalist. Naming AFFECTION explicitly beats generic &#x27;loving&#x27;.</li><li>The round-3 acoustic core (deep/soft/breathy/intimate close-mic/slow + warm low chest resonance UNDER the whisper + utterly meek, no authority) stays untouched and still carries char (S_WHIS 3.09, S_ASMR 2.17, WARM 4.16, VULN 3.25, S_AUTH 0.0 on the winning take).</li><li>Stacking a Contentment/Relief clause (&#x27;a soft sigh of relief&#x27;, &#x27;wrapped in calm and drifting&#x27;) on top of the Affection clause won the final — emotion breadth across all three rewarded emotions beats maxing one.</li></ul></details><details class="principle"><summary style="cursor:pointer;font-weight:800;font-size:16px">🌙 ASMR Woman — what won in round 5</summary>
+          <ul style="color:var(--mut);font-size:14px;margin:10px 0 0;padding-left:20px"><li>Replacing the onomatopoeic opener &quot;Shhh&quot; with a clean maternal phrase (&quot;There now, my love...&quot; / &quot;Sleep now, sweet one...&quot;) lifted the WER gate from invwer~0.786 (a fixed 1-word ASR error on &quot;Shhh&quot;) to 1.000, structurally raising the reward ceiling for the WER-gated archetype. This was the single biggest round-5 lever.</li><li>Adding a silken/velvety-smooth beauty descriptor (ESTH) together with &quot;unmistakably and softly feminine, silvery light and delicate&quot; pushed GEND from 0.89 (round-3 top) to ~4.9 and char from 0.624 to 0.824 — i.e. made it BOTH clearly feminine and more in-character, without hurting blend.</li><li>The maternal &quot;cradling her child to sleep, cheek to cheek, breathing love into every word&quot; simile (over the plainer &quot;murmuring ASMR to lull you asleep&quot;) carried Affection strongest (~4.0) and produced the top take in gen4 (max 3.481) and the winning best-of-64.</li><li>meek/gentle/yielding/never-commanding keeps S_AUTH/STNC ~0, reinforcing the caregiver read (unchanged from round 3).</li></ul></details><details class="principle"><summary style="cursor:pointer;font-weight:800;font-size:16px">😢 Grieving Woman — what won in round 5</summary>
+          <ul style="color:var(--mut);font-size:14px;margin:10px 0 0;padding-left:20px"><li>Round-5 rewards Arousal, so the round-4 &quot;crying softly&quot; champion lost; naming a CLEAR feminine subject (&quot;a grieving young woman, unmistakably and softly feminine&quot;) plus escalation dynamics (&quot;her crying rising into a shaking wail&quot;) pushed both Arousal (AROU up to ~2.7-3.3 on top takes) AND Sadness (~4.0) while GEND stayed clearly female — devastating grief text &quot;No... no, please... don&#x27;t leave me too... I can&#x27;t— I can&#x27;t lose anyone else...&quot; outscored every other line on Sadness (T2/T5 devastated it).</li><li>A single (sob) burst beat (wail)/(choked sob) and two-burst stacking (sw_2burst blend cratered to ~2.0); the winning balance kept blend high (~7-9) by writing the sobbing into the TEXT (broken &quot;I can&#x27;t— I can&#x27;t&quot;) and the escalation into the instruction rather than over-stacking wet/heaving affect words, which raised char_emo to 0.96 on the best-of-64 top take.</li></ul></details><details class="principle"><summary style="cursor:pointer;font-weight:800;font-size:16px">😔 Grieving Man — what won in round 5</summary>
+          <ul style="color:var(--mut);font-size:14px;margin:10px 0 0;padding-left:20px"><li>Pushed from the round-4 &#x27;voice cracking, on the edge of sobbing, fighting tears&#x27; (restrained) to OVERT hard crying -- &#x27;breaking down in tears, gasping and hitching between words, hard sobs catching in his throat, sobbing uncontrollably&#x27;. Reflecting the round-5 reward (Arousal now a rewarded pos dim, Sadness x3.0), this lifted the best-of-64 char_emo from 0.894 to 0.99 and reward from 4.07 to 4.69.</li><li>Breaking the spoken TEXT with a stammer (&#x27;I-I should have been there...&#x27;) induced audible cracking/choking at the seams without hurting WER (invWER stayed 1.0 on the winner) -- the affect-in-text lesson applied to grief.</li><li>&#x27;gasping and hitching between words&#x27; + &#x27;hard sobs catching in his throat&#x27; + &#x27;sobbing uncontrollably&#x27; was the core high-arousal crying engine; every generation winner carried it. Adding &#x27;keening&#x27; (sm4_gasp_wail) gave the single best take (char_emo 0.99).</li><li>The gender anchor &#x27;A man&#x27;s low, masculine voice&#x27; held the male read while the crying pushed pitch up -- the round-4 finding that one masculine phrase reliably splits gender still holds under much harder sobbing.</li></ul></details>
+</div></section>
+
+<section id="arc"><div class="wrap">
+  <div class="eyebrow">Five rounds of progress</div>
+  <h2 class="h2">The improvement arc</h2>
+  <p class="lead">Each round added a new lever, and the scores climbed. <b>Round 2</b> introduced the EmoNet emotion score (there was none in R1). <b>Round 3</b> added resonance, pitch and dominance. <b>Rounds 4–5</b> added per-dimension / per-emotion weights and pushed each voice to its extreme — the ork's hatred (char_emo 0.85→0.93), the grieving man's overt sobbing (0.89→0.99), the goblin caught cleaner <em>and</em> more malevolent, asmr_man's serenity (0.67→0.88), the mouse and asmr_woman climbing hard on character.</p>
+  <div class="tblwrap"><table class="tablearc">
+      <thead><tr><th rowspan="1">Character</th>
+      <th>char R1</th><th>char R3</th><th>char R4</th><th>char R5</th><th>Δ char</th>
+      <th>emo R3</th><th>emo R4</th><th>emo R5</th></tr></thead>
+      <tbody><tr><td>🧟 Zombie</td>
+          <td class="arccell">0.693</td><td class="arccell">0.809</td><td class="arccell flat">·</td><td class="arccell">0.799</td>
+          <td><span class="up">▲ +0.11</span></td>
+          <td class="arccell">0.546</td><td class="arccell flat">·</td><td class="arccell">0.552</td></tr><tr><td>👹 Ork</td>
+          <td class="arccell">0.336</td><td class="arccell">0.531</td><td class="arccell flat">·</td><td class="arccell">0.670</td>
+          <td><span class="up">▲ +0.33</span></td>
+          <td class="arccell">0.847</td><td class="arccell flat">·</td><td class="arccell">0.928</td></tr><tr><td>👺 Goblin</td>
+          <td class="arccell">0.584</td><td class="arccell">0.737</td><td class="arccell">0.476</td><td class="arccell">0.565</td>
+          <td><span class="flat">-0.02</span></td>
+          <td class="arccell">0.275</td><td class="arccell">0.665</td><td class="arccell">0.575</td></tr><tr><td>🐉 Dragon</td>
+          <td class="arccell">0.569</td><td class="arccell">0.724</td><td class="arccell flat">·</td><td class="arccell">0.648</td>
+          <td><span class="up">▲ +0.08</span></td>
+          <td class="arccell">0.705</td><td class="arccell flat">·</td><td class="arccell">0.858</td></tr><tr><td>👻 Evil Ghost</td>
+          <td class="arccell flat">·</td><td class="arccell flat">·</td><td class="arccell">0.592</td><td class="arccell">0.676</td>
+          <td><span class="up">▲ +0.08</span></td>
+          <td class="arccell flat">·</td><td class="arccell">0.583</td><td class="arccell">0.748</td></tr><tr><td>🐭 Cartoon Mouse</td>
+          <td class="arccell">0.752</td><td class="arccell">0.757</td><td class="arccell">0.869</td><td class="arccell">0.805</td>
+          <td><span class="up">▲ +0.05</span></td>
+          <td class="arccell">0.660</td><td class="arccell">0.642</td><td class="arccell">0.885</td></tr><tr><td>🧚 Fairy</td>
+          <td class="arccell">0.464</td><td class="arccell">0.711</td><td class="arccell flat">·</td><td class="arccell">0.724</td>
+          <td><span class="up">▲ +0.26</span></td>
+          <td class="arccell">0.782</td><td class="arccell flat">·</td><td class="arccell">0.888</td></tr><tr><td>🗯️ Ranting Fury</td>
+          <td class="arccell">0.648</td><td class="arccell">0.802</td><td class="arccell">0.798</td><td class="arccell">0.925</td>
+          <td><span class="up">▲ +0.28</span></td>
+          <td class="arccell">0.962</td><td class="arccell">0.742</td><td class="arccell">0.853</td></tr><tr><td>😱 Pain Scream</td>
+          <td class="arccell">0.846</td><td class="arccell">0.714</td><td class="arccell">0.737</td><td class="arccell">0.712</td>
+          <td><span class="flat">-0.13</span></td>
+          <td class="arccell">0.814</td><td class="arccell">0.938</td><td class="arccell">0.882</td></tr><tr><td>🌙 ASMR Man</td>
+          <td class="arccell">0.666</td><td class="arccell">0.615</td><td class="arccell flat">·</td><td class="arccell">0.625</td>
+          <td><span class="flat">-0.04</span></td>
+          <td class="arccell">0.669</td><td class="arccell flat">·</td><td class="arccell">0.884</td></tr><tr><td>🌙 ASMR Woman</td>
+          <td class="arccell">0.491</td><td class="arccell">0.624</td><td class="arccell flat">·</td><td class="arccell">0.824</td>
+          <td><span class="up">▲ +0.33</span></td>
+          <td class="arccell">0.865</td><td class="arccell flat">·</td><td class="arccell">0.555</td></tr><tr><td>😢 Grieving Woman</td>
+          <td class="arccell flat">·</td><td class="arccell flat">·</td><td class="arccell">0.706</td><td class="arccell">0.668</td>
+          <td><span class="flat">-0.04</span></td>
+          <td class="arccell flat">·</td><td class="arccell">0.917</td><td class="arccell">0.956</td></tr><tr><td>😔 Grieving Man</td>
+          <td class="arccell flat">·</td><td class="arccell flat">·</td><td class="arccell">0.623</td><td class="arccell">0.732</td>
+          <td><span class="up">▲ +0.11</span></td>
+          <td class="arccell flat">·</td><td class="arccell">0.894</td><td class="arccell">0.990</td></tr></tbody></table></div>
+      <p class="note">Blank = that round was not run for this character (voices were added at different stages; R1 had no emotion score at all). char / char_emo are absolute VoiceNet / EmoNet dimension scores and are directly comparable across rounds; the round-normalized <em>reward</em> is not.</p>
+</div></section>
+
+<section id="method"><div class="wrap">
+  <div class="eyebrow">Compute &amp; method</div>
+  <h2 class="h2">What it took</h2>
+  <div class="foot-stats">
+    <div class="fstat"><div class="fn">13</div><div class="fl">characters directed</div></div>
+    <div class="fstat"><div class="fn">5</div><div class="fl">evolutionary rounds</div></div>
+    <div class="fstat"><div class="fn">~4</div><div class="fl">generations × ~10 prompts each round</div></div>
+    <div class="fstat"><div class="fn">64</div><div class="fl">takes in each final best-of pick</div></div>
+    <div class="fstat"><div class="fn">~6,200</div><div class="fl">clips generated in round 5 alone</div></div>
+    <div class="fstat"><div class="fn">0</div><div class="fl">reference recordings used</div></div>
+  </div>
+  <p class="lead" style="margin:0 auto;text-align:center;max-width:760px">Every voice on this page was produced by <a href="https://huggingface.co/laion/moss-tts-local-transformer-4.55b-voice-acting"><b>laion/moss-tts-local-transformer-4.55b-voice-acting</b></a> — a 4.55B MOSS-TTS-Local-Transformer at native 48 kHz — from a natural-language instruction and target text, with <b>no reference audio</b>. Each round ran an evolutionary prompt search (best-of-8 while searching, best-of-64 for the final), scored by VoiceNet's 57 acoustic heads, Empathic-Insight EmoNet emotions, a VoiceCLAP burst-blend head, a genuineness head and a Whisper WER gate. The captions and dimension profiles shown here were freshly recomputed by re-embedding each champion clip with VoiceCLAP-commercial and running all 57 heads.</p>
+</div></section>
+
+<footer><div class="wrap">
+  <p>Part of the <a href="https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/overview.html">LAION MOSS-TTS-Local 4.55B voice-acting</a> project ·
+  earlier rounds: <a href="archetypes.html">R1</a> · <a href="archetypes_round2.html">R2</a> · <a href="archetypes_round3.html">R3</a> · <a href="archetypes_round4.html">R4</a></p>
+  <p class="note">Code Apache-2.0 · docs &amp; sample pages CC-BY-4.0 · audio generated by LAION MOSS-TTS-Local 4.55B</p>
+</div></footer>
+
+<script>
+function cp(btn){
+  var t=btn.parentElement.querySelector('.itext').innerText;
+  navigator.clipboard.writeText(t).then(function(){var o=btn.innerText;btn.innerText='copied ✓';setTimeout(function(){btn.innerText=o},1400);});
+}
+</script>
+</body></html>

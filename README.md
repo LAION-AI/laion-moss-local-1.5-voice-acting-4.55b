@@ -9,6 +9,14 @@ in **English and German**, at **native 48 kHz**.
 > **[`laion/moss-tts-local-transformer-4.55b-voice-acting`](https://huggingface.co/laion/moss-tts-local-transformer-4.55b-voice-acting)**
 > — Apache-2.0, no adapter handling needed.
 
+> ## 🏆🎭 **THE FINAL SHOWCASE — [13 Character Voices, Directed by Prompt](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/voices.html)**
+> The **capstone** of the character voice-acting study: the round-5 **best-of-64 champions** for all **13 voices**
+> (zombie · ork · goblin · dragon · evil-ghost · mouse · fairy · ranting · pain-scream · ASMR man/woman · grieving woman/man),
+> each with its **exact reusable prompt**, listenable champion audio + full VoiceNet profile, the **complete 13-principle
+> prompting playbook** distilled from all five rounds (with a copy-paste template and an effect→words lookup), and the
+> **round-1→5 improvement arc** — all **zero-shot, no reference audio**.
+> **→ [projects.laion.ai/.../voices.html](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/voices.html)**
+
 🎧 **Hear it:** [production best-of-64 grid](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/production_best50.html)
 — top-3 takes per group across 40 emotions with full quality scores, generated with this model.
 
@@ -43,6 +51,15 @@ double-length scripts ([dataset](https://huggingface.co/datasets/laion/moss-loca
 
 🎭🎯 **Round 4 — weighted dims & emotions, + 3 new voices:** [tuning the reward and building new characters](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/archetypes_round4.html)
 — introduces **per-dimension** (`vn_w`) and **per-emotion** (`emo_w`) reward weights so the search chases the two or three signals that define a character. Four archetypes are re-tuned (**goblin** made *more evil* — Malevolence ×2.5, char_emo 0.28 → 0.67; **mouse** pushed to an *extreme high pitch* — RANG ×2.5, char 0.76 → 0.87; **pain-scream** with *real screams written into the text* — "Aaah! … Aaargh!" — and Arousal ×2.5, char_emo 0.81 → 0.94; **ranting** with arousal up-weighted), and **three brand-new voices** are built from scratch: a **breathy evil ghost** (airy hollow whispered menace), a **crying woman** and a **crying man** (grief split by a single gender phrase; Sadness ×2.5, char_emo 0.92 / 0.89). Per-take weighted-dim values, firing emotions, and a weighting-behaviour lessons playbook.
+
+🎭🏆 **Round 5 — the FINAL showcase (all 13 voices):** [**13 Character Voices, Directed by Prompt**](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/voices.html)
+— the **definitive capstone** page. The round-5 **best-of-64 champions** for every one of the **13 characters**, each with its
+**exact reusable director instruction**, champion audio + a freshly recomputed 57-dim VoiceNet profile and procedural caption,
+its char / char_emo / blend / genu / invWER scores, signature dimensions and firing emotions. Adds a **complete "how to prompt any
+character voice" playbook** (13 principles, reusable template, effect→words lookup, per-character round-5 recipes), the full
+**round-1→5 improvement arc** table, and the compute/method footer. Round 5 introduced **per-character** blend/genu weights on top of
+the `vn_w`/`emo_w` levers and pushed every voice to its extreme (ork hatred char_emo 0.85→0.93; grieving man overt sobbing 0.89→0.99;
+goblin caught cleaner *and* more malevolent; ASMR-man serenity 0.67→0.88). Everything **zero-shot, no reference audio.**
 
 📘 **Practical cheat-sheet:** [**`PROMPTING_GUIDE.md`**](PROMPTING_GUIDE.md) — a for-dummies, per-archetype guide distilling all three rounds: copy-paste champion instructions, a short recipe for each character (which acoustic + resonance + pitch + dominance + emotion words, which bursts, what to avoid), a general principles list, and a reusable template.
 
