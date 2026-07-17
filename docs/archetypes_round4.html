@@ -1,0 +1,503 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Character Archetypes — Round 4 (Weighted Dims &amp; Emotions + 3 New Voices) — MOSS-TTS-Local 4.55B</title>
+<style>
+:root{--bg:#0c0d17;--panel:#14162a;--panel2:#191c33;--line:#2a2e50;--ink:#e9ecff;--mut:#9aa2c8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:22px 18px 80px}
+a{color:#a9b4ff}
+header.top h1{font-size:30px;margin:6px 0 8px;line-height:1.15}
+.sub{color:#d3d8ee;max-width:940px}
+.pill{display:inline-block;background:var(--panel2);border:1px solid var(--line);color:var(--mut);padding:3px 10px;border-radius:20px;font-size:12.5px;margin:6px 6px 0 0}
+.xlink{display:block;background:linear-gradient(180deg,#20244a,#171a30);border:1px solid #3a3f66;border-radius:12px;padding:12px 16px;margin:10px 0;color:#cdd6ff;text-decoration:none}
+.xlink b{color:#fff}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:16px 0}
+.intro p{max-width:940px;color:#d3d8ee} .intro b{color:#fff}
+.box{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin:14px 0}
+.bt{font-weight:700;color:#fff;margin-bottom:6px;font-size:13px;text-transform:uppercase;letter-spacing:.5px}
+code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;background:#0b0c16;border:1px solid var(--line);padding:2px 6px;border-radius:6px;color:#cdd6ff}
+h2{font-size:22px;margin:26px 0 10px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+th{color:var(--mut);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.5px;background:#10121f;position:sticky;top:0}
+td.num{text-align:right;font-family:ui-monospace,monospace;white-space:nowrap}
+td.an{white-space:nowrap} td.inst{color:#c7cdf0;font-size:12px;min-width:280px}
+td.nd{font-family:ui-monospace,monospace;font-size:11px;color:#f0c368;white-space:nowrap}
+td.rw,.rw{color:#c3b4ff;font-weight:700} td.em,.em{color:#6fe3ba}
+td.te{color:#f0c368;font-size:12px;white-space:nowrap}
+.delta{font-size:11px;padding:1px 5px;border-radius:5px;font-family:ui-monospace,monospace}
+.delta.up{background:rgba(47,191,143,.15);color:#5fe0b4} .delta.down{background:rgba(232,99,111,.15);color:#ff9098}
+td.cnote{font-size:12.5px;color:#d3d8ee;min-width:360px}
+.badge{font-size:10px;padding:1px 6px;border-radius:5px;font-weight:700;vertical-align:middle}
+.badge.new{background:rgba(124,92,255,.2);color:#c3b4ff;border:1px solid rgba(124,92,255,.4)}
+.badge.tun{background:rgba(47,191,143,.14);color:#6fe3ba;border:1px solid rgba(47,191,143,.32)}
+section.arch{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin:20px 0}
+.archhead{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.archhead h2{margin:0;font-size:22px}
+.cfg{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.wtag{font-family:ui-monospace,monospace;font-size:11px;padding:2px 7px;border-radius:5px;background:#0b0c16;border:1px solid var(--line);color:#b9c0e0}
+.chip{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;border:1px solid var(--line);margin:2px 2px;font-family:ui-monospace,monospace}
+.chip.pos{background:rgba(47,191,143,.13);color:#6fe3ba;border-color:rgba(47,191,143,.35)}
+.chip.emw{background:rgba(124,92,255,.16);color:#c3b4ff;border-color:rgba(124,92,255,.4)}
+.chip.neg{background:rgba(232,99,111,.12);color:#ff9098;border-color:rgba(232,99,111,.3)}
+.briefbox{color:#c7cdf0;font-size:13px;margin:10px 0;padding:10px 14px;background:var(--panel2);border:1px solid var(--line);border-radius:10px}
+.notebox{color:#d3d8ee;font-size:12.5px;margin:8px 0;padding:10px 14px;background:#10121f;border:1px solid var(--line);border-left:3px solid #7c5cff;border-radius:8px}
+.champbox{background:linear-gradient(180deg,#20244a,#191d33);border:1px solid #3a3f66;border-radius:12px;padding:12px 16px;margin:12px 0}
+.champ{margin:4px 0 0;color:#e9ecff} .champ2{margin:4px 0 0;color:#aeb6df;font-size:13px;font-style:italic}
+.colh{font-weight:700;color:#fff;margin:14px 0 8px;font-size:14px}
+.cs{color:var(--mut);font-weight:400;font-size:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:900px){.grid3{grid-template-columns:1fr}}
+.take{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:11px 12px}
+.takehead{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:7px}
+.rk{font-weight:700;color:var(--mut);font-size:12px;margin-right:2px}
+.mtag{font-family:ui-monospace,monospace;font-size:10.5px;padding:2px 6px;border-radius:5px;background:#0b0c16;border:1px solid var(--line);color:#b9c0e0}
+.mtag.reward{background:rgba(124,92,255,.18);color:#c3b4ff;border-color:rgba(124,92,255,.4);font-weight:700}
+.mtag.char{background:rgba(47,191,143,.13);color:#6fe3ba;border-color:rgba(47,191,143,.3)}
+.mtag.emo2{background:rgba(240,195,104,.13);color:#f0c368;border-color:rgba(240,195,104,.3)}
+audio{width:100%;height:34px;margin:2px 0 6px}
+.ndrow,.emorow{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0;align-items:center}
+.ndlbl{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--mut);width:100%}
+.ndim{font-size:10.5px;padding:1px 7px;border-radius:5px;border:1px solid var(--line);font-family:ui-monospace,monospace}
+.ndim.good{background:rgba(47,191,143,.16);color:#6fe3ba;border-color:rgba(47,191,143,.38)}
+.ndim.meh{background:#0b0c16;color:#9aa2c8}
+.ndim .wt{color:#c3b4ff}
+.emo{font-size:10.5px;padding:1px 7px;border-radius:20px;border:1px solid var(--line);font-family:ui-monospace,monospace}
+.emo.hi{background:rgba(124,92,255,.18);color:#c3b4ff;border-color:rgba(124,92,255,.4)}
+.emo.mid{background:rgba(124,92,255,.08);color:#9a9ad8} .emo.lo{color:#6a719a}
+.emo .ew{color:#f0c368;margin-left:3px}
+.hyp{font-style:italic;color:#c7cdf0;font-size:12.5px;margin:6px 0}
+.capttl{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--mut);margin-top:6px}
+ul.cap{margin:4px 0 0;padding-left:16px;font-size:12px;color:#cdd6ff} ul.cap li{margin:1px 0}
+.compute{margin-top:10px;color:var(--mut);font-size:12.5px}
+.miss{color:#ff9098;font-size:12px}
+.spark{background:#0b0c16;border:1px solid var(--line);border-radius:8px;margin-left:6px}
+tr.tot td{font-weight:700;color:#fff;border-top:2px solid var(--line)}
+ul.lessons{padding-left:20px} ul.lessons li{margin:9px 0;color:#d3d8ee}
+.foot{color:var(--mut);font-size:12.5px;margin-top:30px;border-top:1px solid var(--line);padding-top:16px}
+</style></head>
+<body><div class="wrap">
+
+<header class="top">
+<h1>Directing character voices — Round 4: weighted dimensions &amp; emotions, plus 3 new voices</h1>
+<div class="sub">Round&nbsp;4 of the prompt-evolution study with <b>MOSS-TTS-Local 4.55B</b>, still <b>zero-shot, no reference audio</b>. This round introduces <b>per-dimension</b> and <b>per-emotion reward weights</b> so the search can chase the few signals that define a character, re-tunes four existing archetypes toward specific asks, and adds three brand-new voices.</div>
+<div>
+<span class="pill">7 archetypes · round 4</span><span class="pill">per-dim weights (vn_w)</span>
+<span class="pill">per-emotion weights (emo_w)</span><span class="pill">3 new archetypes</span>
+<span class="pill">2,253 clips generated</span></div>
+<a class="xlink" href="archetypes.html">← <b>Round&nbsp;1: acoustics-only study</b> (character reward)</a>
+<a class="xlink" href="archetypes_round2.html">← <b>Round&nbsp;2: emotion-aware reward</b> (EmoNet char_emo added)</a>
+<a class="xlink" href="archetypes_round3.html">← <b>Round&nbsp;3: resonance · pitch · dominance</b> dims</a>
+</header>
+
+<div class="card intro">
+<h2 style="margin-top:8px;border:none">What changed in round 4</h2>
+<p>The reward keeps the round-2/3 shape — <span class="mono">0.5·blend + 0.5·genu + w_vn·char_vn + w_emo·char_emo</span>, min-max normalized per best-of-N call, times a WER factor — but <span class="mono">char_vn</span> and <span class="mono">char_emo</span> are now <b>weighted means</b>. Each archetype can assign a <b>per-dimension weight</b> (<span class="mono">vn_w</span>) and a <b>per-emotion weight</b> (<span class="mono">emo_w</span>), so the two or three signals that truly define a character count for more than the incidental ones.</p>
+<div class="box">
+<div class="bt">The four re-tuned archetypes</div>
+<p style="margin:6px 0">• <b>👺 Evil Goblin</b> — pushed from gleeful-cute toward <b>sinister, cruel, sadistic menace</b>; <b>Malevolence/Malice ×2.5</b>.<br>
+• <b>🐭 High-Pitch Mouse</b> — pushed to an <b>extreme high register</b>; <b>RANG ×2.5, REGS ×2.0, BRGT ×1.8</b>.<br>
+• <b>😱 Pain Scream</b> — <b>real screams written into the text</b> (&lsquo;Aaah! … Aaargh!&rsquo;) and <b>Arousal ×2.5</b>.<br>
+• <b>🗯️ Ranting Fury</b> — <b>Arousal/intensity up-weighted</b> further (AROU ×2.5, S_RANT ×1.8).</p>
+</div>
+<div class="box">
+<div class="bt">The three new archetypes</div>
+<p style="margin:6px 0">• <b>👻 Breathy Evil Ghost</b> — airy hollow whispered menace, cold and sinister.<br>
+• <b>😢 Crying Woman</b> — grief, sobbing, a breaking tearful voice.<br>
+• <b>😭 Crying Man</b> — the same grief with a male voice cracking and choked sobs.</p>
+</div>
+<p>Each archetype was seeded (tuned ones from their round-3 champion, new ones authored fresh, ~10 candidates), evolved over several best-of-8 generations with programmatic mutation, picked in a <b>same-call playoff</b>, and finalized with <b>best-of-64</b> — all on a <b>single GPU</b>. Every number below is re-loaded from the run summaries; the per-take <b>weighted-dim</b> values and the procedural caption are freshly re-predicted from each take's full 57-dim VoiceNet profile.</p>
+</div>
+
+<h2 id="high">High-level results (best-of-64 champions)</h2>
+<div class="scroll"><table>
+<thead><tr><th>Archetype</th><th>Round-4 best instruction</th><th>Up-weighted signals</th><th>reward</th><th>char_vn</th><th>char_emo</th><th>blend</th><th>invWER</th><th>Top firing emotions</th></tr></thead>
+<tbody><tr>
+      <td class="an">👺 <b>Evil Goblin</b> <span class="badge tun">tuned</span></td>
+      <td class="inst">A dark, malevolent little goblin, nasal, pinched, reedy and grating, buzzing high through the nose. Cold sadistic cruelty under every gloating word, wicked and vicious, menacing and threatening, hissing malice. The whiny pitch swoops and cracks higher and shriller with evil glee, snickering, taunting. A weak cowardly nobody, no authority. No chest, no warmth, no fullness. High quality recording.</td>
+      <td class="nd">Malevolence×2.5 Contempt×1.5 Bitterness×1.3 Teasing×0.5</td>
+      <td class="num rw">2.47</td>
+      <td class="num">0.48</td>
+      <td class="num em">0.67</td>
+      <td class="num">0.94</td>
+      <td class="num">0.85</td>
+      <td class="te">Teasing 1.7, Malevolence 1.3, Contempt 1.2</td></tr>
+<tr>
+      <td class="an">🐭 <b>High-Pitch Mouse</b> <span class="badge tun">tuned</span></td>
+      <td class="inst">A tiny timid mouse squeaking excitedly, pitched impossibly high, small and piercing, thin and pinched, bright buzzing nasal head resonance, tense. The pitch darts, leaps and cracks up to the very top and back, giddy and squeaky. Amazed, curious and delighted. Weightless and young, no chest, no fullness, meek, no authority. A shrill weightless squeak at the very top of its range. (tiny gasp) High quality recording.</td>
+      <td class="nd">RANG×2.5 REGS×2 BRGT×1.8 R_HEAD×1.5</td>
+      <td class="num rw">2.99</td>
+      <td class="num">0.87</td>
+      <td class="num em">0.64</td>
+      <td class="num">1.98</td>
+      <td class="num">1.00</td>
+      <td class="te">Interest 2.4, Astonishment 1.9, Elation 1.6</td></tr>
+<tr>
+      <td class="an">😱 <b>Pain Scream</b> <span class="badge tun">tuned</span></td>
+      <td class="inst">Maximum raw screaming in unbearable physical agony and terror, throat tearing, voice shredded, guttural and harsh, grating rasp ripping, each scream cracking higher and more frantic. Panic-stricken, helpless, drowning in pain. Extreme arousal, extreme tension, violently volatile and out of control. Raw agonized screaming, throat tearing apart. (agonized scream) (terrified scream) High quality recording.</td>
+      <td class="nd">AROU×2.5 VOLT×1.8 TENS×1.5 ARSH×1.5 Pain×2 Distress×1.5 Fear×1.2</td>
+      <td class="num rw">3.48</td>
+      <td class="num">0.74</td>
+      <td class="num em">0.94</td>
+      <td class="num">4.16</td>
+      <td class="num">0.71</td>
+      <td class="te">Distress 4.0, Fear 3.7, Helplessness 3.6</td></tr>
+<tr>
+      <td class="an">🗯️ <b>Ranting Fury</b> <span class="badge tun">tuned</span></td>
+      <td class="inst">A boiling-over furious tirade, voice tearing and cracking with seething rage, spitting venom, aggressive and in-your-face, domineering and browbeating with contempt, refusing to yield. Harsh, tense, extremely volatile and high-arousal, explosive consonants, pounding relentless emphasis, pitch lurching violently high to low, escalating. Roaring but the words land. (enraged shout)(seething snarl) High quality recording.</td>
+      <td class="nd">AROU×2.5 S_RANT×1.8 TENS×1.5 VOLT×1.5</td>
+      <td class="num rw">4.56</td>
+      <td class="num">0.80</td>
+      <td class="num em">0.74</td>
+      <td class="num">2.69</td>
+      <td class="num">1.00</td>
+      <td class="te">Anger 4.3, Impatience and Irritability 4.0, Bitterness 1.3</td></tr>
+<tr>
+      <td class="an">👻 <b>Breathy Evil Ghost</b> <span class="badge new">NEW</span></td>
+      <td class="inst">A breathy evil ghost, airy and hollow, whispering menace through an ethereal rasp, all air and no body, cold and sinister. Seething with quiet malice and contempt, a dreadful whispered threat, tense and rasping. Wicked, cruel and menacing, dripping with dread. No warmth, no fullness, no brightness. Cold, sinister and dreadful, seething with quiet malice. (breathy hiss) High quality recording.</td>
+      <td class="nd">S_WHIS×1.8 RESP×1.8 TENS×1.2 Malevolence×2 Contempt×1.5 Fear×1.2</td>
+      <td class="num rw">3.28</td>
+      <td class="num">0.59</td>
+      <td class="num em">0.58</td>
+      <td class="num">10.00</td>
+      <td class="num">1.00</td>
+      <td class="te">Malevolence 2.2, Fear 1.9, Contempt 0.6</td></tr>
+<tr>
+      <td class="an">😢 <b>Crying Woman</b> <span class="badge new">NEW</span></td>
+      <td class="inst">A mourning woman crying softly, her voice trembling and breaking, choked and wet with tears, sniffling between words. Heartbroken, inconsolable, aching with deep sorrow and longing, helpless and disappointed. Softly feminine, raw and vulnerable, shaking and broken. (sniffle) High quality recording.</td>
+      <td class="nd">VULN×1.8 RESP×1.5 Sadness×2.5 Distress×1.5 Helplessness×1.3</td>
+      <td class="num rw">4.43</td>
+      <td class="num">0.71</td>
+      <td class="num em">0.92</td>
+      <td class="num">10.00</td>
+      <td class="num">1.00</td>
+      <td class="te">Distress 3.6, Helplessness 3.6, Sadness 3.6</td></tr>
+<tr>
+      <td class="an">😭 <b>Crying Man</b> <span class="badge new">NEW</span></td>
+      <td class="inst">A man&#x27;s voice cracking with sorrow, breaking and wavering, choked and unsteady, on the edge of sobbing. Heartbroken and guilt-stricken, aching with grief and longing, helpless and disappointed. Low and masculine, raw and vulnerable, fighting tears, faltering. (shaky breath) High quality recording.</td>
+      <td class="nd">VULN×1.8 RESP×1.5 Sadness×2.5 Distress×1.5 Helplessness×1.3</td>
+      <td class="num rw">4.07</td>
+      <td class="num">0.62</td>
+      <td class="num em">0.89</td>
+      <td class="num">9.96</td>
+      <td class="num">1.00</td>
+      <td class="te">Distress 3.6, Disappointment 3.5, Sadness 3.4</td></tr></tbody></table></div>
+<p style="color:var(--mut);font-size:12.5px">Reward is per-call normalized — compare within a row's history, not across archetypes. &ldquo;Up-weighted signals&rdquo; lists the per-dim (vn_w) and per-emotion (emo_w) weights this round.</p>
+
+<h2 id="compare">Re-tuned archetypes: round&nbsp;3 → round&nbsp;4</h2>
+<div class="scroll"><table>
+<thead><tr><th>Archetype</th><th>R3 char</th><th>R4 char</th><th>R3 emo</th><th>R4 emo</th><th>What the weighting + re-authoring did</th></tr></thead>
+<tbody><tr>
+      <td class="an">👺 <b>Evil Goblin</b></td>
+      <td class="num">0.74</td>
+      <td class="num">0.48 <span class="delta down">-0.26</span></td>
+      <td class="num">0.28</td>
+      <td class="num em">0.67 <span class="delta up">+0.39</span></td>
+      <td class="cnote">Round&nbsp;4 up-weighted the <b>Malevolence/Malice</b> emotion head <b>×2.5</b> (plus Contempt ×1.5, Bitterness ×1.3) and re-authored the prompt toward <b>sinister, cruel, sadistic, threatening</b> menace instead of gleeful-cute. char_emo moved from R3 <b>0.28</b> to <b>0.67</b>; char_vn 0.48.</td></tr>
+<tr>
+      <td class="an">🐭 <b>High-Pitch Mouse</b></td>
+      <td class="num">0.76</td>
+      <td class="num">0.87 <span class="delta up">+0.11</span></td>
+      <td class="num">0.66</td>
+      <td class="num em">0.64 <span class="delta down">-0.02</span></td>
+      <td class="cnote">Round&nbsp;4 heavily up-weighted the pitch dims — <b>RANG ×2.5, REGS ×2.0, BRGT ×1.8, R_HEAD ×1.5</b> — and pushed the prompt to an <b>impossibly high, tiny, piercing squeak</b>. char_vn R3 <b>0.76</b> → R4 <b>0.87</b>.</td></tr>
+<tr>
+      <td class="an">😱 <b>Pain Scream</b></td>
+      <td class="num">0.71</td>
+      <td class="num">0.74 <span class="delta up">+0.02</span></td>
+      <td class="num">0.81</td>
+      <td class="num em">0.94 <span class="delta up">+0.12</span></td>
+      <td class="cnote">Round&nbsp;4 wrote <b>actual screams into the text</b> (&lsquo;Aaah!&rsquo;, &lsquo;Au!&rsquo;, &lsquo;Urgh!&rsquo;, &lsquo;Aaargh!&rsquo;, &lsquo;Nngh!&rsquo;) and up-weighted <b>Arousal ×2.5</b> (VOLT ×1.8, TENS/ARSH ×1.5, Pain ×2.0). The delivery is rawer and more scream-like; char_vn 0.74, char_emo 0.94.</td></tr>
+<tr>
+      <td class="an">🗯️ <b>Ranting Fury</b></td>
+      <td class="num">0.80</td>
+      <td class="num">0.80 <span class="delta down">-0.00</span></td>
+      <td class="num">0.96</td>
+      <td class="num em">0.74 <span class="delta down">-0.22</span></td>
+      <td class="cnote">Round&nbsp;4 up-weighted <b>Arousal ×2.5</b> (S_RANT ×1.8, TENS/VOLT ×1.5) on top of the round-3 domineering-stance + wild-pitch framing. char_vn 0.80, char_emo 0.74.</td></tr></tbody></table></div>
+
+<h2 id="perarch">Per-archetype detail</h2>
+<p style="color:var(--mut);font-size:13px">Each section shows the champion instruction and spoken text, then the Best-3-of-64 takes. Every take has a lazy-loaded audio player, its reward / char_vn / char_emo / blend / genu / invWER, the <b>up-weighted dim values</b> (re-predicted, ↑/↓ = rewarded direction, ×weight shown, green = landed), the firing EmoNet emotions (×weight marks the up-weighted ones), the spoken words, and a procedural top-5 caption from its 57-dim profile.</p>
+
+<section class="arch" id="goblin">
+  <div class="archhead"><h2>👺 Evil Goblin <span class="badge tun">tuned</span></h2>
+    <div class="cfg"><span class="wtag">weights:</span><span class="chip emw">Malevolence ×2.5</span> <span class="chip emw">Contempt ×1.5</span> <span class="chip emw">Bitterness ×1.3</span> <span class="chip emw">Teasing ×0.5</span><span class="chip neg">FULL ↓</span> <span class="chip neg">R_CHST ↓</span> <span class="chip neg">WARM ↓</span> <span class="chip neg">S_AUTH ↓</span><svg class="spark" width="132" height="26" viewBox="0 0 132 26"><polyline fill="none" stroke="#7c5cff" stroke-width="2" points="3.0,19.2 34.5,20.6 66.0,19.6 97.5,23.0 129.0,3.0"/></svg></div></div>
+  <div class="briefbox">A nasty little goblin made MORE EVIL: the same pinched extremely-nasal buzzing reedy scratchy rasp with wildly leaping cracking pitch, but the glee is now sinister, cruel, sadistic and threatening. Round 4 heavily up-weights the Malevolence/Malice emotion (emo_w 2.5) so the reward pays for wicked, vicious menace, not just gleeful-cute.</div>
+  <div class="notebox">Round&nbsp;4 up-weighted the <b>Malevolence/Malice</b> emotion head <b>×2.5</b> (plus Contempt ×1.5, Bitterness ×1.3) and re-authored the prompt toward <b>sinister, cruel, sadistic, threatening</b> menace instead of gleeful-cute. char_emo moved from R3 <b>0.28</b> to <b>0.67</b>; char_vn 0.48.</div>
+  <div class="champbox">
+    <div class="bt">Round-4 champion instruction</div><p class="champ">A dark, malevolent little goblin, nasal, pinched, reedy and grating, buzzing high through the nose. Cold sadistic cruelty under every gloating word, wicked and vicious, menacing and threatening, hissing malice. The whiny pitch swoops and cracks higher and shriller with evil glee, snickering, taunting. A weak cowardly nobody, no authority. No chest, no warmth, no fullness. High quality recording.</p>
+    <div class="bt" style="margin-top:8px">Spoken text</div><p class="champ2">&ldquo;Heh heh, what have we here? A lost little traveler with shiny pockets?&rdquo;</p>
+  </div>
+  <div class="colh">Best 3 of 64 <span class="cs">(final N=64, GPU 0)</span></div>
+  <div class="grid3"><div class="take">
+      <div class="takehead"><span class="rk">#1</span><span class="mtag reward">reward 2.47</span><span class="mtag char">char_vn 0.48</span><span class="mtag emo2">char_emo 0.67</span><span class="mtag">blend 0.94</span><span class="mtag">genu 1.41</span><span class="mtag">invWER 0.85</span><span class="mtag">11.7s</span></div>
+      <audio controls preload="none" src="audio_r4/goblin_g_dark__s34_8b74db9a.mp3"></audio>
+      <div class="ndrow"><span class="ndlbl">Weighted dims (re-predicted · ↑/↓ rewarded dir · ×weight):</span><span class="ndim meh" title="Nasal Resonance — reward wants high">R_NASL ↑ <b>2.8</b><span class="wt"></span></span><span class="ndim meh" title="Roughness — reward wants high">ROUG ↑ <b>2.9</b><span class="wt"></span></span><span class="ndim good" title="Cartoonish Style — reward wants high">S_CART ↑ <b>3.4</b><span class="wt"></span></span><span class="ndim meh" title="Tension — reward wants high">TENS ↑ <b>0.9</b><span class="wt"></span></span></div>
+      <div class="emorow"><span class="ndlbl">Firing emotions (×weight = up-weighted in reward):</span><span class="emo hi">Teasing <b>1.71</b><span class="ew">×0.5</span></span><span class="emo mid">Malevolence/Malice <b>1.25</b><span class="ew">×2.5</span></span><span class="emo mid">Contempt <b>1.20</b><span class="ew">×1.5</span></span><span class="emo lo">Anger <b>0.09</b></span><span class="emo lo">Bitterness <b>0.01</b><span class="ew">×1.3</span></span></div>
+      <div class="hyp">&ldquo;What have we here? A lost little traveler with shiny pockets?&rdquo;</div>
+      <div class="capttl">Procedural caption from re-predicted 57-dim profile</div>
+      <ul class="cap"><li>Extremely collapsing in energy.</li><li>Extremely dark and muffled.</li><li>Extremely soft and gentle in onset.</li><li>Extremely calm and low-energy.</li><li>Extremely meek and submissive.</li></ul>
+    </div><div class="take">
+      <div class="takehead"><span class="rk">#2</span><span class="mtag reward">reward 2.42</span><span class="mtag char">char_vn 0.60</span><span class="mtag emo2">char_emo 0.51</span><span class="mtag">blend 2.92</span><span class="mtag">genu 1.62</span><span class="mtag">invWER 0.77</span><span class="mtag">8.5s</span></div>
+      <audio controls preload="none" src="audio_r4/goblin_g_dark__s43_b3dbfffa.mp3"></audio>
+      <div class="ndrow"><span class="ndlbl">Weighted dims (re-predicted · ↑/↓ rewarded dir · ×weight):</span><span class="ndim good" title="Nasal Resonance — reward wants high">R_NASL ↑ <b>3.2</b><span class="wt"></span></span><span class="ndim meh" title="Roughness — reward wants high">ROUG ↑ <b>1.8</b><span class="wt"></span></span><span class="ndim good" title="Cartoonish Style — reward wants high">S_CART ↑ <b>3.5</b><span class="wt"></span></span><span class="ndim meh" title="Tension — reward wants high">TENS ↑ <b>1.8</b><span class="wt"></span></span></div>
+      <div class="emorow"><span class="ndlbl">Firing emotions (×weight = up-weighted in reward):</span><span class="emo hi">Teasing <b>1.93</b><span class="ew">×0.5</span></span><span class="emo mid">Malevolence/Malice <b>0.98</b><span class="ew">×2.5</span></span><span class="emo mid">Contempt <b>0.86</b><span class="ew">×1.5</span></span><span class="emo lo">Bitterness <b>0.01</b><span class="ew">×1.3</span></span><span class="emo lo">Anger <b>0.00</b></span></div>
+      <div class="hyp">&ldquo;What have we here? A lost little traveller with shiny pockets?&rdquo;</div>
+      <div class="capttl">Procedural caption from re-predicted 57-dim profile</div>
+      <ul class="cap"><li>Very playful and humorous.</li><li>Very casual and informal.</li><li>Very submissive and unassertive.</li><li>Very soft and gentle in onset.</li><li>Very casual and loose.</li></ul>
+    </div><div class="take">
+      <div class="takehead"><span class="rk">#3</span><span class="mtag reward">reward 2.29</span><span class="mtag char">char_vn 0.66</span><span class="mtag emo2">char_emo 0.48</span><span class="mtag">blend 2.23</span><span class="mtag">genu 1.10</span><span class="mtag">invWER 0.77</span><span class="mtag">7.4s</span></div>
+      <audio controls preload="none" src="audio_r4/goblin_g_dark__s18_815b068a.mp3"></audio>
+      <div class="ndrow"><span class="ndlbl">Weighted dims (re-predicted · ↑/↓ rewarded dir · ×weight):</span><span class="ndim good" title="Nasal Resonance — reward wants high">R_NASL ↑ <b>5.3</b><span class="wt"></span></span><span class="ndim meh" title="Roughness — reward wants high">ROUG ↑ <b>2.7</b><span class="wt"></span></span><span class="ndim good" title="Cartoonish Style — reward wants high">S_CART ↑ <b>3.8</b><span class="wt"></span></span><span class="ndim meh" title="Tension — reward wants high">TENS ↑ <b>2.2</b><span class="wt"></span></span></div>
+      <div class="emorow"><span class="ndlbl">Firing emotions (×weight = up-weighted in reward):</span><span class="emo hi">Teasing <b>1.91</b><span class="ew">×0.5</span></span><span class="emo mid">Contempt <b>1.18</b><span class="ew">×1.5</span></span><span class="emo mid">Malevolence/Malice <b>0.69</b><span class="ew">×2.5</span></span><span class="emo lo">Bitterness <b>0.02</b><span class="ew">×1.3</span></span><span class="emo lo">Anger <b>0.00</b></span></div>
+      <div class="hyp">&ldquo;He what have we here? A lost little traveller with shiny pockets?&rdquo;</div>
+      <div class="capttl">Procedural caption from re-predicted 57-dim profile</div>
+      <ul class="cap"><li>Extremely heavily nasal in resonance.</li><li>Very narrator-like and storybook.</li><li>Very bright in oral resonance.</li><li>Very storytelling in style.</li><li>Very effortless and fluent.</li></ul>
+    </div></div>
+  <div class="compute">Compute: <b>312</b> clips · <b>626</b> s · 0.499 clips/s</div>
+</section>
+
+<section class="arch" id="mouse">
+  <div class="archhead"><h2>🐭 High-Pitch Mouse <span class="badge tun">tuned</span></h2>
+    <div class="cfg"><span class="wtag">weights:</span><span class="chip pos">RANG ×2.5</span> <span class="chip pos">REGS ×2</span> <span class="chip pos">BRGT ×1.8</span> <span class="chip pos">R_HEAD ×1.5</span><span class="chip neg">AGEV ↓</span> <span class="chip neg">R_CHST ↓</span> <span class="chip neg">FULL ↓</span> <span class="chip neg">S_AUTH ↓</span><svg class="spark" width="132" height="26" viewBox="0 0 132 26"><polyline fill="none" stroke="#7c5cff" stroke-width="2" points="3.0,19.9 34.5,23.0 66.0,22.4 97.5,16.5 129.0,3.0"/></svg></div></div>
+  <div class="briefbox">A tiny cartoon mouse pushed to an EXTREME high pitch: the nasal buzzing piercing head voice, now with pitch RANGE, REGISTER, brightness and head-resonance heavily up-weighted (vn_w RANG 2.5 / REGS 2.0 / BRGT 1.8 / R_HEAD 1.5) so the reward chases the highest, tiniest, squeakiest register.</div>
+  <div class="notebox">Round&nbsp;4 heavily up-weighted the pitch dims — <b>RANG ×2.5, REGS ×2.0, BRGT ×1.8, R_HEAD ×1.5</b> — and pushed the prompt to an <b>impossibly high, tiny, piercing squeak</b>. char_vn R3 <b>0.76</b> → R4 <b>0.87</b>.</div>
+  <div class="champbox">
+    <div class="bt">Round-4 champion instruction</div><p class="champ">A tiny timid mouse squeaking excitedly, pitched impossibly high, small and piercing, thin and pinched, bright buzzing nasal head resonance, tense. The pitch darts, leaps and cracks up to the very top and back, giddy and squeaky. Amazed, curious and delighted. Weightless and young, no chest, no fullness, meek, no authority. A shrill weightless squeak at the very top of its range. (tiny gasp) High quality recording.</p>
+    <div class="bt" style="margin-top:8px">Spoken text</div><p class="champ2">&ldquo;Wait for me, wait for me! Did you see that, did you see how big it was?&rdquo;</p>
+  </div>
+  <div class="colh">Best 3 of 64 <span class="cs">(final N=64, GPU 0)</span></div>
+  <div class="grid3"><div class="take">
+      <div class="takehead"><span class="rk">#1</span><span class="mtag reward">reward 2.99</span><span class="mtag char">char_vn 0.87</span><span class="mtag emo2">char_emo 0.64</span><span class="mtag">blend 1.98</span><span class="mtag">genu 1.25</span><span class="mtag">invWER 1.00</span><span class="mtag">12.2s</span></div>
+      <audio controls preload="none" src="audio_r4/mouse_mo2_3__s18_3aacf163.mp3"></audio>
+      <div class="ndrow"><span class="ndlbl">Weighted dims (re-predicted · ↑/↓ rewarded dir · ×weight):</span><span class="ndim good" title="Pitch Range — reward wants high, weight 2.5">RANG ↑ <b>4.9</b><span class="wt"> ×2.5</span></span><span class="ndim good" title="Register — reward wants high, weight 2.0">REGS ↑ <b>4.0</b><span class="wt"> ×2</span></span><span class="ndim meh" title="Brightness — reward wants high, weight 1.8">BRGT ↑ <b>3.0</b><span class="wt"> ×1.8</span></span><span class="ndim meh" title="Head Resonance — reward wants high, weight 1.5">R_HEAD ↑ <b>3.0</b><span class="wt"> ×1.5</span></span></div>
+      <div class="emorow"><span class="ndlbl">Firing emotions (×weight = up-weighted in reward):</span><span class="emo hi">Interest <b>2.45</b></span><span class="emo hi">Astonishment/Surprise <b>1.92</b></span><span class="emo hi">Elation <b>1.60</b></span><span class="emo lo">Amusement <b>0.02</b></span></div>
+      <div class="hyp">&ldquo;Wait for me wait for me Did you see that? Did you see how big it was?&rdquo;</div>
+      <div class="capttl">Procedural caption from re-predicted 57-dim profile</div>
+      <ul class="cap"><li>Extremely thin in chest resonance.</li><li>Extremely wide-ranging in pitch.</li><li>Very choppy and fragmented.</li><li>Very rough and raspy.</li><li>Very submissive and unassertive.</li></ul>
+    </div><div class="take">
+      <div class="takehead"><span class="rk">#2</span><span class="mtag reward">reward 2.90</span><span class="mtag char">char_vn 0.91</span><span class="mtag emo2">char_emo 0.64</span><span class="mtag">blend 1.77</span><span class="mtag">genu 0.79</span><span class="mtag">invWER 0.94</span><span class="mtag">9.4s</span></div>
+      <audio controls preload="none" src="audio_r4/mouse_mo2_3__s40_cc957dad.mp3"></audio>
+      <div class="ndrow"><span class="ndlbl">Weighted dims (re-predicted · ↑/↓ rewarded dir · ×weight):</span><span class="ndim good" title="Pitch Range — reward wants high, weight 2.5">RANG ↑ <b>4.6</b><span class="wt"> ×2.5</span></span><span class="ndim good" title="Register — reward wants high, weight 2.0">REGS ↑ <b>4.4</b><span class="wt"> ×2</span></span><span class="ndim good" title="Brightness — reward wants high, weight 1.8">BRGT ↑ <b>3.4</b><span class="wt"> ×1.8</span></span><span class="ndim good" title="Head Resonance — reward wants high, weight 1.5">R_HEAD ↑ <b>4.0</b><span class="wt"> ×1.5</span></span></div>
+      <div class="emorow"><span class="ndlbl">Firing emotions (×weight = up-weighted in reward):</span><span class="emo hi">Interest <b>2.44</b></span><span class="emo hi">Amusement <b>1.57</b></span><span class="emo hi">Elation <b>1.57</b></span><span class="emo mid">Astonishment/Surprise <b>0.92</b></span></div>
+      <div class="hyp">&ldquo;Oh wait for me, wait for me Did you see that? Did you see how big it was?&rdquo;</div>
+      <div class="capttl">Procedural caption from re-predicted 57-dim profile</div>
+      <ul class="cap"><li>Extremely bright in head resonance.</li><li>Extremely joyful and positive.</li><li>Extremely choppy and fragmented.</li><li>Very heavily nasal in resonance.</li><li>Very wide-ranging in pitch.</li></ul>
+    </div><div class="take">
+      <div class="takehead"><span class="rk">#3</span><span class="mtag reward">reward 2.68</span><span class="mtag char">char_vn 0.62</span><span class="mtag emo2">char_emo 0.75</span><span class="mtag">blend 1.53</span><span class="mtag">genu 1.63</span><span class="mtag">invWER 1.00</span><span class="mtag">12.4s</span></div>
+      <audio controls preload="none" src="audio_r4/mouse_mo2_3__s14_ce67d890.mp3"></audio>
+      <div class="ndrow"><span class="ndlbl">Weighted dims (re-predicted · ↑/↓ rewarded dir · ×weight):</span><span class="ndim meh" title="Pitch Range — reward wants high, weight 2.5">RANG ↑ <b>2.0</b><span class="wt"> ×2.5</span></span><span class="ndim meh" title="Register — reward wants high, weight 2.0">REGS ↑ <b>2.4</b><span class="wt"> ×2</span></span><span class="ndim good" title="Brightness — reward wants high, weight 1.8">BRGT ↑ <b>3.1</b><span class="wt"> ×1.8</span></span><span class="ndim meh" title="Head Resonance — reward wants high, weight 1.5">R_HEAD ↑ <b>1.7</b><span class="wt"> ×1.5</span></span></div>
+      <div class="emorow"><span class="ndlbl">Firing emotions (×weight = up-weighted in reward):</span><span class="emo hi">Amusement <b>3.28</b></span><span class="emo hi">Interest <b>2.41</b></span><span class="emo hi">Elation <b>1.74</b></span><span class="emo mid">Astonishment/Surprise <b>0.54</b></span></div>
+      <div class="hyp">&ldquo;Wait for me, wait for me. Did you see that? Did you see how big it was?&rdquo;</div>
+      <div class="capttl">Procedural caption from re-predicted 57-dim profile</div>
+      <ul class="cap"><li>Extremely smooth and clean.</li><li>Very raw and vulnerable.</li><li>Very emotionally volatile.</li><li>Very submissive and unassertive.</li><li>Very bright in oral resonance.</li></ul>
+    </div></div>
+  <div class="compute">Compute: <b>328</b> clips · <b>645</b> s · 0.508 clips/s</div>
+</section>
+
+<section class="arch" id="pain_scream">
+  <div class="archhead"><h2>😱 Pain Scream <span class="badge tun">tuned</span></h2>
+    <div class="cfg"><span class="wtag">weights:</span><span class="chip pos">AROU ×2.5</span> <span class="chip pos">VOLT ×1.8</span> <span class="chip pos">TENS ×1.5</span> <span class="chip pos">ARSH ×1.5</span><span class="chip emw">Pain ×2</span> <span class="chip emw">Distress ×1.5</span> <span class="chip emw">Fear ×1.2</span><svg class="spark" width="132" height="26" viewBox="0 0 132 26"><polyline fill="none" stroke="#7c5cff" stroke-width="2" points="3.0,23.0 34.5,22.3 66.0,22.0 97.5,20.6 129.0,3.0"/></svg></div></div>
+  <div class="briefbox">A raw scream of physical agony, now with ACTUAL SCREAMS written into the spoken text (&#x27;Aaah!&#x27;, &#x27;Au!&#x27;, &#x27;Urgh!&#x27;, &#x27;Aaargh!&#x27;, &#x27;Nngh!&#x27;) and Arousal heavily up-weighted (vn_w AROU 2.5 / VOLT 1.8 / TENS 1.5 / ARSH 1.5, plus Pain 2.0). The instruction pushes maximum-arousal agonized screaming.</div>
+  <div class="notebox">Round&nbsp;4 wrote <b>actual screams into the text</b> (&lsquo;Aaah!&rsquo;, &lsquo;Au!&rsquo;, &lsquo;Urgh!&rsquo;, &lsquo;Aaargh!&rsquo;, &lsquo;Nngh!&rsquo;) and up-weighted <b>Arousal ×2.5</b> (VOLT ×1.8, TENS/ARSH ×1.5, Pain ×2.0). The delivery is rawer and more scream-like; char_vn 0.74, char_emo 0.94.</div>
+  <div class="champbox">
+    <div class="bt">Round-4 champion instruction</div><p class="champ">Maximum raw screaming in unbearable physical agony and terror, throat tearing, voice shredded, guttural and harsh, grating rasp ripping, each scream cracking higher and more frantic. Panic-stricken, helpless, drowning in pain. Extreme arousal, extreme tension, violently volatile and out of control. Raw agonized screaming, throat tearing apart. (agonized scream) (terrified scream) High quality recording.</p>
+    <div class="bt" style="margin-top:8px">Spoken text</div><p class="champ2">&ldquo;Au! No—no, urgh— somebody help me!&rdquo;</p>
+  </div>
+  <div class="colh">Best 3 of 64 <span class="cs">(final N=64, GPU 0)</span></div>
+  <div class="grid3"><div class="take">
+      <div class="takehead"><span class="rk">#1</span><span class="mtag reward">reward 3.48</span><span class="mtag char">char_vn 0.74</span><span class="mtag emo2">char_emo 0.94</span><span class="mtag">blend 4.16</span><span class="mtag">genu 2.01</span><span class="mtag">invWER 0.71</span><span class="mtag">5.8s</span></div>
+      <audio controls preload="none" src="audio_r4/pain_scream_pa3_4__s49_9f7fd582.mp3"></audio>
+      <div class="ndrow"><span class="ndlbl">Weighted dims (re-predicted · ↑/↓ rewarded dir · ×weight):</span><span class="ndim good" title="Arousal — reward wants high, weight 2.5">AROU ↑ <b>5.0</b><span class="wt"> ×2.5</span></span><span class="ndim good" title="Volatility — reward wants high, weight 1.8">VOLT ↑ <b>5.1</b><span class="wt"> ×1.8</span></span><span class="ndim good" title="Tension — reward wants high, weight 1.5">TENS ↑ <b>3.0</b><span class="wt"> ×1.5</span></span><span class="ndim meh" title="Arousal Shift — reward wants high, weight 1.5">ARSH ↑ <b>1.6</b><span class="wt"> ×1.5</span></span></div>
+      <div class="emorow"><span class="ndlbl">Firing emotions (×weight = up-weighted in reward):</span><span class="emo hi">Distress <b>3.96</b><span class="ew">×1.5</span></span><span class="emo hi">Fear <b>3.69</b><span class="ew">×1.2</span></span><span class="emo hi">Helplessness <b>3.59</b></span><span class="emo hi">Pain <b>2.16</b><span class="ew">×2</span></span></div>
+      <div class="hyp">&ldquo;Oh no, no Somebody help me!&rdquo;</div>
+      <div class="capttl">Procedural caption from re-predicted 57-dim profile</div>
+      <ul class="cap"><li>Extremely one-dimensional in resonance.</li><li>Extremely jerky and uneven in rhythm.</li><li>Extremely unpleasant and harsh.</li><li>Extremely cold and sterile.</li><li>Extremely poor in recording quality.</li></ul>
+    </div><div class="take">
+      <div class="takehead"><span class="rk">#2</span><span class="mtag reward">reward 3.34</span><span class="mtag char">char_vn 0.88</span><span class="mtag emo2">char_emo 0.79</span><span class="mtag">blend 3.18</span><span class="mtag">genu 1.34</span><span class="mtag">invWER 0.71</span><span class="mtag">5.8s</span></div>
+      <audio controls preload="none" src="audio_r4/pain_scream_pa3_4__s7_29250563.mp3"></audio>
+      <div class="ndrow"><span class="ndlbl">Weighted dims (re-predicted · ↑/↓ rewarded dir · ×weight):</span><span class="ndim good" title="Arousal — reward wants high, weight 2.5">AROU ↑ <b>5.6</b><span class="wt"> ×2.5</span></span><span class="ndim good" title="Volatility — reward wants high, weight 1.8">VOLT ↑ <b>5.0</b><span class="wt"> ×1.8</span></span><span class="ndim good" title="Tension — reward wants high, weight 1.5">TENS ↑ <b>4.4</b><span class="wt"> ×1.5</span></span><span class="ndim meh" title="Arousal Shift — reward wants high, weight 1.5">ARSH ↑ <b>2.5</b><span class="wt"> ×1.5</span></span></div>
+      <div class="emorow"><span class="ndlbl">Firing emotions (×weight = up-weighted in reward):</span><span class="emo hi">Distress <b>3.22</b><span class="ew">×1.5</span></span><span class="emo hi">Helplessness <b>3.10</b></span><span class="emo hi">Fear <b>2.89</b><span class="ew">×1.2</span></span><span class="emo hi">Pain <b>1.95</b><span class="ew">×2</span></span></div>
+      <div class="hyp">&ldquo;Oh no no Erk somebody help me&rdquo;</div>
+      <div class="capttl">Procedural caption from re-predicted 57-dim profile</div>
+      <ul class="cap"><li>Extremely wide in dynamic swell.</li><li>Extremely ranting and angry.</li><li>Extremely high-energy and animated.</li><li>Extremely strongly emphasized.</li><li>Extremely tight and tense.</li></ul>
+    </div><div class="take">
+      <div class="takehead"><span class="rk">#3</span><span class="mtag reward">reward 3.18</span><span class="mtag char">char_vn 0.57</span><span class="mtag emo2">char_emo 0.79</span><span class="mtag">blend 8.23</span><span class="mtag">genu 2.00</span><span class="mtag">invWER 0.71</span><span class="mtag">3.8s</span></div>
+      <audio controls preload="none" src="audio_r4/pain_scream_pa3_4__s10_bd9b169c.mp3"></audio>
+      <div class="ndrow"><span class="ndlbl">Weighted dims (re-predicted · ↑/↓ rewarded dir · ×weight):</span><span class="ndim good" title="Arousal — reward wants high, weight 2.5">AROU ↑ <b>4.4</b><span class="wt"> ×2.5</span></span><span class="ndim good" title="Volatility — reward wants high, weight 1.8">VOLT ↑ <b>4.3</b><span class="wt"> ×1.8</span></span><span class="ndim meh" title="Tension — reward wants high, weight 1.5">TENS ↑ <b>2.7</b><span class="wt"> ×1.5</span></span><span class="ndim meh" title="Arousal Shift — reward wants high, weight 1.5">ARSH ↑ <b>1.0</b><span class="wt"> ×1.5</span></span></div>
+      <div class="emorow"><span class="ndlbl">Firing emotions (×weight = up-weighted in reward):</span><span class="emo hi">Distress <b>3.60</b><span class="ew">×1.5</span></span><span class="emo hi">Helplessness <b>3.60</b></span><span class="emo hi">Fear <b>3.49</b><span class="ew">×1.2</span></span><span class="emo mid">Pain <b>1.34</b><span class="ew">×2</span></span></div>
+      <div class="hyp">&ldquo;No, no, Erk, somebody help me.&rdquo;</div>
+      <div class="capttl">Procedural caption from re-predicted 57-dim profile</div>
+      <ul class="cap"><li>Extremely one-dimensional in resonance.</li><li>Extremely unpleasant and harsh.</li><li>Extremely young and childlike.</li><li>Extremely thin in head resonance.</li><li>Extremely scattered and disorganized.</li></ul>
+    </div></div>
+  <div class="compute">Compute: <b>320</b> clips · <b>593</b> s · 0.539 clips/s</div>
+</section>
+
+<section class="arch" id="ranting">
+  <div class="archhead"><h2>🗯️ Ranting Fury <span class="badge tun">tuned</span></h2>
+    <div class="cfg"><span class="wtag">weights:</span><span class="chip pos">AROU ×2.5</span> <span class="chip pos">S_RANT ×1.8</span> <span class="chip pos">TENS ×1.5</span> <span class="chip pos">VOLT ×1.5</span><svg class="spark" width="132" height="26" viewBox="0 0 132 26"><polyline fill="none" stroke="#7c5cff" stroke-width="2" points="3.0,20.5 34.5,16.5 66.0,20.0 97.5,23.0 129.0,3.0"/></svg></div></div>
+  <div class="briefbox">An unhinged furious rant with Arousal/intensity up-weighted much more (vn_w AROU 2.5 / S_RANT 1.8 / TENS 1.5 / VOLT 1.5 on top of w_vn 3.0), while keeping the round-3 domineering-stance + wild-pitch-swing framing.</div>
+  <div class="notebox">Round&nbsp;4 up-weighted <b>Arousal ×2.5</b> (S_RANT ×1.8, TENS/VOLT ×1.5) on top of the round-3 domineering-stance + wild-pitch framing. char_vn 0.80, char_emo 0.74.</div>
+  <div class="champbox">
+    <div class="bt">Round-4 champion instruction</div><p class="champ">A boiling-over furious tirade, voice tearing and cracking with seething rage, spitting venom, aggressive and in-your-face, domineering and browbeating with contempt, refusing to yield. Harsh, tense, extremely volatile and high-arousal, explosive consonants, pounding relentless emphasis, pitch lurching violently high to low, escalating. Roaring but the words land. (enraged shout)(seething snarl) High quality recording.</p>
+    <div class="bt" style="margin-top:8px">Spoken text</div><p class="champ2">&ldquo;I am absolutely sick of this! How dare you waste my time again and again!&rdquo;</p>
+  </div>
+  <div class="colh">Best 3 of 64 <span class="cs">(final N=64, GPU 0)</span></div>
+  <div class="grid3"><div class="take">
+      <div class="takehead"><span class="rk">#1</span><span class="mtag reward">reward 4.56</span><span class="mtag char">char_vn 0.80</span><span class="mtag emo2">char_emo 0.74</span><span class="mtag">blend 2.69</span><span class="mtag">genu 0.89</span><span class="mtag">invWER 1.00</span><span class="mtag">7.8s</span></div>
+      <audio controls preload="none" src="audio_r4/ranting_r_boil__s10_2357e1b8.mp3"></audio>
+      <div class="ndrow"><span class="ndlbl">Weighted dims (re-predicted · ↑/↓ rewarded dir · ×weight):</span><span class="ndim good" title="Arousal — reward wants high, weight 2.5">AROU ↑ <b>4.5</b><span class="wt"> ×2.5</span></span><span class="ndim meh" title="Ranting/Angry Style — reward wants high, weight 1.8">S_RANT ↑ <b>2.5</b><span class="wt"> ×1.8</span></span><span class="ndim good" title="Tension — reward wants high, weight 1.5">TENS ↑ <b>3.6</b><span class="wt"> ×1.5</span></span><span class="ndim good" title="Volatility — reward wants high, weight 1.5">VOLT ↑ <b>4.3</b><span class="wt"> ×1.5</span></span></div>
+      <div class="emorow"><span class="ndlbl">Firing emotions (×weight = up-weighted in reward):</span><span class="emo hi">Anger <b>4.30</b></span><span class="emo hi">Impatience and Irritability <b>3.96</b></span><span class="emo mid">Bitterness <b>1.34</b></span><span class="emo mid">Malevolence/Malice <b>1.29</b></span><span class="emo mid">Contempt <b>1.03</b></span></div>
+      <div class="hyp">&ldquo;I am absolutely sick of this! How dare you waste my time again and again!&rdquo;</div>
+      <div class="capttl">Procedural caption from re-predicted 57-dim profile</div>
+      <ul class="cap"><li>Extremely strongly emphasized.</li><li>Extremely dramatic and theatrical.</li><li>Extremely collapsing in energy.</li><li>Very metallic and ringing.</li><li>Very wide-ranging in pitch.</li></ul>
+    </div><div class="take">
+      <div class="takehead"><span class="rk">#2</span><span class="mtag reward">reward 4.50</span><span class="mtag char">char_vn 0.66</span><span class="mtag emo2">char_emo 0.91</span><span class="mtag">blend 1.31</span><span class="mtag">genu 0.90</span><span class="mtag">invWER 1.00</span><span class="mtag">7.4s</span></div>
+      <audio controls preload="none" src="audio_r4/ranting_r_boil__s26_8e688c9e.mp3"></audio>
+      <div class="ndrow"><span class="ndlbl">Weighted dims (re-predicted · ↑/↓ rewarded dir · ×weight):</span><span class="ndim good" title="Arousal — reward wants high, weight 2.5">AROU ↑ <b>4.2</b><span class="wt"> ×2.5</span></span><span class="ndim meh" title="Ranting/Angry Style — reward wants high, weight 1.8">S_RANT ↑ <b>0.1</b><span class="wt"> ×1.8</span></span><span class="ndim good" title="Tension — reward wants high, weight 1.5">TENS ↑ <b>3.2</b><span class="wt"> ×1.5</span></span><span class="ndim good" title="Volatility — reward wants high, weight 1.5">VOLT ↑ <b>4.1</b><span class="wt"> ×1.5</span></span></div>
+      <div class="emorow"><span class="ndlbl">Firing emotions (×weight = up-weighted in reward):</span><span class="emo hi">Anger <b>4.45</b></span><span class="emo hi">Impatience and Irritability <b>3.75</b></span><span class="emo hi">Contempt <b>2.05</b></span><span class="emo hi">Bitterness <b>1.79</b></span><span class="emo hi">Malevolence/Malice <b>1.55</b></span></div>
+      <div class="hyp">&ldquo;I am absolutely sick of this. How dare you waste my time again and again!&rdquo;</div>
+      <div class="capttl">Procedural caption from re-predicted 57-dim profile</div>
+      <ul class="cap"><li>Extremely cold and sterile.</li><li>Extremely guarded and armored.</li><li>Very darkening in mood.</li><li>Very effortless and fluent.</li><li>Very dominant and commanding.</li></ul>
+    </div><div class="take">
+      <div class="takehead"><span class="rk">#3</span><span class="mtag reward">reward 4.49</span><span class="mtag char">char_vn 0.74</span><span class="mtag emo2">char_emo 0.74</span><span class="mtag">blend 3.39</span><span class="mtag">genu 1.12</span><span class="mtag">invWER 1.00</span><span class="mtag">7.1s</span></div>
+      <audio controls preload="none" src="audio_r4/ranting_r_boil__s18_ce4f0399.mp3"></audio>
+      <div class="ndrow"><span class="ndlbl">Weighted dims (re-predicted · ↑/↓ rewarded dir · ×weight):</span><span class="ndim good" title="Arousal — reward wants high, weight 2.5">AROU ↑ <b>4.3</b><span class="wt"> ×2.5</span></span><span class="ndim meh" title="Ranting/Angry Style — reward wants high, weight 1.8">S_RANT ↑ <b>1.1</b><span class="wt"> ×1.8</span></span><span class="ndim good" title="Tension — reward wants high, weight 1.5">TENS ↑ <b>3.4</b><span class="wt"> ×1.5</span></span><span class="ndim good" title="Volatility — reward wants high, weight 1.5">VOLT ↑ <b>4.4</b><span class="wt"> ×1.5</span></span></div>
+      <div class="emorow"><span class="ndlbl">Firing emotions (×weight = up-weighted in reward):</span><span class="emo hi">Anger <b>4.28</b></span><span class="emo hi">Impatience and Irritability <b>3.97</b></span><span class="emo hi">Bitterness <b>1.51</b></span><span class="emo mid">Malevolence/Malice <b>1.17</b></span><span class="emo mid">Contempt <b>0.99</b></span></div>
+      <div class="hyp">&ldquo;I am absolutely sick of this. How dare you waste my time again and again?&rdquo;</div>
+      <div class="capttl">Procedural caption from re-predicted 57-dim profile</div>
+      <ul class="cap"><li>Extremely cold and sterile.</li><li>Extremely strongly emphasized.</li><li>Extremely guarded and armored.</li><li>Extremely darkening in mood.</li><li>Very dominant and commanding.</li></ul>
+    </div></div>
+  <div class="compute">Compute: <b>319</b> clips · <b>702</b> s · 0.455 clips/s</div>
+</section>
+
+<section class="arch" id="evil_ghost">
+  <div class="archhead"><h2>👻 Breathy Evil Ghost <span class="badge new">NEW</span></h2>
+    <div class="cfg"><span class="wtag">weights:</span><span class="chip pos">S_WHIS ×1.8</span> <span class="chip pos">RESP ×1.8</span> <span class="chip pos">TENS ×1.2</span><span class="chip emw">Malevolence ×2</span> <span class="chip emw">Contempt ×1.5</span> <span class="chip emw">Fear ×1.2</span><span class="chip neg">WARM ↓</span> <span class="chip neg">FULL ↓</span> <span class="chip neg">BRGT ↓</span><svg class="spark" width="132" height="26" viewBox="0 0 132 26"><polyline fill="none" stroke="#7c5cff" stroke-width="2" points="3.0,23.0 34.5,20.3 66.0,19.9 97.5,21.6 129.0,3.0"/></svg></div></div>
+  <div class="briefbox">A BREATHY evil ghost (new): airy, hollow, whispered menace, cold and sinister, an ethereal rasp full of dread. Rewards whisper-style + respiration + tension + rasp (vn_w S_WHIS/RESP 1.8, TENS 1.2), penalizes warmth/fullness/brightness, and up-weights Malevolence/Contempt/Fear emotions.</div>
+  <div class="notebox"><b>New archetype.</b> A breathy, airy, hollow whispered menace. Rewards whisper-style + audible respiration + tension + rasp (S_WHIS/RESP ×1.8, TENS ×1.2), penalizes warmth/fullness/brightness, and up-weights Malevolence ×2.0 / Contempt ×1.5 / Fear ×1.2. char_vn 0.59, char_emo 0.58.</div>
+  <div class="champbox">
+    <div class="bt">Round-4 champion instruction</div><p class="champ">A breathy evil ghost, airy and hollow, whispering menace through an ethereal rasp, all air and no body, cold and sinister. Seething with quiet malice and contempt, a dreadful whispered threat, tense and rasping. Wicked, cruel and menacing, dripping with dread. No warmth, no fullness, no brightness. Cold, sinister and dreadful, seething with quiet malice. (breathy hiss) High quality recording.</p>
+    <div class="bt" style="margin-top:8px">Spoken text</div><p class="champ2">&ldquo;You should not have come here... this house feeds on the living.&rdquo;</p>
+  </div>
+  <div class="colh">Best 3 of 64 <span class="cs">(final N=64, GPU 0)</span></div>
+  <div class="grid3"><div class="take">
+      <div class="takehead"><span class="rk">#1</span><span class="mtag reward">reward 3.28</span><span class="mtag char">char_vn 0.59</span><span class="mtag emo2">char_emo 0.58</span><span class="mtag">blend 10.00</span><span class="mtag">genu 1.68</span><span class="mtag">invWER 1.00</span><span class="mtag">5.8s</span></div>
+      <audio controls preload="none" src="audio_r4/evil_ghost_ev2_2__s45_d1b2a73d.mp3"></audio>
+      <div class="ndrow"><span class="ndlbl">Weighted dims (re-predicted · ↑/↓ rewarded dir · ×weight):</span><span class="ndim meh" title="Whisper-Talk Style — reward wants high, weight 1.8">S_WHIS ↑ <b>1.8</b><span class="wt"> ×1.8</span></span><span class="ndim good" title="Respiration — reward wants high, weight 1.8">RESP ↑ <b>4.1</b><span class="wt"> ×1.8</span></span><span class="ndim meh" title="Tension — reward wants high, weight 1.2">TENS ↑ <b>1.0</b><span class="wt"> ×1.2</span></span></div>
+      <div class="emorow"><span class="ndlbl">Firing emotions (×weight = up-weighted in reward):</span><span class="emo hi">Malevolence/Malice <b>2.22</b><span class="ew">×2</span></span><span class="emo hi">Fear <b>1.93</b><span class="ew">×1.2</span></span><span class="emo mid">Contempt <b>0.56</b><span class="ew">×1.5</span></span><span class="emo lo">Bitterness <b>0.21</b></span></div>
+      <div class="hyp">&ldquo;You should not have come here. This house feeds on the living.&rdquo;</div>
+      <div class="capttl">Procedural caption from re-predicted 57-dim profile</div>
+      <ul class="cap"><li>Extremely denasal and clear.</li><li>Extremely noisy and aperiodic.</li><li>Extremely dark and muffled.</li><li>Extremely blurry and mumbled.</li><li>Extremely soft and gentle in onset.</li></ul>
+    </div><div class="take">
+      <div class="takehead"><span class="rk">#2</span><span class="mtag reward">reward 2.74</span><span class="mtag char">char_vn 0.50</span><span class="mtag emo2">char_emo 0.72</span><span class="mtag">blend 5.38</span><span class="mtag">genu 0.22</span><span class="mtag">invWER 1.00</span><span class="mtag">7.0s</span></div>
+      <audio controls preload="none" src="audio_r4/evil_ghost_ev2_2__s44_abc9ebef.mp3"></audio>
+      <div class="ndrow"><span class="ndlbl">Weighted dims (re-predicted · ↑/↓ rewarded dir · ×weight):</span><span class="ndim good" title="Whisper-Talk Style — reward wants high, weight 1.8">S_WHIS ↑ <b>3.9</b><span class="wt"> ×1.8</span></span><span class="ndim meh" title="Respiration — reward wants high, weight 1.8">RESP ↑ <b>2.2</b><span class="wt"> ×1.8</span></span><span class="ndim meh" title="Tension — reward wants high, weight 1.2">TENS ↑ <b>1.5</b><span class="wt"> ×1.2</span></span></div>
+      <div class="emorow"><span class="ndlbl">Firing emotions (×weight = up-weighted in reward):</span><span class="emo hi">Malevolence/Malice <b>1.95</b><span class="ew">×2</span></span><span class="emo hi">Contempt <b>1.92</b><span class="ew">×1.5</span></span><span class="emo mid">Fear <b>1.11</b><span class="ew">×1.2</span></span><span class="emo mid">Bitterness <b>0.66</b></span></div>
+      <div class="hyp">&ldquo;You should not have come here. This house feeds on the living.&rdquo;</div>
+      <div class="capttl">Procedural caption from re-predicted 57-dim profile</div>
+      <ul class="cap"><li>Extremely one-dimensional in resonance.</li><li>Extremely full and cinematic.</li><li>Extremely warm and enveloping.</li><li>Extremely thin in head resonance.</li><li>Very monologue-like.</li></ul>
+    </div><div class="take">
+      <div class="takehead"><span class="rk">#3</span><span class="mtag reward">reward 2.73</span><span class="mtag char">char_vn 0.57</span><span class="mtag emo2">char_emo 0.58</span><span class="mtag">blend 5.99</span><span class="mtag">genu 0.63</span><span class="mtag">invWER 1.00</span><span class="mtag">4.6s</span></div>
+      <audio controls preload="none" src="audio_r4/evil_ghost_ev2_2__s53_a461ca46.mp3"></audio>
+      <div class="ndrow"><span class="ndlbl">Weighted dims (re-predicted · ↑/↓ rewarded dir · ×weight):</span><span class="ndim good" title="Whisper-Talk Style — reward wants high, weight 1.8">S_WHIS ↑ <b>5.2</b><span class="wt"> ×1.8</span></span><span class="ndim meh" title="Respiration — reward wants high, weight 1.8">RESP ↑ <b>2.1</b><span class="wt"> ×1.8</span></span><span class="ndim meh" title="Tension — reward wants high, weight 1.2">TENS ↑ <b>2.0</b><span class="wt"> ×1.2</span></span></div>
+      <div class="emorow"><span class="ndlbl">Firing emotions (×weight = up-weighted in reward):</span><span class="emo mid">Contempt <b>1.43</b><span class="ew">×1.5</span></span><span class="emo mid">Malevolence/Malice <b>1.32</b><span class="ew">×2</span></span><span class="emo mid">Fear <b>0.99</b><span class="ew">×1.2</span></span><span class="emo mid">Bitterness <b>0.78</b></span></div>
+      <div class="hyp">&ldquo;You should not have come here. This house feeds on the living.&rdquo;</div>
+      <div class="capttl">Procedural caption from re-predicted 57-dim profile</div>
+      <ul class="cap"><li>Extremely full and cinematic.</li><li>Extremely warm and enveloping.</li><li>Extremely rough and raspy.</li><li>Very elderly-sounding.</li><li>Very formal and scripted.</li></ul>
+    </div></div>
+  <div class="compute">Compute: <b>327</b> clips · <b>625</b> s · 0.523 clips/s</div>
+</section>
+
+<section class="arch" id="sad_woman">
+  <div class="archhead"><h2>😢 Crying Woman <span class="badge new">NEW</span></h2>
+    <div class="cfg"><span class="wtag">weights:</span><span class="chip pos">VULN ×1.8</span> <span class="chip pos">RESP ×1.5</span><span class="chip emw">Sadness ×2.5</span> <span class="chip emw">Distress ×1.5</span> <span class="chip emw">Helplessness ×1.3</span><span class="chip neg">VALN ↓</span> <span class="chip neg">S_AUTH ↓</span><svg class="spark" width="132" height="26" viewBox="0 0 132 26"><polyline fill="none" stroke="#7c5cff" stroke-width="2" points="3.0,23.0 34.5,15.9 66.0,20.3 97.5,18.8 129.0,3.0"/></svg></div></div>
+  <div class="briefbox">A very sad CRYING WOMAN (new): grief, sobbing, trembling, breaking tearful voice. Rewards vulnerability + respiration (audible breath/sob) + tension + a little roughness + feminine gender, penalizes positive valence and authority; Sadness heavily up-weighted (emo_w 2.5).</div>
+  <div class="notebox"><b>New archetype.</b> A crying woman: grief, sobbing, breaking voice. Rewards vulnerability + respiration + tension + roughness + feminine gender, penalizes positive valence and authority; <b>Sadness ×2.5</b>. char_vn 0.71, char_emo 0.92.</div>
+  <div class="champbox">
+    <div class="bt">Round-4 champion instruction</div><p class="champ">A mourning woman crying softly, her voice trembling and breaking, choked and wet with tears, sniffling between words. Heartbroken, inconsolable, aching with deep sorrow and longing, helpless and disappointed. Softly feminine, raw and vulnerable, shaking and broken. (sniffle) High quality recording.</p>
+    <div class="bt" style="margin-top:8px">Spoken text</div><p class="champ2">&ldquo;Please don&#x27;t leave me too... I can&#x27;t lose anyone else.&rdquo;</p>
+  </div>
+  <div class="colh">Best 3 of 64 <span class="cs">(final N=64, GPU 0)</span></div>
+  <div class="grid3"><div class="take">
+      <div class="takehead"><span class="rk">#1</span><span class="mtag reward">reward 4.43</span><span class="mtag char">char_vn 0.71</span><span class="mtag emo2">char_emo 0.92</span><span class="mtag">blend 10.00</span><span class="mtag">genu 2.34</span><span class="mtag">invWER 1.00</span><span class="mtag">6.9s</span></div>
+      <audio controls preload="none" src="audio_r4/sad_woman_sw_mourn__s31_7654e842.mp3"></audio>
+      <div class="ndrow"><span class="ndlbl">Weighted dims (re-predicted · ↑/↓ rewarded dir · ×weight):</span><span class="ndim good" title="Vulnerability — reward wants high, weight 1.8">VULN ↑ <b>4.8</b><span class="wt"> ×1.8</span></span><span class="ndim good" title="Respiration — reward wants high, weight 1.5">RESP ↑ <b>3.7</b><span class="wt"> ×1.5</span></span></div>
+      <div class="emorow"><span class="ndlbl">Firing emotions (×weight = up-weighted in reward):</span><span class="emo hi">Distress <b>3.60</b><span class="ew">×1.5</span></span><span class="emo hi">Helplessness <b>3.56</b><span class="ew">×1.3</span></span><span class="emo hi">Sadness <b>3.55</b><span class="ew">×2.5</span></span><span class="emo hi">Longing <b>2.96</b></span><span class="emo hi">Disappointment <b>2.79</b></span></div>
+      <div class="hyp">&ldquo;Please don&#x27;t leave me too. I can&#x27;t lose anyone else.&rdquo;</div>
+      <div class="capttl">Procedural caption from re-predicted 57-dim profile</div>
+      <ul class="cap"><li>Extremely collapsing in energy.</li><li>Extremely raw and vulnerable.</li><li>Extremely unpleasant and harsh.</li><li>Extremely one-dimensional in resonance.</li><li>Extremely soft and gentle in onset.</li></ul>
+    </div><div class="take">
+      <div class="takehead"><span class="rk">#2</span><span class="mtag reward">reward 3.95</span><span class="mtag char">char_vn 0.68</span><span class="mtag emo2">char_emo 0.91</span><span class="mtag">blend 10.00</span><span class="mtag">genu 0.96</span><span class="mtag">invWER 1.00</span><span class="mtag">6.0s</span></div>
+      <audio controls preload="none" src="audio_r4/sad_woman_sw_mourn__s60_722cb7cf.mp3"></audio>
+      <div class="ndrow"><span class="ndlbl">Weighted dims (re-predicted · ↑/↓ rewarded dir · ×weight):</span><span class="ndim good" title="Vulnerability — reward wants high, weight 1.8">VULN ↑ <b>3.7</b><span class="wt"> ×1.8</span></span><span class="ndim meh" title="Respiration — reward wants high, weight 1.5">RESP ↑ <b>2.4</b><span class="wt"> ×1.5</span></span></div>
+      <div class="emorow"><span class="ndlbl">Firing emotions (×weight = up-weighted in reward):</span><span class="emo hi">Distress <b>3.56</b><span class="ew">×1.5</span></span><span class="emo hi">Longing <b>3.53</b></span><span class="emo hi">Sadness <b>3.52</b><span class="ew">×2.5</span></span><span class="emo hi">Helplessness <b>3.45</b><span class="ew">×1.3</span></span><span class="emo hi">Disappointment <b>2.56</b></span></div>
+      <div class="hyp">&ldquo;Please don&#x27;t leave me too. I can&#x27;t lose anyone else.&rdquo;</div>
+      <div class="capttl">Procedural caption from re-predicted 57-dim profile</div>
+      <ul class="cap"><li>Extremely full and cinematic.</li><li>Extremely denasal and clear.</li><li>Extremely warm and enveloping.</li><li>Extremely dark and muffled.</li><li>Extremely soft and gentle in onset.</li></ul>
+    </div><div class="take">
+      <div class="takehead"><span class="rk">#3</span><span class="mtag reward">reward 3.93</span><span class="mtag char">char_vn 0.67</span><span class="mtag emo2">char_emo 0.89</span><span class="mtag">blend 10.00</span><span class="mtag">genu 1.15</span><span class="mtag">invWER 1.00</span><span class="mtag">5.8s</span></div>
+      <audio controls preload="none" src="audio_r4/sad_woman_sw_mourn__s63_f03bbd9b.mp3"></audio>
+      <div class="ndrow"><span class="ndlbl">Weighted dims (re-predicted · ↑/↓ rewarded dir · ×weight):</span><span class="ndim good" title="Vulnerability — reward wants high, weight 1.8">VULN ↑ <b>3.3</b><span class="wt"> ×1.8</span></span><span class="ndim good" title="Respiration — reward wants high, weight 1.5">RESP ↑ <b>3.1</b><span class="wt"> ×1.5</span></span></div>
+      <div class="emorow"><span class="ndlbl">Firing emotions (×weight = up-weighted in reward):</span><span class="emo hi">Helplessness <b>3.53</b><span class="ew">×1.3</span></span><span class="emo hi">Distress <b>3.49</b><span class="ew">×1.5</span></span><span class="emo hi">Sadness <b>3.30</b><span class="ew">×2.5</span></span><span class="emo hi">Longing <b>3.21</b></span><span class="emo hi">Disappointment <b>2.77</b></span></div>
+      <div class="hyp">&ldquo;Please don&#x27;t leave me too. I can&#x27;t lose anyone else.&rdquo;</div>
+      <div class="capttl">Procedural caption from re-predicted 57-dim profile</div>
+      <ul class="cap"><li>Extremely denasal and clear.</li><li>Extremely warm and enveloping.</li><li>Extremely soft and gentle in onset.</li><li>Extremely full and cinematic.</li><li>Extremely thin in mask resonance.</li></ul>
+    </div></div>
+  <div class="compute">Compute: <b>320</b> clips · <b>596</b> s · 0.537 clips/s</div>
+</section>
+
+<section class="arch" id="sad_man">
+  <div class="archhead"><h2>😭 Crying Man <span class="badge new">NEW</span></h2>
+    <div class="cfg"><span class="wtag">weights:</span><span class="chip pos">VULN ×1.8</span> <span class="chip pos">RESP ×1.5</span><span class="chip emw">Sadness ×2.5</span> <span class="chip emw">Distress ×1.5</span> <span class="chip emw">Helplessness ×1.3</span><span class="chip neg">VALN ↓</span> <span class="chip neg">S_AUTH ↓</span> <span class="chip neg">GEND ↓</span><svg class="spark" width="132" height="26" viewBox="0 0 132 26"><polyline fill="none" stroke="#7c5cff" stroke-width="2" points="3.0,19.3 34.5,21.6 66.0,23.0 97.5,22.7 129.0,3.0"/></svg></div></div>
+  <div class="briefbox">A very sad CRYING MAN (new): the same grief but a male voice cracking with sorrow and choked sobs. Same reward as sad_woman but rewards a masculine (low-feminine) gender and penalizes authority; Sadness up-weighted (2.5).</div>
+  <div class="notebox"><b>New archetype.</b> A crying man: the same grief with a male voice cracking and choked sobs (rewards masculine gender). <b>Sadness ×2.5</b>. char_vn 0.62, char_emo 0.89.</div>
+  <div class="champbox">
+    <div class="bt">Round-4 champion instruction</div><p class="champ">A man&#x27;s voice cracking with sorrow, breaking and wavering, choked and unsteady, on the edge of sobbing. Heartbroken and guilt-stricken, aching with grief and longing, helpless and disappointed. Low and masculine, raw and vulnerable, fighting tears, faltering. (shaky breath) High quality recording.</p>
+    <div class="bt" style="margin-top:8px">Spoken text</div><p class="champ2">&ldquo;It&#x27;s my fault... I should have been there, I should have saved her.&rdquo;</p>
+  </div>
+  <div class="colh">Best 3 of 64 <span class="cs">(final N=64, GPU 0)</span></div>
+  <div class="grid3"><div class="take">
+      <div class="takehead"><span class="rk">#1</span><span class="mtag reward">reward 4.07</span><span class="mtag char">char_vn 0.62</span><span class="mtag emo2">char_emo 0.89</span><span class="mtag">blend 9.96</span><span class="mtag">genu 1.79</span><span class="mtag">invWER 1.00</span><span class="mtag">7.4s</span></div>
+      <audio controls preload="none" src="audio_r4/sad_man_sm_crack__s37_4dae4074.mp3"></audio>
+      <div class="ndrow"><span class="ndlbl">Weighted dims (re-predicted · ↑/↓ rewarded dir · ×weight):</span><span class="ndim good" title="Vulnerability — reward wants high, weight 1.8">VULN ↑ <b>4.1</b><span class="wt"> ×1.8</span></span><span class="ndim good" title="Respiration — reward wants high, weight 1.5">RESP ↑ <b>3.4</b><span class="wt"> ×1.5</span></span></div>
+      <div class="emorow"><span class="ndlbl">Firing emotions (×weight = up-weighted in reward):</span><span class="emo hi">Distress <b>3.63</b><span class="ew">×1.5</span></span><span class="emo hi">Disappointment <b>3.48</b></span><span class="emo hi">Sadness <b>3.44</b><span class="ew">×2.5</span></span><span class="emo hi">Helplessness <b>2.79</b><span class="ew">×1.3</span></span><span class="emo hi">Longing <b>1.88</b></span></div>
+      <div class="hyp">&ldquo;It&#x27;s my fault. I should have been there. I should have saved her.&rdquo;</div>
+      <div class="capttl">Procedural caption from re-predicted 57-dim profile</div>
+      <ul class="cap"><li>Extremely denasal and clear.</li><li>Extremely noisy and aperiodic.</li><li>Extremely meek and submissive.</li><li>Extremely soft and gentle in onset.</li><li>Extremely distressed and negative.</li></ul>
+    </div><div class="take">
+      <div class="takehead"><span class="rk">#2</span><span class="mtag reward">reward 4.01</span><span class="mtag char">char_vn 0.70</span><span class="mtag emo2">char_emo 0.82</span><span class="mtag">blend 6.94</span><span class="mtag">genu 2.36</span><span class="mtag">invWER 1.00</span><span class="mtag">7.8s</span></div>
+      <audio controls preload="none" src="audio_r4/sad_man_sm_crack__s62_b81d274d.mp3"></audio>
+      <div class="ndrow"><span class="ndlbl">Weighted dims (re-predicted · ↑/↓ rewarded dir · ×weight):</span><span class="ndim good" title="Vulnerability — reward wants high, weight 1.8">VULN ↑ <b>5.4</b><span class="wt"> ×1.8</span></span><span class="ndim good" title="Respiration — reward wants high, weight 1.5">RESP ↑ <b>3.4</b><span class="wt"> ×1.5</span></span></div>
+      <div class="emorow"><span class="ndlbl">Firing emotions (×weight = up-weighted in reward):</span><span class="emo hi">Distress <b>3.32</b><span class="ew">×1.5</span></span><span class="emo hi">Sadness <b>3.12</b><span class="ew">×2.5</span></span><span class="emo hi">Disappointment <b>3.02</b></span><span class="emo hi">Helplessness <b>2.99</b><span class="ew">×1.3</span></span><span class="emo hi">Longing <b>1.53</b></span></div>
+      <div class="hyp">&ldquo;It&#x27;s my fault. I should have been there. I should have saved her.&rdquo;</div>
+      <div class="capttl">Procedural caption from re-predicted 57-dim profile</div>
+      <ul class="cap"><li>Extremely raw and vulnerable.</li><li>Extremely denasal and clear.</li><li>Extremely collapsing in energy.</li><li>Extremely dark and muffled.</li><li>Extremely soft and gentle in onset.</li></ul>
+    </div><div class="take">
+      <div class="takehead"><span class="rk">#3</span><span class="mtag reward">reward 3.98</span><span class="mtag char">char_vn 0.69</span><span class="mtag emo2">char_emo 0.81</span><span class="mtag">blend 7.89</span><span class="mtag">genu 2.14</span><span class="mtag">invWER 1.00</span><span class="mtag">11.0s</span></div>
+      <audio controls preload="none" src="audio_r4/sad_man_sm_crack__s24_499a3337.mp3"></audio>
+      <div class="ndrow"><span class="ndlbl">Weighted dims (re-predicted · ↑/↓ rewarded dir · ×weight):</span><span class="ndim good" title="Vulnerability — reward wants high, weight 1.8">VULN ↑ <b>5.5</b><span class="wt"> ×1.8</span></span><span class="ndim good" title="Respiration — reward wants high, weight 1.5">RESP ↑ <b>3.3</b><span class="wt"> ×1.5</span></span></div>
+      <div class="emorow"><span class="ndlbl">Firing emotions (×weight = up-weighted in reward):</span><span class="emo hi">Distress <b>3.95</b><span class="ew">×1.5</span></span><span class="emo hi">Disappointment <b>3.12</b></span><span class="emo hi">Sadness <b>3.00</b><span class="ew">×2.5</span></span><span class="emo hi">Helplessness <b>2.70</b><span class="ew">×1.3</span></span><span class="emo mid">Longing <b>1.27</b></span></div>
+      <div class="hyp">&ldquo;It&#x27;s my fault. I should have been there. I should have saved her.&rdquo;</div>
+      <div class="capttl">Procedural caption from re-predicted 57-dim profile</div>
+      <ul class="cap"><li>Extremely raw and vulnerable.</li><li>Extremely denasal and clear.</li><li>Extremely collapsing in energy.</li><li>Extremely noisy and aperiodic.</li><li>Extremely poor in recording quality.</li></ul>
+    </div></div>
+  <div class="compute">Compute: <b>327</b> clips · <b>603</b> s · 0.542 clips/s</div>
+</section>
+
+<h2 id="compute">Compute &amp; timing (GPU 0 only)</h2>
+<div class="scroll"><table>
+<thead><tr><th>Archetype</th><th>Clips</th><th>Seconds</th><th>Clips/s</th></tr></thead>
+<tbody><tr><td class="an">👺 Evil Goblin</td><td class="num">312</td><td class="num">626</td><td class="num">0.499</td></tr><tr><td class="an">🐭 High-Pitch Mouse</td><td class="num">328</td><td class="num">645</td><td class="num">0.508</td></tr><tr><td class="an">😱 Pain Scream</td><td class="num">320</td><td class="num">593</td><td class="num">0.539</td></tr><tr><td class="an">🗯️ Ranting Fury</td><td class="num">319</td><td class="num">702</td><td class="num">0.455</td></tr><tr><td class="an">👻 Breathy Evil Ghost</td><td class="num">327</td><td class="num">625</td><td class="num">0.523</td></tr><tr><td class="an">😢 Crying Woman</td><td class="num">320</td><td class="num">596</td><td class="num">0.537</td></tr><tr><td class="an">😭 Crying Man</td><td class="num">327</td><td class="num">603</td><td class="num">0.542</td></tr><tr class="tot"><td>TOTAL</td><td class="num">2253</td><td class="num">4390</td><td class="num">0.513</td></tr></tbody></table></div>
+<p style="color:var(--mut);font-size:12.5px">Totals across round-4 search generations + playoff + final best-of-64, all on a single GPU.</p>
+
+<h2 id="lessons">Round-4 lessons — weighted dims &amp; emotions, and building new voices</h2>
+<div class="card"><ul class="lessons"><li><b>Per-emotion weights are the sharpest new lever for &lsquo;which feeling&rsquo;.</b> Up-weighting a single EmoNet head (Malevolence ×2.5 for the goblin, Sadness ×2.5 for the sad voices, Pain ×2.0 for the scream) reliably steered the search toward the intended affect without touching timbre. When one emotion defines the character, weight it heavily and let the others ride along at ×1.</li><li><b>Per-dimension weights concentrate char_vn where it matters.</b> The mouse's RANG ×2.5 / REGS ×2.0 made the reward chase pitch height specifically, so the winner is measurably higher and squeakier; the scream's AROU ×2.5 pushed raw energy. Weighting 2-4 signature dims beats adding more unweighted dims — it stops a strong-but-off-target dim from dominating the mean.</li><li><b>Writing the affect into the TEXT does what the instruction alone cannot.</b> Putting real screams (&lsquo;Aaah! ... Aaargh!&rsquo;) in the spoken words made the pain-scream genuinely scream-like — vocalized interjections give the model something to actually scream, where a purely descriptive instruction over neutral words stays half-spoken. Keep a few real words so it is not pure noise (the &lsquo;none&rsquo; WER gate allows it).</li><li><b>Malevolence is harder to raise than pitch or sadness.</b> Even with Malevolence ×2.5, the goblin's absolute malice score stayed modest — the EmoNet malice head fires low on a nasal, giddy, cackling delivery; the up-weighting did lift it and push the prompt darker (sinister/sadistic/threatening), but a cute-shrill timbre and true menace pull against each other. Sadness and Fear were far easier to drive high.</li><li><b>The 3 new archetypes confirm the round-1→3 recipe transfers.</b> Naming a concrete resonance/breath signature (breathy hollow whisper; audible sob/sniffle), a pitch/stance cue (low authority, trembling), and the target emotion in one prompt — then evolving with per-call normalization — produced clean ghost / crying-woman / crying-man voices from scratch, no reference audio.</li><li><b>Breath is a rewardable signature.</b> The evil ghost leaned on S_WHIS + RESP (audible respiration): &lsquo;all air and no body&rsquo;, &lsquo;breath rattling&rsquo; and (breathy hiss)/(hollow whisper) bursts raised the whisper/respiration dims and read as ethereal dread, while penalizing warmth/fullness/brightness kept it cold and hollow.</li><li><b>Same-call playoff still decides champions.</b> As in every prior round, the highest single-generation candidate is not always the best under a fair head-to-head; re-scoring the strongest across generations under one normalization (best-of-8 playoff) then finalizing best-of-64 is what picks the published champion.</li><li><b>Gender is a cheap, reliable knob.</b> Rewarding feminine gender (sad_woman) vs penalizing it (sad_man) split one grief prompt into two convincingly different voices — the GEND head responds strongly to a single &lsquo;a man's voice&rsquo; / &lsquo;softly feminine&rsquo; phrase.</li></ul></div>
+<p style="color:var(--mut);font-size:12.5px">See also the <a href="../PROMPTING_GUIDE.md">practical per-archetype prompting guide</a>, and rounds <a href="archetypes.html">1</a> / <a href="archetypes_round2.html">2</a> / <a href="archetypes_round3.html">3</a>.</p>
+
+<div class="foot">
+MOSS-TTS-Local 4.55B voice-acting · round-4 weighted-dimension/emotion prompt-evolution study. Rewards from VoiceNet (57 VoiceCLAP-commercial regression heads) + EmoNet / Empathic-Insight-Voice-Plus, with per-dimension and per-emotion weights. Numbers loaded from the round-4 result summaries; weighted-dim values and captions re-predicted from each take's profile on GPU 0. Rounds: <a href="archetypes.html">1</a> · <a href="archetypes_round2.html">2</a> · <a href="archetypes_round3.html">3</a> · 4.
+</div>
+</div></body></html>
