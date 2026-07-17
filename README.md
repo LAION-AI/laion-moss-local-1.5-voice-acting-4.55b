@@ -17,6 +17,14 @@ in **English and German**, at **native 48 kHz**.
 (blend + genuineness + 1.25× 42-dim Empathic-Insight emotion-profile similarity) × invWER) next to the
 original recording. Full 2,953-group dataset: [`laion/moss-local-dramabox-full-reinterpretations-64`](https://huggingface.co/datasets/laion/moss-local-dramabox-full-reinterpretations-64).
 
+🎲 **Random-take previews (honest samples, not cherry-picked):**
+[v3 grid](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/v3_preview_grid.html)
+— 40 groups (one per emotion), 3 random takes each, voice-cloned from a unique reference speaker with
+double-length scripts ([datasets](https://huggingface.co/datasets/laion/moss-local-voice-acting-v3-refs-64x100-part1)) ·
+[v4 “emorant” grid](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/v4_preview_grid.html)
+— maximum-intensity delivery prompting, 40 groups from the first emotions of the (still running) 512k-clip run
+([datasets](https://huggingface.co/datasets/laion/moss-local-voice-acting-v4-emorant-64x200-part1)).
+
 
 📚 **Read it:** [full experiment overview](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/overview.html)
 — every temperature/scaling, best-of-N, reward-variant (V1–V6), VoiceCLAP-small blend-scorer, FAIR-eval, character/emotion and voice-cloning study we ran with this model, with results and links to the live grids.
