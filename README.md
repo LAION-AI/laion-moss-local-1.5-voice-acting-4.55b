@@ -61,6 +61,9 @@ character voice" playbook** (13 principles, reusable template, effect→words lo
 the `vn_w`/`emo_w` levers and pushed every voice to its extreme (ork hatred char_emo 0.85→0.93; grieving man overt sobbing 0.89→0.99;
 goblin caught cleaner *and* more malevolent; ASMR-man serenity 0.67→0.88). Everything **zero-shot, no reference audio.**
 
+🎭🎬 **Character groups — best-of-64 grid (live snapshot):** [**one champion instruction × many spoken lines**](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/character_groups.html)
+— a browsable grid built from the growing [`laion/moss-character-voices-bestof64`](https://huggingface.co/datasets/laion/moss-character-voices-bestof64) dataset. Each **group** holds a character's fixed champion instruction paired with a different Gemma-authored spoken **text**; the model samples **64 takes** per group, reward-ranked *within* the group, and each card plays the **top-3 of 64** (① Champion / ② Runner-up / ③ Third) with its reward / char / char_emo / blend / genu / invWER. This is a **snapshot of the first characters** generated so far (dragon + the two ASMR voices, EN&nbsp;+&nbsp;DE); more creatures, the intense voices and the grief voices land as generation continues.
+
 📘 **Practical cheat-sheet:** [**`PROMPTING_GUIDE.md`**](PROMPTING_GUIDE.md) — a for-dummies, per-archetype guide distilling all three rounds: copy-paste champion instructions, a short recipe for each character (which acoustic + resonance + pitch + dominance + emotion words, which bursts, what to avoid), a general principles list, and a reusable template.
 
 🎬 **DramaBox best-of-4 TTS benchmark:** [vanilla two-scene `CUT TO:` benchmark](https://projects.laion.ai/Voice-Acting-Pipeline/dramabox.html)
