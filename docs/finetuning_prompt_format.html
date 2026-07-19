@@ -166,10 +166,11 @@ already does; this document includes <b>real captions it produced</b> on stored 
  <a href="#s5"><b>5</b> Worked examples</a>
  <a href="#s6"><b>6</b> The procedural-caption pipeline</a>
  <a href="#s7"><b>7</b> Real caption.py output (proof of concept)</a>
- <a href="#s8"><b>8</b> Deriving the general speaker caption</a>
- <a href="#s9"><b>9</b> Design recommendations &mdash; what I think</a>
- <a href="#s10"><b>10</b> Open questions</a>
- <a href="#s11"><b>11</b> Links &amp; resources</a>
+ <a href="#s8"><b>8</b> The genuineness gate (in detail)</a>
+ <a href="#s9"><b>9</b> Deriving the general speaker caption</a>
+ <a href="#s10"><b>10</b> Design recommendations &mdash; what I think</a>
+ <a href="#s11"><b>11</b> Open questions</a>
+ <a href="#s12"><b>12</b> Links &amp; resources</a>
 </div>
 
 
@@ -280,7 +281,7 @@ keywords), and <b>empty/omitted</b> for flat, unremarkable sentences.</li>
 &asymp;X seconds was measured in the source audio. No silence &rarr; no marker (just a space).</li>
 <li>Burst notes (e.g. <code>(sigh)</code>, <code>(soft laugh)</code>) and all markup stay <b>outside</b>
 any double-quotes, so the model never reads brackets aloud.</li>
-<li>Double-quotes around the words are <b>optional</b> (see &sect;9 &mdash; quotes-in-text raised WER in our
+<li>Double-quotes around the words are <b>optional</b> (see &sect;10 &mdash; quotes-in-text raised WER in our
 earlier experiments, so bursts/markup stay outside them).</li>
 <li><code>${token:N}</code> may be placed once at the front (whole-clip pacing) or per unit (to teach
 sentence pacing on slow/fast deliveries).</li>
@@ -551,7 +552,7 @@ gated by intensity. Then two scalar heads add notes:</p>
 <ul>
 <li><b>Genuineness note.</b> If genuineness deviates high, the emotion reads as <i>sincere / genuinely felt</i>;
 if it deviates low, as <i>performed / theatrical</i>. It also gates whether strong emotion words are added at
-all (see &sect;9).</li>
+all (see the dedicated <a href="#s8">&sect;8</a>).</li>
 <li><b>Burst note.</b> If vocal-burst blend is high (as in ZH_B00039 at 8.55, FR_B00000 at 6.29), append a
 burst director-note &mdash; <code>(soft laugh)</code>, <code>(gasp)</code>, <code>(sigh)</code>, <code>(shaky
 breath)</code> &mdash; matched to the dominant emotion, placed outside the words.</li>
@@ -561,8 +562,108 @@ breath)</code> &mdash; matched to the dominant emotion, placed outside the words
 |z| / value threshold, capped to a small keyword budget.</p>
 
 
-<!-- ===================== 8 ===================== -->
-<h2 id="s8"><span class="num">8</span> Deriving the general speaker caption</h2>
+<!-- ===================== 8 : GENUINENESS GATE ===================== -->
+<h2 id="s8"><span class="num">8</span> The genuineness gate &mdash; in detail</h2>
+<p class="lead">The single most important trust mechanism in the emotion half of the pipeline. It decides
+<b>whether</b> a salient emotion is described at all, and <b>how strongly</b>. Because it is the piece that
+keeps the caption&rarr;delivery mapping clean, it gets its own section.</p>
+
+<h3>Definition</h3>
+<div class="field"><div class="fk">genuineness<br>(0&ndash;6)</div>
+<div class="fv"><a href="https://huggingface.co/laion/voiceclap-commercial-genuineness" target="_blank" rel="noopener"><code>laion/voiceclap-commercial-genuineness</code></a>
+measures <b>"lived-in vs performed"</b>: <b>0</b> = read / scripted / detached, <b>6</b> = a genuine,
+unplanned, real moment. It scores <b>how genuinely an emotion is embodied</b> &mdash; <i>not which emotion</i>.
+It is orthogonal to Empathic-Insight, which says <i>what</i> the emotion is; genuineness says <i>whether you
+believe it.</i></div></div>
+
+<h3>The problem it solves</h3>
+<p>When we derive a per-sentence emotion caption from Empathic-Insight's top-|z| emotions, <b>some high
+emotion scores are untrustworthy</b>, in two distinct ways:</p>
+<ul>
+<li><b>(a) Artifacts.</b> Noise, clipping, background music, or a bad ASR cut can make the emotion head
+<b>spuriously fire</b> &mdash; a burst of noise reads as Distress or Fear when nobody is distressed.</li>
+<li><b>(b) Flat / acted delivery.</b> A sentence can score "sad" on the emotion head yet <b>sound read,
+detached, or hammy</b> &mdash; the words are sad, the delivery is not.</li>
+</ul>
+<p>Captioning either case as "very sad" teaches the TTS a <b>noisy caption&rarr;delivery mapping</b>: it
+learns to attach a strong emotion word to audio that does not actually deliver that emotion. We want a strong
+emotion word <b>only when the emotion is BOTH salient (high |z| on Empathic-Insight) AND genuinely embodied
+(high genuineness).</b> Genuineness is the AND-term.</p>
+
+<div class="finding"><b>The rule in one line.</b>
+<code>keep_strong_emotion  =  (|z|<sub>emotion</sub> high)  AND  (genuineness high)  AND  (quality ok)</code>
+&nbsp;&mdash; salience alone is not enough.</div>
+
+<h3>Three implementations (pick per corpus)</h3>
+
+<div class="card">
+<h4>1 &middot; Hard gate</h4>
+<p>If <code>genuineness &lt; &tau;</code> (e.g. <b>&lt;2/6</b>) <b>OR</b> quality is low, <b>drop the emotion
+terms entirely</b> and keep only the neutral acoustic traits &mdash; or explicitly label the sentence a
+<b>"flat / measured read."</b> Simple, auditable, and the safest default for noisy in-the-wild corpora.</p>
+<pre><span class="k">if</span> genuineness &lt; 2.0 <span class="k">or</span> quality &lt; q_min:
+    emotion_terms = []                 <span class="c"># suppress</span>
+    caption = acoustic_terms <span class="k">or</span> ["flat, measured read"]
+<span class="k">else</span>:
+    caption = acoustic_terms + emotion_terms</pre>
+</div>
+
+<div class="card">
+<h4>2 &middot; Soft gate (scaling)</h4>
+<p>Scale the |z|-derived intensity by genuineness, so the emotion word <b>fades out gracefully</b> instead
+of snapping off: <code>effective_intensity = |z| &times; f(genuineness)</code>, where <code>f</code> rises
+from 0 to 1 over the genuineness range. A high emotion-z with <b>low</b> genuineness lands on "somewhat sad"
+&mdash; or nothing &mdash; rather than "extremely sad."</p>
+<pre><span class="c"># f(g): 0 at g=1, ramps to 1 by g=4</span>
+f          = clamp((genuineness - 1.0) / 3.0, 0, 1)
+eff_z      = abs(z) * f
+adverb     = intensity_word(eff_z)     <span class="c"># Extremely / Very / Notably / Somewhat / (drop)</span></pre>
+<p class="sub">This reuses <code>caption.py</code>'s existing <code>INTENSITY</code> ladder unchanged &mdash;
+genuineness simply attenuates the |z| that is fed into it.</p>
+</div>
+
+<div class="card">
+<h4>3 &middot; Genuineness as its own caption dimension (+ a quality gate)</h4>
+<p>Give genuineness <b>double duty</b>: besides gating the emotion, describe it directly &mdash;
+<b>high</b> &rarr; <i>"genuine, lived-in delivery"</i>; <b>low</b> &rarr; <i>"measured, controlled,
+performed."</i> This is honest (it captions the flat read as flat rather than hiding it) and it teaches the
+model the <b>genuine&harr;performed axis</b> itself. Pair it with a <b>quality gate</b> using
+Empathic-Insight's own quality scores: if quality is poor (noise/clipping/bad cut), suppress emotion terms
+regardless of genuineness &mdash; this is what catches the <b>artifact</b> case (a) before genuineness even
+applies.</p>
+</div>
+
+<h3>Worked example &mdash; same emotion, opposite treatment</h3>
+<div class="tw"><table>
+<thead><tr><th class="l">Sentence</th><th>Sadness z</th><th>genuineness</th><th class="l">Gate decision</th><th class="l">&rarr; caption</th></tr></thead>
+<tbody>
+<tr><td class="l">A</td><td>+2.5</td><td>5.2</td><td class="l">salient AND genuine &rarr; full intensity</td><td class="l"><span class="win">"deeply, genuinely sorrowful"</span></td></tr>
+<tr><td class="l">B</td><td>+2.5</td><td>1.1</td><td class="l">salient but NOT genuine &rarr; gated</td><td class="l"><span class="lose">"flat, measured read"</span> <span class="sub">(emotion word suppressed)</span></td></tr>
+</tbody></table></div>
+<p>Identical emotion salience (z = +2.5 in both); genuineness is the only difference, and it flips the
+caption from a full-intensity emotion phrase to a suppressed, honestly-labelled flat read.</p>
+
+<h3>Why it fits in-the-wild data</h3>
+<p>The two corpora we fine-tune on have <b>opposite failure modes</b>, and the gate fixes both:</p>
+<ul>
+<li><b>In-the-wild speech</b> is mostly <b>flat-but-genuine</b> &mdash; low emotion, but what little there is
+is real. The gate lets those honest, mild emotions through (scaled), and correctly labels the many flat
+sentences as flat.</li>
+<li><b>Acted / performance data</b> is <b>high-emotion-but-sometimes-un-genuine</b> &mdash; strong emotion
+scores, some of which are overacted or hammy. The gate withholds strong words from the un-genuine takes.</li>
+</ul>
+<p>Net effect: the model learns emotion from <b>real emotional moments</b>, not from noise or overacting.</p>
+
+<div class="finding"><b>Why a measured axis works where a prompt cannot.</b> In our earlier prompting experiments,
+<b>genuineness could not be prompted for</b> &mdash; asking the model to "be genuine / sound authentic"
+actually scored <i>lower</i>. Genuineness is not a dial you can request; it is a <b>real, measured property of
+the audio</b>. That is exactly why it works as a <b>trust filter on the training captions</b>: we cannot
+manufacture it in the prompt, but we can measure it in the data and refuse to caption emotion where it is
+absent.</p></div>
+
+
+<!-- ===================== 9 ===================== -->
+<h2 id="s9"><span class="num">9</span> Deriving the general speaker caption</h2>
 <p>The global <code>instruction</code> caption is the <b>aggregate</b> of what is stable across the clip.
 After scoring every sentence, take the <b>median over sentences</b> of the <i>speaker-identity</i>
 dimensions &mdash; the ones that should not change within one clip:</p>
@@ -586,8 +687,8 @@ valence, emphasis, tempo, style shifts, vulnerability) &rarr; the inline per-sen
 itself tells you which field a trait belongs in.</div>
 
 
-<!-- ===================== 9 ===================== -->
-<h2 id="s9"><span class="num">9</span> Design recommendations &mdash; what I think</h2>
+<!-- ===================== 10 ===================== -->
+<h2 id="s10"><span class="num">10</span> Design recommendations &mdash; what I think</h2>
 
 <h3>1. Deviation-vs-baseline beats absolute captioning</h3>
 <p>Caption only what is <b>salient</b> &mdash; the dims/emotions where the sentence departs from ordinary
@@ -608,16 +709,16 @@ Cap each caption at <b>top-3&ndash;5 dims + 1&ndash;2 emotion words + at most on
 consistent.</p>
 
 <h3>4. Put STABLE traits in instruction, DYNAMIC ones inline</h3>
-<p>This is the core architectural choice, and &sect;8 gives a principled test for it: <b>sentence-to-sentence
+<p>This is the core architectural choice, and &sect;9 gives a principled test for it: <b>sentence-to-sentence
 variance</b>. Low-variance traits (identity) belong in the global instruction; high-variance traits
 (performance) belong inline. Do not repeat the speaker's timbre in every sentence caption &mdash; it wastes
 the budget and teaches the model nothing new per sentence.</p>
 
 <h3>5. A genuineness gate on strong emotion words</h3>
-<p>Only add strong emotion words when genuineness (and overall quality) is high. A sentence that scores as
-theatrical/low-genuineness should get a hedged or omitted emotion word rather than a confident one &mdash;
-otherwise the model learns to attach "grief-stricken" to unconvincing acting. Genuineness is both a
-<b>gate</b> (should we add the emotion word?) and a <b>note</b> (sincere vs performed).</p>
+<p>Only add strong emotion words when genuineness (and overall quality) is high &mdash; otherwise the model
+learns to attach "grief-stricken" to unconvincing acting or to noise artifacts. This is important enough that
+it has its own section: see <a href="#s8"><b>&sect;8 &mdash; the genuineness gate</b></a> for the definition,
+the three implementations (hard gate / soft scaling / own dimension + quality gate), and a worked example.</p>
 
 <h3>6. A fixed, shared lexicon</h3>
 <p>Draw every caption phrase from a <b>closed vocabulary</b> &mdash; the VoiceNet rubric adjectives
@@ -654,8 +755,8 @@ stable-vs-dynamic field split. It is cheap (two encodes/sentence), consistent (f
 self-thinning (empty on boring sentences), and it reuses code that already runs.</div>
 
 
-<!-- ===================== 10 ===================== -->
-<h2 id="s10"><span class="num">10</span> Open questions</h2>
+<!-- ===================== 11 ===================== -->
+<h2 id="s11"><span class="num">11</span> Open questions</h2>
 <ul>
 <li><b>How many top-k?</b> 3 vs 5 vs an adaptive cut (keep all dims with |z| &gt; 1.5). Fewer is cleaner but
 may drop a real second signal; adaptive matches caption length to how unusual the sentence actually is.</li>
@@ -671,8 +772,8 @@ build), does it belong in the instruction, inline, or both?</li>
 </ul>
 
 
-<!-- ===================== 11 ===================== -->
-<h2 id="s11"><span class="num">11</span> Links &amp; resources</h2>
+<!-- ===================== 12 ===================== -->
+<h2 id="s12"><span class="num">12</span> Links &amp; resources</h2>
 <h3>The four scoring models</h3>
 <div class="links">
  <a class="btn" href="https://huggingface.co/laion/Empathic-Insight-Voice-Plus" target="_blank" rel="noopener">Empathic-Insight-Voice-Plus (42 emo)</a>
