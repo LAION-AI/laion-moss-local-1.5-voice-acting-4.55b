@@ -405,7 +405,7 @@ bias.</p>
 <tr><td class="l"><a href="https://huggingface.co/laion/Empathic-Insight-Voice-Plus" target="_blank" rel="noopener">Empathic-Insight-Voice-Plus</a></td>
 <td class="l">BUD-E-Whisper enc &rarr; per-emotion MLP heads</td>
 <td class="l"><b>40 EmoNet emotions + Valence + Arousal (42)</b> + quality</td>
-<td class="l">The sentence's <b>dominant emotion(s)</b></td></tr>
+<td class="l">The sentence's <b>dominant emotion(s)</b> &mdash; we use only the <b>40 emotions</b> (Valence/Arousal come from VoiceNet, see below)</td></tr>
 <tr><td class="l"><a href="https://huggingface.co/laion/voicenet-dimension-predictors-commercial" target="_blank" rel="noopener">voicenet-dimension-predictors-commercial</a></td>
 <td class="l">VoiceCLAP-commercial 768-d emb &rarr; regressors</td>
 <td class="l"><b>57 VoiceNet perceptual dims</b> (0&ndash;6): brightness, resonance cavities, register, pitch range, roughness, tempo, styles&hellip;</td>
@@ -425,8 +425,21 @@ Two encodes per sentence, four score vectors.</p>
 
 <h3>The six steps</h3>
 <ol class="steps">
-<li><b>ASR with sentence-level timestamps.</b> Run WhisperX / Parakeet + forced alignment to get each
-sentence's text and its <code>[start, end]</code> times (and the gaps between sentences &rarr; the pauses).</li>
+<li><b>ASR with sentence-level timestamps.</b> Transcribe with word/segment-level timing, then aggregate to
+sentence spans. Two strong recommended options (either works; not a hard requirement):
+<ul>
+<li><a href="https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3" target="_blank" rel="noopener"><code>nvidia/parakeet-tdt-0.6b-v3</code></a>
+&mdash; a <b>TDT (Token-and-Duration Transducer)</b> that natively predicts token durations, giving accurate
+<b>word/token-level timestamps</b>; multilingual (incl. EN + DE). We <b>already use it in this project for
+invWER scoring</b>, so it is a natural fit &mdash; its word timestamps are aggregated up to sentence spans.</li>
+<li><a href="https://huggingface.co/microsoft/VibeVoice-ASR" target="_blank" rel="noopener"><code>microsoft/VibeVoice-ASR</code></a>
+&mdash; provides good <b>sentence / segment-level timestamps</b>, well-suited to long-form transcription +
+alignment.</li>
+</ul>
+Either yields each sentence's text and its <code>[start, end]</code> times, which feed the format two ways:
+<b>(a)</b> the span cuts the sentence segment for the four scoring models (next step); <b>(b)</b> the
+<b>silence gap</b> between one sentence's end and the next sentence's start is measured and, rounded, becomes
+the <code>[pause Xs]</code> marker (kept only ~50% of the time per the dropout policy in &sect;6).</li>
 <li><b>Cut each sentence segment</b> <code>[start, end]</code> from the audio.</li>
 <li><b>Score each segment through the four models.</b> One VoiceCLAP-commercial encode &rarr; VoiceNet (57) +
 genuineness + blend; one BUD-E-Whisper encode &rarr; Empathic-Insight (42). Result: a per-sentence score
@@ -448,6 +461,26 @@ value would be long, repetitive, and dominated by traits shared by all speech. T
 baseline keeps <b>only what is surprising about this sentence</b> &mdash; which is exactly what a director
 note should say. It also makes "boring" fall out for free: a sentence at the baseline has no high-|z| dims,
 so it gets no caption.</div>
+
+<h3>Format augmentation &amp; annotation dropout</h3>
+<p>A fine-tuned model that <b>only</b> ever saw fully-marked prompts would <b>require</b> that markup at
+inference. But real users span a spectrum &mdash; from power-users who write per-sentence director notes and
+pauses, to novices who type a single bare line. To stay robust across all of them, the training set must
+<b>vary its annotation richness on purpose</b>. We therefore apply an <b>augmentation / dropout policy</b>:
+each sample is randomly rendered somewhere on a scale from fully-annotated to bare.</p>
+<div class="tw"><table>
+<thead><tr><th class="l">Augmentation</th><th>~share of samples</th><th class="l">What it does &mdash; and why</th></tr></thead>
+<tbody>
+<tr><td class="l"><b>Pause dropout</b></td><td>keep&nbsp;in&nbsp;~50%</td><td class="l">Include <code>[pause Xs]</code> in only about half the samples, <b>even when real pauses exist</b>; omit them in the rest. Teaches the model to <i>use</i> pause markup when present without <i>depending</i> on it.</td></tr>
+<tr><td class="l"><b>Caption dropout</b></td><td>~30&ndash;50%</td><td class="l">In 30&ndash;50% of samples, drop <b>all</b> inline <code>(round-bracket)</code> per-sentence captions <b>and</b> pauses &mdash; leaving just plain spoken text (the current bare MOSS format). Keeps the model fully working for bare, unmarked prompts.</td></tr>
+<tr><td class="l"><b>Instruction-field format mix</b></td><td>mixed</td><td class="l">Sometimes route the emotion / stage directions into the <code>instruction</code> (how-to) field instead of inline, and vary its <i>format</i>: a rich global caption vs a short tag (<code>"sad, whispered"</code>) vs a bare speaker description with no emotion at all. Mixed across the dataset.</td></tr>
+<tr><td class="l"><b>Duration dropout</b></td><td>keep&nbsp;in&nbsp;~50%</td><td class="l">Include <code>${token:N}</code> pacing targets on only some samples (per-clip and/or per-sentence), omit on the rest &mdash; so pacing control is available but not required.</td></tr>
+</tbody></table></div>
+<div class="finding"><b>Net effect &mdash; a spectrum of supervision.</b> Across the corpus the model sees the full
+range: <b>fully-annotated</b> (inline captions + pauses + tokens), <b>instruction-only</b> (global how-to,
+clean text), <b>emotion-in-instruction vs emotion-inline</b>, and <b>bare</b> (plain text, no markup at all).
+It therefore learns that the format is <b>optional and compositional</b>, and stays robust to <b>how people
+actually prompt</b> &mdash; whether they hand it a director's script or a single sentence.</div>
 
 
 <!-- ===================== 7 ===================== -->
@@ -544,11 +577,27 @@ No GPU &mdash; pure inference on the stored score vectors.</p>
 </div>
 
 <h3>Extending the recipe to the emotion half (Empathic-Insight)</h3>
-<p>The <b>same z-score-vs-baseline machinery</b> extends verbatim from the 57 VoiceNet dims to the 42 EmoNet
-dimensions (40 emotions + Valence + Arousal). Build a baseline median+spread per emotion over the in-the-wild
-corpus; per sentence, take the top emotions by |z|; emit the dominant <b>emotion word(s)</b> directly
-(EmoNet already gives readable names &mdash; <i>Grief, Amusement, Malice, Relief, Contempt, Awe</i>&hellip;),
-gated by intensity. Then two scalar heads add notes:</p>
+<p>The <b>same z-score-vs-baseline machinery</b> extends verbatim from the 57 VoiceNet dims to the EmoNet
+emotions. Build a baseline median+spread per emotion over the in-the-wild corpus; per sentence, take the top
+emotions by |z|; emit the dominant <b>emotion word(s)</b> (EmoNet gives readable names &mdash; <i>Grief,
+Amusement, Malice, Relief, Contempt, Awe</i>&hellip;, but we expand each into a <b>synonym cluster</b> so the
+same concept is expressed with varied words &mdash; see <a href="#s10">&sect;10.6</a>), gated by intensity.
+Then two scalar heads add notes:</p>
+
+<div class="note warn"><b>Source-of-truth rule &mdash; no double-counting.</b> Empathic-Insight outputs
+42 dimensions: 40 emotions <b>plus</b> Valence + Arousal. But Valence and Arousal <b>also</b> exist as
+VoiceNet dimensions (<code>VALN</code>, <code>AROU</code>). To avoid describing the same axis twice, take
+<b>Valence + Arousal from VoiceNet only</b> and use <b>EmoNet for its 40 emotions only</b> (drop EmoNet's
+Valence/Arousal). So the emotion half contributes exactly the <b>40 named emotions</b>; the affective
+dimensions live on the VoiceNet side.</div>
+
+<div class="note good-note"><b>General principle &mdash; discard below-baseline noise.</b> Only <b>salient
+above-baseline</b> deviations become caption terms. A dimension or emotion sitting <i>far below</i> its
+baseline median carries no useful information for a director note (a sentence that is simply "not sad" and
+"not bright" should not be captioned "un-sad, un-bright") &mdash; it is <b>discarded, not captioned</b>. The
+exceptions are the handful of VoiceNet dims whose <i>low</i> end is itself a describable trait (e.g. a very
+<i>low</i> register, a <i>meek</i> stance), which the curated <code>DESC</code> map handles explicitly; raw
+emotion heads and quality dims are kept only on their high side.</div>
 <ul>
 <li><b>Genuineness note.</b> If genuineness deviates high, the emotion reads as <i>sincere / genuinely felt</i>;
 if it deviates low, as <i>performed / theatrical</i>. It also gates whether strong emotion words are added at
@@ -594,6 +643,33 @@ emotion word <b>only when the emotion is BOTH salient (high |z| on Empathic-Insi
 <code>keep_strong_emotion  =  (|z|<sub>emotion</sub> high)  AND  (genuineness high)  AND  (quality ok)</code>
 &nbsp;&mdash; salience alone is not enough.</div>
 
+<h3>The concrete rule &mdash; median-anchored</h3>
+<p>"High genuineness" is made concrete the same robust way every other threshold in this pipeline is:
+<b>against the genuineness baseline median</b> computed over the in-the-wild corpus. The intensity a sentence's
+emotion word is allowed to reach is <b>capped by where its genuineness sits relative to that median</b>:</p>
+<div class="tw"><table>
+<thead><tr><th class="l">Sentence genuineness vs baseline</th><th class="l">Emotion-word intensity allowed</th><th class="l">Example (Sadness, salient)</th></tr></thead>
+<tbody>
+<tr><td class="l"><b>at / above the median</b></td><td class="l"><b>full</b> &mdash; "extremely / very &lt;emotion&gt;" permitted</td><td class="l"><span class="win">"deeply, genuinely sorrowful"</span></td></tr>
+<tr><td class="l"><b>below the median</b></td><td class="l"><b>capped</b> &mdash; no "extremely/very"; mild word only</td><td class="l">"somewhat downcast"</td></tr>
+<tr><td class="l"><b>well below the median</b></td><td class="l"><b>dropped</b> &mdash; emotion term removed / not captioned</td><td class="l"><span class="lose">"flat, measured read"</span></td></tr>
+</tbody></table></div>
+<p>So <b>extreme emotion words ("extremely", "very") are allowed only when genuineness is above-median</b>;
+below-median genuineness caps the intensity, and well-below-median drops the emotion entirely. This is the
+same "only salient, above-baseline deviations become caption terms" principle from &sect;6 &mdash; applied to
+the trust axis: a value far below its baseline median is discarded, not described.</p>
+
+<h3>Genuineness as a graded descriptor (its own ladder)</h3>
+<p>Genuineness is not only a gate &mdash; laddered against its own baseline it is also a describable trait,
+so it can be added to the caption directly (this is implementation&nbsp;3 below):</p>
+<div class="tw"><table>
+<thead><tr><th class="l">Genuineness vs baseline</th><th class="l">Descriptor added</th></tr></thead>
+<tbody>
+<tr><td class="l">well above median</td><td class="l"><i>"deeply / genuinely &lt;emotion&gt;"</i> (prefix that intensifies the emotion word)</td></tr>
+<tr><td class="l">around the median</td><td class="l"><i>"genuine"</i> / <i>"slightly genuine"</i> (light note, or nothing)</td></tr>
+<tr><td class="l">below median</td><td class="l"><i>"measured"</i> / <i>"controlled, performed"</i> &mdash; and the emotion word is capped or dropped per the rule above</td></tr>
+</tbody></table></div>
+
 <h3>Three implementations (pick per corpus)</h3>
 
 <div class="card">
@@ -614,12 +690,13 @@ terms entirely</b> and keep only the neutral acoustic traits &mdash; or explicit
 of snapping off: <code>effective_intensity = |z| &times; f(genuineness)</code>, where <code>f</code> rises
 from 0 to 1 over the genuineness range. A high emotion-z with <b>low</b> genuineness lands on "somewhat sad"
 &mdash; or nothing &mdash; rather than "extremely sad."</p>
-<pre><span class="c"># f(g): 0 at g=1, ramps to 1 by g=4</span>
-f          = clamp((genuineness - 1.0) / 3.0, 0, 1)
+<pre><span class="c"># f rises through 1.0 at the genuineness median (g_med): above-median -> full intensity</span>
+f          = clamp(genuineness / g_med, 0, 1)
 eff_z      = abs(z) * f
 adverb     = intensity_word(eff_z)     <span class="c"># Extremely / Very / Notably / Somewhat / (drop)</span></pre>
 <p class="sub">This reuses <code>caption.py</code>'s existing <code>INTENSITY</code> ladder unchanged &mdash;
-genuineness simply attenuates the |z| that is fed into it.</p>
+genuineness simply attenuates the |z| that is fed into it, and it is a continuous version of the
+median-anchored cap above (at/above median &rarr; <code>f&asymp;1</code> &rarr; full intensity).</p>
 </div>
 
 <div class="card">
@@ -720,12 +797,33 @@ learns to attach "grief-stricken" to unconvincing acting or to noise artifacts. 
 it has its own section: see <a href="#s8"><b>&sect;8 &mdash; the genuineness gate</b></a> for the definition,
 the three implementations (hard gate / soft scaling / own dimension + quality gate), and a worked example.</p>
 
-<h3>6. A fixed, shared lexicon</h3>
-<p>Draw every caption phrase from a <b>closed vocabulary</b> &mdash; the VoiceNet rubric adjectives
-(<code>caption.py</code>'s <code>DESC</code>) + the EmoNet emotion taxonomy + a small burst set. A stable
-caption&rarr;delivery mapping is only learnable if the same acoustic fact is always described with the same
-words. Free-form LLM captioning would inject synonyms and break that mapping; the procedural pipeline enforces
-it by construction.</p>
+<h3 id="s10lex">6. A controlled lexicon &mdash; with deliberate synonym variety</h3>
+<p>Draw every caption phrase from a <b>controlled vocabulary</b> &mdash; the VoiceNet rubric adjectives
+(<code>caption.py</code>'s <code>DESC</code>) + the EmoNet emotion taxonomy + a small burst set. This is what
+lets a caption&rarr;delivery mapping be learnable at all: free-form LLM captioning would inject uncontrolled,
+inconsistent phrasing and blur the mapping.</p>
+<p><b>But "controlled" must not mean "one canonical word per concept."</b> If every sad sentence in training
+is captioned with the single token <code>sad</code>, the fine-tuned model learns to respond to <i>that exact
+token</i> &mdash; and an inexperienced in-the-wild user who types <i>"he sounds really pissed off"</i> or
+<i>"melancholic"</i> at inference gets nothing, because those words were never bound to the delivery. The fix
+is to <b>vary the words within each concept</b>, drawing from the <b>EmoNet synonym clusters</b>: each of the
+40 emotions ships a cluster of near-synonyms. We <b>rotate / sample</b> among them across the dataset so the
+<i>same</i> measured emotion is expressed with <i>varied</i> surface words.</p>
+<div class="tw"><table>
+<thead><tr><th class="l">EmoNet emotion</th><th class="l">Synonym cluster (from the EmoNet taxonomy)</th><th class="l">Sample caption phrasings (rotated)</th></tr></thead>
+<tbody>
+<tr><td class="l">Anger</td><td class="l">anger, rage, fury, wrath, hate, irascibility, vexation, annoyance, peevishness</td><td class="l">"seething with rage" &middot; "furious" &middot; "wrathful" &middot; "bitterly annoyed"</td></tr>
+<tr><td class="l">Sadness</td><td class="l">sadness, sorrow, grief, melancholy, dejection, despair, heartache, mournfulness, misery</td><td class="l">"deeply sorrowful" &middot; "grief-stricken" &middot; "melancholic" &middot; "dejected"</td></tr>
+<tr><td class="l">Amusement</td><td class="l">mirth, joviality, playfulness, silliness, jesting, lighthearted fun, laughter</td><td class="l">"full of mirth" &middot; "jovial" &middot; "playful and silly" &middot; "lighthearted"</td></tr>
+<tr><td class="l">Fear</td><td class="l">fear, terror, dread, apprehension, alarm, horror, panic, nervousness</td><td class="l">"terrified" &middot; "dread-filled" &middot; "panicked" &middot; "nervous and apprehensive"</td></tr>
+<tr><td class="l">Contempt</td><td class="l">contempt, disapproval, scorn, disdain, loathing, detestation</td><td class="l">"scornful" &middot; "full of disdain" &middot; "contemptuous" &middot; "loathing"</td></tr>
+<tr><td class="l">Elation</td><td class="l">happiness, excitement, joy, exhilaration, delight, jubilation, bliss, cheerfulness</td><td class="l">"jubilant" &middot; "exhilarated" &middot; "delighted" &middot; "cheerful and bright"</td></tr>
+</tbody></table></div>
+<div class="finding"><b>Rationale: teach the concept, not the token.</b> Rotating synonyms within a fixed cluster
+keeps the mapping <b>anchored to the measured emotion</b> (the cluster is closed, so it stays learnable) while
+exposing the model to the <b>many words a real user might use</b> for it. The result generalises: at inference
+"pissed off", "furious", and "wrath" all land on the Anger delivery because all of them appeared, bound to it,
+in training. Controlled at the concept level, varied at the word level.</div>
 
 <h3>7. Use blend for burst director-notes</h3>
 <p>The vocal-burst-blend head cheaply flags laughs/gasps/sighs/moans. Turn a high blend into <b>one</b>
@@ -780,6 +878,11 @@ build), does it belong in the instruction, inline, or both?</li>
  <a class="btn" href="https://huggingface.co/laion/voicenet-dimension-predictors-commercial" target="_blank" rel="noopener">VoiceNet dimension predictors (57)</a>
  <a class="btn" href="https://huggingface.co/laion/voiceclap-commercial-genuineness" target="_blank" rel="noopener">VoiceCLAP genuineness</a>
  <a class="btn" href="https://huggingface.co/laion/voiceclap-commercial-vocalburst-blend" target="_blank" rel="noopener">VoiceCLAP vocal-burst blend</a>
+</div>
+<h3>ASR / sentence-timestamping (recommended options)</h3>
+<div class="links">
+ <a class="btn" href="https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3" target="_blank" rel="noopener">nvidia/parakeet-tdt-0.6b-v3 (TDT word timestamps)</a>
+ <a class="btn" href="https://huggingface.co/microsoft/VibeVoice-ASR" target="_blank" rel="noopener">microsoft/VibeVoice-ASR (segment timestamps)</a>
 </div>
 <h3>The existing procedural-caption work &amp; the model</h3>
 <div class="links">
