@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Sentence-Level Caption Prompt Format for Fine-Tuning MOSS-TTS-Local 4.55B</title>
+<style>
+:root{
+ --bg:#0b0e14;--panel:#131a25;--panel2:#0f151f;--line:#233047;--ink:#e8eef7;--mut:#94a2b8;
+ --dim:#5f6d82;--acc:#5fd0c4;--acc2:#e8b062;--good:#6bd08a;--bad:#e0796b;--vio:#9b8cf0;
+ --mono:ui-monospace,"JetBrains Mono","SF Mono",Menlo,monospace;
+ --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(1200px 520px at 80% -10%,#16202e,transparent 60%),var(--bg);
+ color:var(--ink);font-family:var(--sans);line-height:1.62;font-size:15px}
+.wrap{max-width:1080px;margin:0 auto;padding:34px 22px 120px}
+a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--acc);margin-bottom:10px}
+h1{font-family:var(--mono);font-weight:700;font-size:29px;margin:0 0 12px;letter-spacing:-.01em;line-height:1.22}
+h1 .hl{color:var(--acc)}
+h2{font-family:var(--mono);font-size:20px;margin:48px 0 12px;padding-top:14px;border-top:1px solid var(--line);scroll-margin-top:16px}
+h2 .num{color:var(--acc);margin-right:8px}
+h3{font-family:var(--mono);font-size:14px;letter-spacing:.03em;color:var(--acc2);margin:26px 0 8px;text-transform:uppercase}
+h4{font-family:var(--mono);font-size:12.5px;color:var(--ink);margin:16px 0 6px}
+p{max-width:84ch}
+.sub{color:var(--mut);font-size:15px;max-width:86ch}
+.lead{color:#c7d2e0;font-size:15.5px;max-width:86ch}
+.pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:3px 9px;border:1px solid var(--line);
+ border-radius:20px;color:var(--mut);margin:3px 6px 3px 0;background:var(--panel)}
+.pill.on{color:var(--acc);border-color:#2c5a55}
+.links{margin:16px 0 6px}
+.btn{display:inline-block;font-family:var(--mono);font-size:12.5px;padding:8px 14px;border:1px solid var(--line);
+ border-radius:9px;background:var(--panel);margin:4px 8px 4px 0;color:var(--ink)}
+.btn:hover{border-color:var(--acc);text-decoration:none}
+.btn.live{border-color:#2c5a55;color:var(--acc)}
+.btn.live:before{content:"\25CF ";color:var(--good)}
+.tldr{background:linear-gradient(180deg,#16202e,#111823);border:1px solid #2c5a55;border-left:3px solid var(--acc);
+ border-radius:14px;padding:20px 24px;margin:26px 0}
+.tldr h3{margin-top:0;color:var(--acc)}
+.tldr ul{margin:8px 0;padding-left:20px}
+.tldr li{margin:7px 0;color:#d3dced;max-width:90ch}
+.tldr b{color:#fff}
+.toc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin:24px 0;
+ columns:2;column-gap:36px}
+.toc a{display:block;font-family:var(--mono);font-size:12.5px;padding:4px 0;color:var(--mut);break-inside:avoid}
+.toc a:hover{color:var(--acc)}
+.toc a b{color:var(--acc);margin-right:7px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:16px 0}
+.card.tested{border-left:3px solid var(--acc2)}
+.card h4:first-child{margin-top:0}
+.meta{font-family:var(--mono);font-size:11.5px;color:var(--dim);margin:2px 0 10px;letter-spacing:.02em}
+.finding{border-left:3px solid var(--good);background:var(--panel2);border-radius:0 10px 10px 0;padding:12px 16px;margin:14px 0}
+.finding b{color:var(--good)}
+.kpis{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+.kpi{background:var(--panel2);border:1px solid var(--line);border-top:2px solid var(--acc);border-radius:10px;padding:12px 15px;min-width:130px}
+.kpi b{display:block;font-family:var(--mono);font-size:20px;color:var(--acc);line-height:1.1}
+.kpi span{font-size:11.5px;color:var(--mut)}
+.tw{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;width:100%;font-family:var(--mono);font-size:12.5px;font-variant-numeric:tabular-nums}
+th,td{border:1px solid var(--line);padding:6px 11px;text-align:right;white-space:nowrap;vertical-align:top}
+th{background:var(--panel2);color:var(--dim);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+td:first-child,th:first-child{text-align:left;color:var(--ink)}
+td.l,th.l{text-align:left;white-space:normal}
+.win{color:var(--good);font-weight:700}
+.lose{color:var(--bad)}
+.note{font-size:13px;color:var(--mut);border-left:2px solid var(--line);padding-left:14px;margin:12px 0;max-width:86ch}
+.warn{border-left-color:var(--acc2);color:#d8c199}
+.good-note{border-left-color:var(--good);color:#b5e2c3}
+code{font-family:var(--mono);font-size:12px;background:#0d131d;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:#cfe6e2}
+pre{background:#0d131d;border:1px solid var(--line);border-radius:10px;padding:15px 17px;overflow-x:auto;
+ font-family:var(--mono);font-size:12.5px;line-height:1.55;color:#cfe6e2;margin:12px 0}
+pre .c{color:var(--dim)}          /* comment / label */
+pre .i{color:var(--acc2)}         /* instruction field */
+pre .cap{color:var(--vio)}        /* (caption) */
+pre .w{color:var(--ink)}          /* words */
+pre .p{color:var(--good)}         /* [pause] / ${token} */
+pre .k{color:var(--acc)}          /* keyword */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field{display:grid;grid-template-columns:120px 1fr;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:12px 0}
+.field .fk{background:var(--panel2);padding:12px 14px;font-family:var(--mono);font-size:12px;color:var(--acc2);border-right:1px solid var(--line)}
+.field .fv{padding:12px 14px;font-size:13.5px;color:#d3dced}
+.field .fv code{background:#0d131d}
+.foot{margin-top:60px;padding-top:18px;border-top:1px solid var(--line);color:var(--dim);font-family:var(--mono);font-size:11.5px}
+hr.d{border:0;border-top:1px dashed var(--line);margin:22px 0}
+.tag{font-family:var(--mono);font-size:10.5px;padding:2px 7px;border-radius:5px;border:1px solid var(--line);color:var(--mut)}
+.tag.i{color:var(--acc2);border-color:#5a4a2c}
+.tag.cap{color:var(--vio);border-color:#4a3f7a}
+.tag.p{color:var(--good);border-color:#2c5a3a}
+ol.steps{counter-reset:st;list-style:none;padding-left:0;max-width:88ch}
+ol.steps>li{position:relative;padding:6px 0 14px 46px;margin:0;border-left:1px solid var(--line);margin-left:16px}
+ol.steps>li:before{counter-increment:st;content:counter(st);position:absolute;left:-15px;top:4px;width:30px;height:30px;
+ background:var(--panel);border:1px solid #2c5a55;border-radius:50%;color:var(--acc);font-family:var(--mono);
+ font-size:13px;display:flex;align-items:center;justify-content:center}
+ol.steps>li b{color:#fff}
+ol.steps>li:last-child{border-left:1px solid transparent}
+@media(max-width:820px){.toc{columns:1}.grid2{grid-template-columns:1fr}.field{grid-template-columns:1fr}.field .fk{border-right:0;border-bottom:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="eyebrow">LAION &middot; Expressive TTS &middot; design proposal</div>
+<h1>A Sentence-Level <span class="hl">Caption Prompt Format</span> for Fine-Tuning MOSS-TTS-Local 4.55B</h1>
+<p class="lead">A concept and design document for a fine-tuning prompt format that gives the
+<b>4.55B MOSS-TTS-Local voice-acting model</b> both a <b>global speaker/scene description</b> and
+<b>per-sentence delivery control</b>, mapped onto the model's two native input fields. The dynamic,
+sentence-by-sentence captions are <b>derived automatically from audio</b> using LAION's four voice
+scoring models and a deviation-from-baseline (z-score) recipe &mdash; the same procedural-caption
+method already prototyped in <code>voicenet_v3grid/caption.py</code>, extended here with worked,
+real examples.</p>
+
+<div>
+ <span class="pill on">moss_tts_local</span>
+ <span class="pill on">instruction = HOW (global)</span>
+ <span class="pill on">text = WHAT (+ inline per-sentence)</span>
+ <span class="pill">[pause Xs]</span>
+ <span class="pill">${token:N}</span>
+ <span class="pill">57 VoiceNet dims</span>
+ <span class="pill">42 EmoNet emotions</span>
+ <span class="pill">genuineness</span>
+ <span class="pill">vocal-burst blend</span>
+</div>
+
+<div class="links">
+ <a class="btn live" href="https://projects.laion.ai/voicenet/grid-v3/" target="_blank" rel="noopener">Live &middot; VoiceNet caption grid v3</a>
+ <a class="btn live" href="https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/voices.html" target="_blank" rel="noopener">Live &middot; 13 character voices</a>
+ <a class="btn" href="https://huggingface.co/laion/moss-tts-local-transformer-4.55b-voice-acting" target="_blank" rel="noopener">HF model</a>
+ <a class="btn" href="sglang.html" target="_blank" rel="noopener">Serving guide (markup facts)</a>
+</div>
+
+<!-- ===================== ABSTRACT ===================== -->
+<div class="tldr">
+<h3>Abstract &mdash; the proposal in one screen</h3>
+<ul>
+<li><b>The problem.</b> For expressive fine-tuning we want <b>sentence-level / soundbite-level control</b>
+&mdash; a caption specific to <i>each sentence</i> describing how it is delivered &mdash; <b>together with</b>
+a single general description of the speaker and scene that holds across the whole clip.</li>
+<li><b>The two-field mapping.</b> MOSS-TTS-Local already takes two inputs. We put the <b>stable</b>
+identity in <span class="tag i">instruction</span> (the "how it sounds in general" caption: age, gender,
+timbre, resonance, register, roughness, plus the overall emotional register and stage directions), and we
+put the <b>dynamic</b> delivery <b>inline</b> in <span class="tag cap">text</span>, interleaving per
+sentence: a <code>(round-bracket caption)</code>, the words, and a <code>[pause Xs]</code> marker for real
+inter-sentence silence.</li>
+<li><b>The format.</b> <code>text = (caption) words [pause Xs] (caption) words [pause Xs] &hellip;</code>
+&mdash; a compact per-sentence director note carried in the words channel, where MOSS's verified inline
+markup (<code>[pause 0.5s]</code>, <code>${token:N}</code>) already lives.</li>
+<li><b>The captions are procedural.</b> They are computed from the audio, not hand-written: ASR with
+sentence timestamps &rarr; cut each sentence &rarr; score it with the four LAION models &rarr; compare each
+dimension against an <b>in-the-wild baseline</b> &rarr; keep only the <b>top-3&ndash;5 dimensions/emotions on
+which the sentence most stands out</b> &rarr; render them as a few keywords. Boring sentences get short or
+empty captions &mdash; naturally, and for free.</li>
+<li><b>It reuses working code.</b> The VoiceNet half is exactly what
+<a href="https://projects.laion.ai/voicenet/grid-v3/" target="_blank" rel="noopener"><code>voicenet_v3grid/caption.py</code></a>
+already does; this document includes <b>real captions it produced</b> on stored predictions
+(e.g. <i>"Extremely full and cinematic.", "Extremely narrator-like and storybook."</i>).</li>
+</ul>
+</div>
+
+<div class="toc">
+ <a href="#s1"><b>1</b> Motivation &amp; the two-field idea</a>
+ <a href="#s2"><b>2</b> The MOSS two-field model &amp; verified markup</a>
+ <a href="#s3"><b>3</b> The proposed format &amp; grammar</a>
+ <a href="#s4"><b>4</b> Prompt templates</a>
+ <a href="#s5"><b>5</b> Worked examples</a>
+ <a href="#s6"><b>6</b> The procedural-caption pipeline</a>
+ <a href="#s7"><b>7</b> Real caption.py output (proof of concept)</a>
+ <a href="#s8"><b>8</b> Deriving the general speaker caption</a>
+ <a href="#s9"><b>9</b> Design recommendations &mdash; what I think</a>
+ <a href="#s10"><b>10</b> Open questions</a>
+ <a href="#s11"><b>11</b> Links &amp; resources</a>
+</div>
+
+
+<!-- ===================== 1 ===================== -->
+<h2 id="s1"><span class="num">1</span> Motivation &amp; the two-field idea</h2>
+<p>The character-voice study on this model (rounds 1&ndash;5, see the
+<a href="voices.html" target="_blank" rel="noopener">13-voice showcase</a>) established that MOSS-TTS-Local
+responds strongly to a <b>natural-language description of how the voice sounds</b> placed in the
+<code>instruction</code> field. That work optimised a <i>single, static</i> instruction per character:
+one description for the whole clip. It is excellent for a fixed persona reading a line.</p>
+<p>But a real performance is not static. Within one clip a grieving woman <b>steadies herself, breaks,
+whispers, then chokes on a sob</b>; a narrator <b>lands a punchline, drops to a hush, then swells</b>.
+A single global caption cannot say "this sentence is the one that cracks." For expressive fine-tuning
+&mdash; where we want the model to learn to <b>move</b> across a clip &mdash; we need per-sentence control.
+Yet we also do not want to throw away the thing that works: a stable, holistic description of the speaker.</p>
+<p class="lead">The proposal is to keep both, and to split them by <b>timescale</b>: what is <i>stable</i>
+across the clip goes in <code>instruction</code>; what is <i>dynamic</i> per sentence goes <b>inline</b> in
+<code>text</code>, right next to the words it governs. Crucially, the per-sentence captions are not authored
+by hand &mdash; they are <b>derived from the audio itself</b> by scoring each sentence and describing only
+where it deviates from an ordinary-speech baseline.</p>
+
+<div class="kpis">
+ <div class="kpi"><b>2</b><span>native fields used<br>(instruction + text)</span></div>
+ <div class="kpi"><b>4</b><span>LAION scoring models<br>drive the captions</span></div>
+ <div class="kpi"><b>57 + 42</b><span>VoiceNet dims +<br>EmoNet emotions</span></div>
+ <div class="kpi"><b>top&nbsp;3&ndash;5</b><span>salient dims kept<br>per sentence</span></div>
+</div>
+
+
+<!-- ===================== 2 ===================== -->
+<h2 id="s2"><span class="num">2</span> The MOSS two-field model &amp; verified inline markup</h2>
+<p>MOSS-TTS-Local's <code>build_user_message(&hellip;)</code> / the SGLang <code>/v1/audio/speech</code> API
+expose two text inputs plus a duration dial. From the model's own README and
+<a href="sglang.html" target="_blank" rel="noopener">serving guide</a>:</p>
+
+<div class="field"><div class="fk">instruction<br>(alias&nbsp;instruct)</div>
+<div class="fv"><b>HOW to speak.</b> Free-text performance direction / stage directions. Vocal bursts are written
+here as <code>(round-bracket)</code> director notes, e.g. <code>(gasping)</code>. In our FAIR eval, keeping
+bursts here (and the spoken text clean) rather than inline cut WER by roughly <b>5&times;</b>.</div></div>
+
+<div class="field"><div class="fk">text<br>(input)</div>
+<div class="fv"><b>WHAT to speak.</b> The words. Per the serving guide it "may carry <code>${token:N}</code> and
+inline markup (<code>[pause 0.5s]</code>, IPA&hellip;)". This is the field we extend with per-sentence
+captions.</div></div>
+
+<div class="field"><div class="fk">tokens<br>${token:N}</div>
+<div class="fv"><b>Pacing dial.</b> An explicit codec-frame target at <b>12.5&nbsp;Hz</b> (<code>tokens &asymp;
+words &times; 6</code>). Set inline as <code>${token:150}&hellip;</code> or via the <code>token_count</code>
+parameter. It is <b>stripped before synthesis</b>. Larger N &rarr; longer/slower audio.</div></div>
+
+<h3>Verified markup facts (use exactly these)</h3>
+<div class="tw"><table>
+<thead><tr><th class="l">Marker</th><th class="l">Meaning</th><th class="l">Where it lives</th><th class="l">Status</th></tr></thead>
+<tbody>
+<tr><td class="l"><code>[pause 0.5s]</code></td><td class="l">A timed inter-word/inter-sentence silence, in seconds</td><td class="l">inline in <code>text</code></td><td class="l"><span class="win">native</span></td></tr>
+<tr><td class="l"><code>${token:N}</code></td><td class="l">Target duration = N codec frames @ 12.5&nbsp;Hz; stripped before synthesis</td><td class="l">inline in <code>text</code> (or <code>token_count</code>)</td><td class="l"><span class="win">native</span></td></tr>
+<tr><td class="l">IPA</td><td class="l">Phonetic pronunciation hints</td><td class="l">inline in <code>text</code></td><td class="l"><span class="win">native</span></td></tr>
+<tr><td class="l"><code>(round-bracket)</code></td><td class="l">Performance / burst director note</td><td class="l"><code>instruction</code> (training convention)</td><td class="l"><span class="win">native</span></td></tr>
+<tr><td class="l"><code>reference=[codes]</code></td><td class="l">Voice-clone reference clip + transcript (separate path)</td><td class="l"><code>references</code>&nbsp;field</td><td class="l">separate</td></tr>
+</tbody></table></div>
+<p class="note">Voice cloning (<code>reference=[codes]</code> from <code>encode_audios_from_path(&hellip;)</code>)
+is a different input path and orthogonal to this proposal &mdash; the caption format targets the
+<b>reference-less</b> instruction+text route, where an empty instruction otherwise gives the model no
+direction. It composes with cloning too (clone identity, caption delivery), but that is out of scope here.</p>
+
+<p><b>The key observation this proposal builds on:</b> pauses are <b>already</b> a native, inline
+<code>text</code>-channel construct. So the natural place to put a per-sentence marker &mdash; a
+<code>(caption)</code> before the sentence and a <code>[pause Xs]</code> after it &mdash; is exactly the
+channel MOSS already reads for timing markup. We are extending an existing inline convention, not inventing
+a new field.</p>
+
+
+<!-- ===================== 3 ===================== -->
+<h2 id="s3"><span class="num">3</span> The proposed format &amp; grammar</h2>
+<p>The <code>instruction</code> field is unchanged in spirit from the character study: a single global
+description. The novelty is the <code>text</code> field, which becomes an interleaved sequence of
+per-sentence units.</p>
+
+<h3>The text field, labelled</h3>
+<pre><span class="c">text  =  </span><span class="cap">(warm, storytelling, deeply genuine)</span> <span class="w">Once, in a village at the edge of the frostwood,</span> <span class="p">[pause 0.4s]</span>
+<span class="cap">(hushed, intimate, slowing)</span> <span class="w">there lived a girl who could hear the snow.</span> <span class="p">[pause 0.9s]</span>
+<span class="cap">(brightening, delighted, playful)</span> <span class="w">"And oh, what stories the snow would tell!"</span>
+<span class="c">           \_______  ______/  \____________ _____________/  \___ ___/
+                    \/                      \/                   \/
+              per-sentence            the sentence's words     real silence
+              (caption): HOW          (quotes optional)        between sentences</span></pre>
+
+<h3>Grammar (EBNF-ish)</h3>
+<pre><span class="k">instruction</span>  = global-speaker-caption ;   <span class="c">(* stable traits + overall register + stage dirs *)</span>
+
+<span class="k">text</span>         = [ duration ] , unit , { sep , unit } ;
+<span class="k">unit</span>         = [ caption ] , words ;
+<span class="k">caption</span>      = "(" , phrase , { "," , phrase } , ")" ;   <span class="c">(* 0-5 short delivery keywords *)</span>
+<span class="k">words</span>        = plain-text | '"' , plain-text , '"' ;   <span class="c">(* double-quotes OPTIONAL *)</span>
+<span class="k">sep</span>          = pause | " " ;
+<span class="k">pause</span>        = "[pause " , seconds , "s]" ;   <span class="c">(* only when a real silence occurred *)</span>
+<span class="k">duration</span>     = "${token:" , integer , "}" ;   <span class="c">(* optional pacing target, per clip or per unit *)</span>
+<span class="k">phrase</span>       = { direction-word | emotion-word | style-word | burst-note } ;</pre>
+
+<h3>Rules of the format</h3>
+<ul>
+<li>Each <b>sentence</b> (from ASR sentence segmentation) is one <code>unit</code>: an optional
+<code>(caption)</code> immediately followed by its words.</li>
+<li>The <code>(caption)</code> describes <b>only that sentence's</b> dominant delivery &mdash; its salient
+emotions + speaking-style shifts + a genuineness/burst note when warranted. It is <b>short</b> (a few
+keywords), and <b>empty/omitted</b> for flat, unremarkable sentences.</li>
+<li>Between two units, insert <code>[pause Xs]</code> <b>iff</b> a real inter-sentence silence of
+&asymp;X seconds was measured in the source audio. No silence &rarr; no marker (just a space).</li>
+<li>Burst notes (e.g. <code>(sigh)</code>, <code>(soft laugh)</code>) and all markup stay <b>outside</b>
+any double-quotes, so the model never reads brackets aloud.</li>
+<li>Double-quotes around the words are <b>optional</b> (see &sect;9 &mdash; quotes-in-text raised WER in our
+earlier experiments, so bursts/markup stay outside them).</li>
+<li><code>${token:N}</code> may be placed once at the front (whole-clip pacing) or per unit (to teach
+sentence pacing on slow/fast deliveries).</li>
+</ul>
+
+<div class="note good-note">Design intent: the <code>text</code> channel now carries a <b>time-ordered
+score</b> of the performance &mdash; captions where the delivery changes, pauses where the silence is,
+words throughout &mdash; while <code>instruction</code> carries the <b>constant</b> who-is-speaking. During
+fine-tuning the model learns to bind each inline <code>(caption)</code> to the acoustic change in the very
+next span of audio.</div>
+
+
+<!-- ===================== 4 ===================== -->
+<h2 id="s4"><span class="num">4</span> Prompt templates</h2>
+
+<h3>Template A &mdash; expressive / character narration (per-sentence dynamics)</h3>
+<pre><span class="c">instruction:</span>
+  <span class="i">&lt;AGE + GENDER&gt;, &lt;TIMBRE: rough/smooth, breathy/full, bright/dark&gt;,
+  &lt;RESONANCE: chest / throat / nasal / head&gt;, &lt;REGISTER + PITCH RANGE&gt;.
+  &lt;overall emotional register of the whole clip&gt;. &lt;scene / stage direction&gt;.
+  High quality recording.</span>
+
+<span class="c">text:</span>
+  <span class="p">${token:NN}</span> <span class="cap">(&lt;dominant emotion&gt;, &lt;style shift&gt;[, &lt;genuine|burst note&gt;])</span> <span class="w">Sentence one.</span> <span class="p">[pause Xs]</span>
+  <span class="cap">(&lt;dominant emotion&gt;, &lt;style shift&gt;)</span> <span class="w">Sentence two.</span> <span class="p">[pause Ys]</span>
+  <span class="w">A flat, unremarkable sentence with no caption.</span> <span class="p">[pause Zs]</span>
+  <span class="cap">(&lt;dominant emotion&gt;)</span> <span class="w">Final sentence.</span></pre>
+
+<h3>Template B &mdash; calm, even narration (sparse captions)</h3>
+<pre><span class="c">instruction:</span>
+  <span class="i">A &lt;age&gt; &lt;gender&gt; narrator, warm and full, &lt;chest resonance&gt;, even mid register,
+  measured and unhurried. Calm, storybook, reassuring overall. Clean studio recording.</span>
+
+<span class="c">text:</span>
+  <span class="w">Sentence.</span> <span class="p">[pause 0.4s]</span> <span class="w">Sentence.</span> <span class="p">[pause 0.5s]</span>
+  <span class="cap">(gently emphatic)</span> <span class="w">The one line that carries weight.</span> <span class="p">[pause 0.6s]</span> <span class="w">Sentence.</span>
+  <span class="c">// most units have NO caption because the delivery does not deviate from baseline</span></pre>
+
+<h3>Template C &mdash; a fixed character voice (reuse a showcase archetype)</h3>
+<pre><span class="c">instruction:</span>   <span class="c">// the stable persona = a round-5 champion instruction, verbatim</span>
+  <span class="i">A nasty little goblin voice, extremely nasal and pinched, buzzing high through the
+  nose with a grating scratchy rasp, whiny and reedy. A weak, cowardly underling, no
+  authority whatsoever. No chest, no warmth, no fullness. Gleeful, mean overall.</span>
+
+<span class="c">text:</span>   <span class="c">// per-sentence emotion/energy shifts ride inline on the fixed goblin timbre</span>
+  <span class="cap">(sly, taunting, low and conspiratorial)</span> <span class="w">"You think you can stop me?"</span> <span class="p">[pause 0.5s]</span>
+  <span class="cap">(erupting, shrill, manic glee)(wicked cackle)</span> <span class="w">"Nothing can stop me now!"</span></pre>
+
+<p class="note">In Template C the <b>timbre never changes</b> (it lives in <code>instruction</code>), but the
+goblin goes from a conspiratorial hush to a manic shriek <b>across two sentences</b> &mdash; exactly what a
+static instruction could not express. The burst note stays outside the quotes.</p>
+
+
+<!-- ===================== 5 ===================== -->
+<h2 id="s5"><span class="num">5</span> Worked examples</h2>
+<p>Four full <code>instruction</code>+<code>text</code> pairs across different content. The captions shown
+are in the compact keyword style the pipeline (&sect;6&ndash;7) produces.</p>
+
+<div class="card tested">
+<h4>Example 1 &mdash; Emotional storytelling: a grieving woman</h4>
+<div class="meta">stable persona &rarr; instruction &middot; per-sentence grief dynamics + real pauses &rarr; text</div>
+<div class="field"><div class="fk">instruction</div><div class="fv">A woman in her thirties, warm mid-low timbre with soft chest resonance, a gentle breathy edge, even register. Grief-stricken and raw throughout, fighting to hold herself together in a quiet room. Intimate close-mic. High quality recording.</div></div>
+<pre><span class="c">text:</span>
+<span class="p">${token:210}</span> <span class="cap">(subdued, trembling, holding back)</span> <span class="w">I keep expecting to hear his key in the door.</span> <span class="p">[pause 0.8s]</span>
+<span class="cap">(voice cracking, raw and vulnerable, breaking)</span> <span class="w">And then I remember.</span> <span class="p">[pause 1.4s]</span>
+<span class="cap">(hushed, collapsing in energy, barely audible)(shaky breath)</span> <span class="w">He's not coming back.</span> <span class="p">[pause 1.1s]</span>
+<span class="cap">(a fragile attempt at composure, distant)</span> <span class="w">I should be stronger than this by now.</span></pre>
+<div class="note">Long pauses (1.1&ndash;1.4&nbsp;s) between the emotional beats are copied from the real
+inter-sentence silences and teach the model the <i>timing</i> of grief. Only the deviating sentences carry
+strong captions; "I keep expecting&hellip;" is subdued, not flat, so it gets a mild one.</div>
+</div>
+
+<div class="card tested">
+<h4>Example 2 &mdash; Calm narration (documentary)</h4>
+<div class="meta">sparse captions &mdash; most sentences do not deviate from the baseline</div>
+<div class="field"><div class="fk">instruction</div><div class="fv">A man in his fifties, warm and full, rich chest resonance, even low-mid register, measured and unhurried. Calm, authoritative, storybook-documentary tone overall. Clean studio recording.</div></div>
+<pre><span class="c">text:</span>
+<span class="w">The glacier moves less than a metre a day.</span> <span class="p">[pause 0.5s]</span>
+<span class="w">To the eye, it is perfectly still.</span> <span class="p">[pause 0.5s]</span>
+<span class="cap">(quietly emphatic, slowing)</span> <span class="w">But it has been moving for ten thousand years.</span> <span class="p">[pause 0.7s]</span>
+<span class="w">Everything you see here, it carved.</span></pre>
+<div class="note">Three of four units have <b>no caption</b> &mdash; the delivery sits at the calm baseline
+this narrator holds, so there is nothing salient to say. Only the one line that swells and slows earns a
+caption. Empty captions here are correct, compact and cheap.</div>
+</div>
+
+<div class="card tested">
+<h4>Example 3 &mdash; A character voice: the goblin (persona fixed, emotion moves)</h4>
+<div class="meta">reuses the round-5 goblin champion as the stable instruction</div>
+<div class="field"><div class="fk">instruction</div><div class="fv">A nasty little goblin voice, extremely nasal and pinched, buzzing high through the nose with a grating scratchy rasp, whiny and reedy. A weak, cowardly underling, no authority whatsoever. No chest, no warmth, no fullness. Malicious and gleeful overall.</div></div>
+<pre><span class="c">text:</span>
+<span class="cap">(sly, wheedling, conspiratorial hush)</span> <span class="w">Ohhh, you found the treasure, did you?</span> <span class="p">[pause 0.6s]</span>
+<span class="cap">(mock-innocent, sing-song, taunting)</span> <span class="w">Pity it's mine now.</span> <span class="p">[pause 0.4s]</span>
+<span class="cap">(erupting, shrill, manic spite)(wicked cackle)</span> <span class="w">All mine, all mine!</span></pre>
+<div class="note">The nasal, pinched, no-chest timbre is <b>constant</b> (instruction); the goblin ramps from a
+wheedling hush to a shrieking cackle <b>across sentences</b>. One affect-burst, placed outside the words.</div>
+</div>
+
+<div class="card tested">
+<h4>Example 4 &mdash; Upbeat, high-energy delivery (advert/trailer read)</h4>
+<div class="meta">shows brightening, high register, and a burst flagged by the blend model</div>
+<div class="field"><div class="fk">instruction</div><div class="fv">A woman in her late twenties, bright and clear timbre, forward head resonance, sitting in a high register, crisp articulation. Upbeat and enthusiastic overall, high-energy studio delivery. Clean recording.</div></div>
+<pre><span class="c">text:</span>
+<span class="p">${token:96}</span> <span class="cap">(bright, high register, eager)</span> <span class="w">It finally happened.</span> <span class="p">[pause 0.3s]</span>
+<span class="cap">(surging in energy, joyful, exclaiming)(delighted laugh)</span> <span class="w">The wait is over!</span> <span class="p">[pause 0.4s]</span>
+<span class="cap">(warm, sincere, landing it)</span> <span class="w">And it was worth every second.</span></pre>
+</div>
+
+
+<!-- ===================== 6 ===================== -->
+<h2 id="s6"><span class="num">6</span> The procedural-caption pipeline</h2>
+<p>The heart of the proposal: the per-sentence <code>(captions)</code> are not written by hand &mdash; they
+are <b>derived automatically from the audio</b> by four LAION voice models plus a deviation-from-baseline
+recipe. This makes captioning a large fine-tuning corpus cheap, consistent, and free of human labelling
+bias.</p>
+
+<h3>The four scoring models &amp; their roles</h3>
+<div class="tw"><table>
+<thead><tr><th class="l">Model</th><th class="l">Encoder &rarr; heads</th><th class="l">Output</th><th class="l">Role in the caption</th></tr></thead>
+<tbody>
+<tr><td class="l"><a href="https://huggingface.co/laion/Empathic-Insight-Voice-Plus" target="_blank" rel="noopener">Empathic-Insight-Voice-Plus</a></td>
+<td class="l">BUD-E-Whisper enc &rarr; per-emotion MLP heads</td>
+<td class="l"><b>40 EmoNet emotions + Valence + Arousal (42)</b> + quality</td>
+<td class="l">The sentence's <b>dominant emotion(s)</b></td></tr>
+<tr><td class="l"><a href="https://huggingface.co/laion/voicenet-dimension-predictors-commercial" target="_blank" rel="noopener">voicenet-dimension-predictors-commercial</a></td>
+<td class="l">VoiceCLAP-commercial 768-d emb &rarr; regressors</td>
+<td class="l"><b>57 VoiceNet perceptual dims</b> (0&ndash;6): brightness, resonance cavities, register, pitch range, roughness, tempo, styles&hellip;</td>
+<td class="l">The <b>dominant delivery / speaker traits</b></td></tr>
+<tr><td class="l"><a href="https://huggingface.co/laion/voiceclap-commercial-genuineness" target="_blank" rel="noopener">voiceclap-commercial-genuineness</a></td>
+<td class="l">VoiceCLAP-commercial emb &rarr; head</td>
+<td class="l"><b>genuineness (0&ndash;6)</b></td>
+<td class="l">How <b>genuine vs performed</b> the sentence sounds (a gate + a note)</td></tr>
+<tr><td class="l"><a href="https://huggingface.co/laion/voiceclap-commercial-vocalburst-blend" target="_blank" rel="noopener">voiceclap-commercial-vocalburst-blend</a></td>
+<td class="l">VoiceCLAP-commercial emb &rarr; head</td>
+<td class="l"><b>vocal-burst blend (0&ndash;10)</b></td>
+<td class="l">Flags sentences with <b>laughs / gasps / sighs</b> &rarr; a burst note</td></tr>
+</tbody></table></div>
+<p class="note">Efficiency: <b>one VoiceCLAP-commercial encode</b> of the sentence feeds VoiceNet + genuineness
++ blend (three heads share the 768-d embedding); <b>one BUD-E-Whisper encode</b> feeds Empathic-Insight.
+Two encodes per sentence, four score vectors.</p>
+
+<h3>The six steps</h3>
+<ol class="steps">
+<li><b>ASR with sentence-level timestamps.</b> Run WhisperX / Parakeet + forced alignment to get each
+sentence's text and its <code>[start, end]</code> times (and the gaps between sentences &rarr; the pauses).</li>
+<li><b>Cut each sentence segment</b> <code>[start, end]</code> from the audio.</li>
+<li><b>Score each segment through the four models.</b> One VoiceCLAP-commercial encode &rarr; VoiceNet (57) +
+genuineness + blend; one BUD-E-Whisper encode &rarr; Empathic-Insight (42). Result: a per-sentence score
+vector of ~99 numbers + genuineness + blend.</li>
+<li><b>Build an in-the-wild baseline.</b> Run the same four models over a large, ordinary
+"in-the-wild" corpus and compute, per dimension/emotion, a <b>robust median + spread (MAD or std)</b>. Most
+in-the-wild speech is flat and unremarkable, so this baseline captures "average delivery."</li>
+<li><b>Per sentence, compute z-scores.</b> <code>z = (value &minus; median) / spread</code> for every
+dimension and emotion; take the <b>top-3 to top-5 by |z|</b> &mdash; the dimensions/emotions on which
+<i>this</i> sentence most stands out. These are its dominant delivery traits and dominant emotions.</li>
+<li><b>Render the caption.</b> Map each selected dim/emotion to a short phrase reflecting <b>direction</b>
+(above / below baseline) and <b>intensity</b> (from |z|); add the dominant EmoNet emotion word(s), a
+genuineness note if it deviates, and a burst note if blend is high. Flat sentences &rarr; short or empty
+captions (natural + cheap).</li>
+</ol>
+
+<div class="finding"><b>Why deviation, not absolutes.</b> A caption that listed every dimension's absolute
+value would be long, repetitive, and dominated by traits shared by all speech. The z-score against a
+baseline keeps <b>only what is surprising about this sentence</b> &mdash; which is exactly what a director
+note should say. It also makes "boring" fall out for free: a sentence at the baseline has no high-|z| dims,
+so it gets no caption.</div>
+
+
+<!-- ===================== 7 ===================== -->
+<h2 id="s7"><span class="num">7</span> Real caption.py output &mdash; proof of concept</h2>
+<p>The VoiceNet half of step 5&ndash;6 is <b>already implemented and running</b> in
+<a href="https://projects.laion.ai/voicenet/grid-v3/" target="_blank" rel="noopener"><code>voicenet_v3grid/caption.py</code></a>.
+It is the concrete proof of concept for this proposal. Its design maps one-to-one onto the recipe above:</p>
+
+<div class="grid2">
+<div class="card"><h4>The intensity ladder (from |z|)</h4>
+<pre><span class="k">INTENSITY</span> = [(2.0, "Extremely"),
+             (1.5, "Very"),
+             (1.0, "Notably"),
+             (0.0, "Somewhat")]</pre>
+<p class="sub">|z|&gt;2 &rarr; "Extremely", &gt;1.5 &rarr; "Very", &gt;1 &rarr; "Notably", else "Somewhat" &mdash;
+the deviation's <b>magnitude</b> becomes the adverb.</p></div>
+<div class="card"><h4>The per-dimension adjective map (excerpt)</h4>
+<pre><span class="k">DESC</span> = {
+ "FULL":  {hi:"full and cinematic",
+           lo:"thin and paper-like"},
+ "R_CHST":{hi:"rich in deep chest resonance",
+           lo:"thin in chest resonance"},
+ "VULN":  {hi:"raw and vulnerable",
+           lo:"guarded and armored"}, ...}</pre>
+<p class="sub">Each dim has a curated hi/lo phrase (informed by the VoiceNet rubric texts). The z-score's
+<b>sign</b> picks hi vs lo; its magnitude picks the adverb.</p></div>
+</div>
+
+<p><code>caption(pred_dict, REFERENCE_STATS, topk=5)</code> scores every dim against
+<code>reference_stats.json</code> (per-dim median/mean+std over 1000 real, stratified in-the-wild Emolia
+clips), sorts by |z|, and returns the top-k phrases. Below are <b>real captions it produced</b> when run on
+stored predictions in <code>pred100_v3.json</code> (each entry = one clip's 57 VoiceNet regression outputs).
+No GPU &mdash; pure inference on the stored score vectors.</p>
+
+<div class="card tested">
+<h4>Real example A &mdash; a rich, cinematic voice <span class="tag">EN_B00015</span></h4>
+<div class="meta">genuineness 1.38 &middot; blend 6.64 &middot; top-5 by |z| vs the average-Emolia baseline</div>
+<div class="tw"><table>
+<thead><tr><th class="l">VoiceNet dim</th><th>reg (0&ndash;6)</th><th>baseline&nbsp;&mu;</th><th>z</th><th class="l">&rarr; caption phrase</th></tr></thead>
+<tbody>
+<tr><td class="l">FULL &middot; Fullness</td><td>5.53</td><td>2.29</td><td class="win">+3.33</td><td class="l">Extremely full and cinematic.</td></tr>
+<tr><td class="l">WARM &middot; Warmth</td><td>5.17</td><td>2.68</td><td class="win">+3.13</td><td class="l">Extremely warm and enveloping.</td></tr>
+<tr><td class="l">ESTH &middot; Esthetics</td><td>4.46</td><td>2.39</td><td class="win">+2.53</td><td class="l">Extremely beautiful and pleasing.</td></tr>
+<tr><td class="l">R_NASL &middot; Nasal Res.</td><td>0.97</td><td>2.90</td><td class="lose">&minus;2.04</td><td class="l">Extremely denasal and clear.</td></tr>
+<tr><td class="l">R_HEAD &middot; Head Res.</td><td>0.01</td><td>1.82</td><td class="lose">&minus;2.00</td><td class="l">Very thin in head resonance.</td></tr>
+</tbody></table></div>
+</div>
+
+<div class="card tested">
+<h4>Real example B &mdash; an elderly storybook narrator <span class="tag">EN_B00024</span></h4>
+<div class="meta">genuineness 0.73 &middot; blend 4.49 &middot; a textbook "calm narration" persona</div>
+<div class="tw"><table>
+<thead><tr><th class="l">VoiceNet dim</th><th>reg</th><th>&mu;</th><th>z</th><th class="l">&rarr; caption phrase</th></tr></thead>
+<tbody>
+<tr><td class="l">WARM &middot; Warmth</td><td>5.08</td><td>2.68</td><td class="win">+3.03</td><td class="l">Extremely warm and enveloping.</td></tr>
+<tr><td class="l">ESTH &middot; Esthetics</td><td>4.77</td><td>2.39</td><td class="win">+2.90</td><td class="l">Extremely beautiful and pleasing.</td></tr>
+<tr><td class="l">FULL &middot; Fullness</td><td>4.88</td><td>2.29</td><td class="win">+2.66</td><td class="l">Extremely full and cinematic.</td></tr>
+<tr><td class="l">S_NARR &middot; Narrator Style</td><td>5.81</td><td>2.44</td><td class="win">+2.26</td><td class="l">Extremely narrator-like and storybook.</td></tr>
+<tr><td class="l">AGEV &middot; Voice Age</td><td>5.43</td><td>2.83</td><td class="win">+2.17</td><td class="l">Extremely elderly-sounding.</td></tr>
+</tbody></table></div>
+</div>
+
+<div class="card tested">
+<h4>Real example C &mdash; a bright, joyful, high voice <span class="tag">DE_B00002</span></h4>
+<div class="meta">genuineness 1.49 &middot; blend 3.30 &middot; note the one <i>below</i>-baseline dim (noisy background)</div>
+<div class="tw"><table>
+<thead><tr><th class="l">VoiceNet dim</th><th>reg</th><th>&mu;</th><th>z</th><th class="l">&rarr; caption phrase</th></tr></thead>
+<tbody>
+<tr><td class="l">VALN &middot; Valence</td><td>6.00</td><td>2.33</td><td class="win">+3.74</td><td class="l">Extremely joyful and positive.</td></tr>
+<tr><td class="l">R_HEAD &middot; Head Res.</td><td>4.62</td><td>1.82</td><td class="win">+3.10</td><td class="l">Extremely bright in head resonance.</td></tr>
+<tr><td class="l">REGS &middot; Register</td><td>5.09</td><td>1.93</td><td class="win">+2.23</td><td class="l">Extremely high in vocal register.</td></tr>
+<tr><td class="l">HARM &middot; Harmonicity</td><td>4.63</td><td>2.61</td><td class="win">+2.16</td><td class="l">Extremely pure and tonal.</td></tr>
+<tr><td class="l">BKGN &middot; Background</td><td>1.81</td><td>3.10</td><td class="lose">&minus;2.16</td><td class="l">Extremely noisy in the background.</td></tr>
+</tbody></table></div>
+</div>
+
+<div class="card tested">
+<h4>Real examples D &amp; E &mdash; two distressed, vulnerable voices <span class="tag">ZH_B00039</span> <span class="tag">FR_B00000</span></h4>
+<div class="meta">both high-|z| on Vulnerability &mdash; exactly the sentences a grief clip would caption strongly</div>
+<div class="grid2">
+<div><h4>ZH_B00039 &middot; genu 2.51 &middot; blend 8.55</h4><pre class="w"><span class="cap">Extremely raw and vulnerable.        </span><span class="c">[VULN  z=+3.08]</span>
+<span class="cap">Extremely collapsing in energy.      </span><span class="c">[ARSH  z=-2.54]</span>
+<span class="cap">Extremely audibly breathing/gasping. </span><span class="c">[RESP  z=+2.27]</span>
+<span class="cap">Extremely meek and submissive.       </span><span class="c">[STNC  z=-2.26]</span>
+<span class="cap">Extremely thin in chest resonance.   </span><span class="c">[R_CHST z=-2.01]</span></pre>
+<p class="sub">blend 8.55 is very high &rarr; the pipeline would add a burst note, e.g. <code>(shaky breath)</code>.</p></div>
+<div><h4>FR_B00000 &middot; genu 2.96 &middot; blend 6.29</h4><pre class="w"><span class="cap">Extremely raw and vulnerable.        </span><span class="c">[VULN  z=+3.15]</span>
+<span class="cap">Extremely noisy and aperiodic.       </span><span class="c">[HARM  z=-2.52]</span>
+<span class="cap">Extremely darkening in mood.         </span><span class="c">[VALS  z=-2.21]</span>
+<span class="cap">Extremely blurry and mumbled.        </span><span class="c">[CLRT  z=-2.20]</span>
+<span class="cap">Extremely rough and raspy.           </span><span class="c">[ROUG  z=+2.19]</span></pre>
+<p class="sub">"raw and vulnerable, darkening in mood, rough" is a ready-made grief caption &mdash; derived, not written.</p></div>
+</div>
+</div>
+
+<h3>Extending the recipe to the emotion half (Empathic-Insight)</h3>
+<p>The <b>same z-score-vs-baseline machinery</b> extends verbatim from the 57 VoiceNet dims to the 42 EmoNet
+dimensions (40 emotions + Valence + Arousal). Build a baseline median+spread per emotion over the in-the-wild
+corpus; per sentence, take the top emotions by |z|; emit the dominant <b>emotion word(s)</b> directly
+(EmoNet already gives readable names &mdash; <i>Grief, Amusement, Malice, Relief, Contempt, Awe</i>&hellip;),
+gated by intensity. Then two scalar heads add notes:</p>
+<ul>
+<li><b>Genuineness note.</b> If genuineness deviates high, the emotion reads as <i>sincere / genuinely felt</i>;
+if it deviates low, as <i>performed / theatrical</i>. It also gates whether strong emotion words are added at
+all (see &sect;9).</li>
+<li><b>Burst note.</b> If vocal-burst blend is high (as in ZH_B00039 at 8.55, FR_B00000 at 6.29), append a
+burst director-note &mdash; <code>(soft laugh)</code>, <code>(gasp)</code>, <code>(sigh)</code>, <code>(shaky
+breath)</code> &mdash; matched to the dominant emotion, placed outside the words.</li>
+</ul>
+<p>A full sentence caption is thus the concatenation, in a fixed order, of: <b>[VoiceNet delivery phrases]
++ [EmoNet emotion words] + [genuineness note] + [burst note]</b>, each contributed only when it clears its
+|z| / value threshold, capped to a small keyword budget.</p>
+
+
+<!-- ===================== 8 ===================== -->
+<h2 id="s8"><span class="num">8</span> Deriving the general speaker caption</h2>
+<p>The global <code>instruction</code> caption is the <b>aggregate</b> of what is stable across the clip.
+After scoring every sentence, take the <b>median over sentences</b> of the <i>speaker-identity</i>
+dimensions &mdash; the ones that should not change within one clip:</p>
+<div class="tw"><table>
+<thead><tr><th class="l">Trait family</th><th class="l">VoiceNet dims (median over sentences)</th></tr></thead>
+<tbody>
+<tr><td class="l">Age / gender</td><td class="l">AGEV, GEND</td></tr>
+<tr><td class="l">Timbre / quality</td><td class="l">BRGT, ROUG, WARM, FULL, HARM, METL, ESTH</td></tr>
+<tr><td class="l">Resonance cavities</td><td class="l">R_CHST, R_THRT, R_NASL, R_HEAD, R_MASK, R_ORAL, R_MIXD</td></tr>
+<tr><td class="l">Register / pitch</td><td class="l">REGS, RANG</td></tr>
+<tr><td class="l">Overall emotional register</td><td class="l">median VALN / AROU + the most persistent EmoNet emotion across sentences</td></tr>
+</tbody></table></div>
+<p>Run the <i>same</i> <code>caption()</code> on this per-clip median vector (against the same baseline) to
+get the stable-trait phrases, then compose them into the instruction with the overall emotional register and
+any scene direction. Real example B above is exactly this shape when treated as a whole-clip aggregate:
+"warm, beautiful, full, narrator-like, elderly" &rarr; a global instruction like <i>"An elderly man, warm and
+full, rich resonance, storybook narrator delivery."</i></p>
+<div class="note good-note">Division of labour: <b>dims with low sentence-to-sentence variance</b> (timbre,
+resonance, age, gender) &rarr; the <code>instruction</code> caption. <b>Dims with high variance</b> (arousal,
+valence, emphasis, tempo, style shifts, vulnerability) &rarr; the inline per-sentence captions. The variance
+itself tells you which field a trait belongs in.</div>
+
+
+<!-- ===================== 9 ===================== -->
+<h2 id="s9"><span class="num">9</span> Design recommendations &mdash; what I think</h2>
+
+<h3>1. Deviation-vs-baseline beats absolute captioning</h3>
+<p>Caption only what is <b>salient</b> &mdash; the dims/emotions where the sentence departs from ordinary
+speech. This yields <b>compact</b> captions, keeps them on-topic, and makes flat sentences produce
+<b>short or empty</b> captions automatically. Absolute captioning would drown the signal in shared,
+uninformative traits and over-constrain the model.</p>
+
+<h3>2. Use robust statistics (median + MAD), not mean + std</h3>
+<p>In-the-wild score distributions are <b>skewed and heavy-tailed</b> (most speech is flat, a few clips are
+extreme). Median + MAD resists those outliers far better than mean + std, giving a more honest "typical
+voice" reference. (The current <code>reference_stats.json</code> ships mean/std; I recommend switching the
+production baseline to <b>median + MAD</b>, or at least winsorising before computing std.)</p>
+
+<h3>3. Keep captions short &mdash; a few keywords</h3>
+<p>Long captions over-constrain generation and, worse, <b>drift from the data density</b>: fine-tuning works
+best when the caption distribution the model sees at train time matches what it must interpret at inference.
+Cap each caption at <b>top-3&ndash;5 dims + 1&ndash;2 emotion words + at most one note</b>. Short, salient,
+consistent.</p>
+
+<h3>4. Put STABLE traits in instruction, DYNAMIC ones inline</h3>
+<p>This is the core architectural choice, and &sect;8 gives a principled test for it: <b>sentence-to-sentence
+variance</b>. Low-variance traits (identity) belong in the global instruction; high-variance traits
+(performance) belong inline. Do not repeat the speaker's timbre in every sentence caption &mdash; it wastes
+the budget and teaches the model nothing new per sentence.</p>
+
+<h3>5. A genuineness gate on strong emotion words</h3>
+<p>Only add strong emotion words when genuineness (and overall quality) is high. A sentence that scores as
+theatrical/low-genuineness should get a hedged or omitted emotion word rather than a confident one &mdash;
+otherwise the model learns to attach "grief-stricken" to unconvincing acting. Genuineness is both a
+<b>gate</b> (should we add the emotion word?) and a <b>note</b> (sincere vs performed).</p>
+
+<h3>6. A fixed, shared lexicon</h3>
+<p>Draw every caption phrase from a <b>closed vocabulary</b> &mdash; the VoiceNet rubric adjectives
+(<code>caption.py</code>'s <code>DESC</code>) + the EmoNet emotion taxonomy + a small burst set. A stable
+caption&rarr;delivery mapping is only learnable if the same acoustic fact is always described with the same
+words. Free-form LLM captioning would inject synonyms and break that mapping; the procedural pipeline enforces
+it by construction.</p>
+
+<h3>7. Use blend for burst director-notes</h3>
+<p>The vocal-burst-blend head cheaply flags laughs/gasps/sighs/moans. Turn a high blend into <b>one</b>
+matched burst note (the character study found one burst helps, a second usually hurts), placed as a
+<code>(round-bracket)</code> note <b>outside</b> the spoken words.</p>
+
+<h3>8. Real pauses teach real timing; per-sentence tokens teach pacing</h3>
+<p><code>[pause Xs]</code> taken from the <b>measured</b> inter-sentence gaps teaches natural phrasing and the
+timing of emotion (the 1.4&nbsp;s beat before "He's not coming back."). A per-sentence <code>${token:N}</code>
+can additionally teach the model the <b>pacing</b> of a slow, heavy line vs a quick one. Both are free
+by-products of the alignment step.</p>
+
+<h3>9. Quality-control the corpus</h3>
+<p>Drop sentences with <b>bad ASR</b> (low alignment confidence, high WER on re-decode) or <b>low recording
+quality</b> (RCQL/BKGN off) before captioning &mdash; a wrong transcript or a noisy segment produces a
+misleading caption that teaches the model the wrong binding.</p>
+
+<h3>10. Double-quotes are optional &mdash; and markup stays outside them</h3>
+<p>Wrapping the words in <code>"double quotes"</code> is optional. In our earlier experiments,
+<b>quotes-in-text raised WER</b>, so if quotes are used, keep <b>all bursts and markup outside</b> the quotes
+(the model must never read a bracket aloud &mdash; inline bursts-in-text cost ~5&times; WER). The safest
+default is no quotes; the format supports both.</p>
+
+<div class="finding"><b>Net recommendation.</b> A procedural, deviation-based, closed-lexicon captioner with a
+median+MAD baseline, a genuineness gate, one blend-driven burst, measured pauses, and a strict
+stable-vs-dynamic field split. It is cheap (two encodes/sentence), consistent (fixed vocabulary),
+self-thinning (empty on boring sentences), and it reuses code that already runs.</div>
+
+
+<!-- ===================== 10 ===================== -->
+<h2 id="s10"><span class="num">10</span> Open questions</h2>
+<ul>
+<li><b>How many top-k?</b> 3 vs 5 vs an adaptive cut (keep all dims with |z| &gt; 1.5). Fewer is cleaner but
+may drop a real second signal; adaptive matches caption length to how unusual the sentence actually is.</li>
+<li><b>Caption length budget.</b> A hard keyword cap vs a soft one; whether to merge redundant phrases
+(e.g. "high register" + "bright head resonance" often co-fire).</li>
+<li><b>Granularity.</b> Sentence-level is proposed here, but should we also caption at <b>phrase/word</b>
+level for very expressive lines &mdash; or does that over-constrain and inflate the markup?</li>
+<li><b>Baseline choice.</b> One global in-the-wild baseline vs per-language / per-domain baselines (a
+whisper corpus has a different "average" than a shouting corpus).</li>
+<li><b>Instruction vs inline overlap.</b> When a trait drifts slowly across a long clip (e.g. a gradual
+build), does it belong in the instruction, inline, or both?</li>
+<li><b>Quotes.</b> Whether to keep double-quotes at all, given the WER cost, or standardise on no-quotes.</li>
+</ul>
+
+
+<!-- ===================== 11 ===================== -->
+<h2 id="s11"><span class="num">11</span> Links &amp; resources</h2>
+<h3>The four scoring models</h3>
+<div class="links">
+ <a class="btn" href="https://huggingface.co/laion/Empathic-Insight-Voice-Plus" target="_blank" rel="noopener">Empathic-Insight-Voice-Plus (42 emo)</a>
+ <a class="btn" href="https://huggingface.co/laion/voicenet-dimension-predictors-commercial" target="_blank" rel="noopener">VoiceNet dimension predictors (57)</a>
+ <a class="btn" href="https://huggingface.co/laion/voiceclap-commercial-genuineness" target="_blank" rel="noopener">VoiceCLAP genuineness</a>
+ <a class="btn" href="https://huggingface.co/laion/voiceclap-commercial-vocalburst-blend" target="_blank" rel="noopener">VoiceCLAP vocal-burst blend</a>
+</div>
+<h3>The existing procedural-caption work &amp; the model</h3>
+<div class="links">
+ <a class="btn live" href="https://projects.laion.ai/voicenet/grid-v3/" target="_blank" rel="noopener">VoiceNet caption grid v3 (the caption.py POC, live)</a>
+ <a class="btn live" href="https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/voices.html" target="_blank" rel="noopener">13 Character Voices, Directed by Prompt</a>
+ <a class="btn" href="https://huggingface.co/laion/moss-tts-local-transformer-4.55b-voice-acting" target="_blank" rel="noopener">HF &middot; MOSS-TTS-Local 4.55B voice-acting</a>
+ <a class="btn" href="sglang.html" target="_blank" rel="noopener">Serving guide (verified markup)</a>
+ <a class="btn" href="overview.html" target="_blank" rel="noopener">Experiments overview</a>
+</div>
+
+<div class="foot">
+LAION &middot; MOSS-TTS-Local 4.55B voice-acting &middot; fine-tuning prompt-format proposal (design document).
+Real caption examples produced by <code>voicenet_v3grid/caption.py</code> on stored VoiceNet predictions
+(<code>pred100_v3.json</code>), baseline <code>reference_stats.json</code> (1000 stratified in-the-wild
+Emolia clips). Verified MOSS markup (<code>[pause Xs]</code>, <code>${token:N}</code>) per the model's
+serving guide. Docs CC-BY-4.0.
+</div>
+
+</div>
+</body>
+</html>

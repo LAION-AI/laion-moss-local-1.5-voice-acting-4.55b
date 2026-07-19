@@ -66,6 +66,9 @@ goblin caught cleaner *and* more malevolent; ASMR-man serenity 0.67→0.88). Eve
 
 📘 **Practical cheat-sheet:** [**`PROMPTING_GUIDE.md`**](PROMPTING_GUIDE.md) — a for-dummies, per-archetype guide distilling all three rounds: copy-paste champion instructions, a short recipe for each character (which acoustic + resonance + pitch + dominance + emotion words, which bursts, what to avoid), a general principles list, and a reusable template.
 
+🧩 **Fine-tuning prompt-format proposal:** [**sentence-level caption format**](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/finetuning_prompt_format.html)
+— a design document for a fine-tuning format that gives **both** a global speaker/scene description (in `instruction`) **and** per-sentence delivery control interleaved inline in `text` as `(caption) words [pause Xs] …`, using MOSS's verified inline markup (`[pause Xs]`, `${token:N}`). The per-sentence `(captions)` are **derived automatically from audio** via the four LAION scoring models (Empathic-Insight 42 emotions · VoiceNet 57 dims · genuineness · vocal-burst blend) and a deviation-from-baseline (z-score) recipe — with **real captions** produced by the existing `voicenet_v3grid/caption.py` proof-of-concept, worked examples, and design recommendations.
+
 🎬 **DramaBox best-of-4 TTS benchmark:** [vanilla two-scene `CUT TO:` benchmark](https://projects.laion.ai/Voice-Acting-Pipeline/dramabox.html)
 — 4 reward-ranked seed variants per two-scene `CUT TO:` prompt with listenable takes, the best-of-k quality/compute trade-off, measured timing, and the full k=1..32 seed-scaling walltime table. *(Now lives in the [Voice-Acting-Pipeline](https://github.com/LAION-AI/Voice-Acting-Pipeline) repo.)*
 
