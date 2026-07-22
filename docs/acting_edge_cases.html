@@ -106,6 +106,15 @@ h1 em{font-style:italic;color:var(--amber)}
 .experts li{break-inside:avoid;font-size:.9rem;color:#d3dae9;margin:0 0 9px;
   padding-left:16px;position:relative}
 .experts li::before{content:"→";position:absolute;left:0;color:var(--new)}
+.tax{padding-top:6px}
+.taxnote{color:#c5cdde;max-width:80ch;margin:6px 0 18px}
+.taxgrid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:820px){.taxgrid{grid-template-columns:1fr}}
+.taxgrid .inv li{margin:5px 0}
+table.epx{border-collapse:collapse;width:100%;font-size:.8rem}
+table.epx td{border-bottom:1px solid var(--line);padding:5px 8px;vertical-align:top}
+table.epx .code{font-family:"IBM Plex Mono",monospace;color:var(--amber);width:52px}
+table.epx .ex{color:var(--mut);font-size:.74rem}
 footer{border-top:1px solid var(--line);padding:26px 0 60px;color:var(--mut);font-size:.82rem}
 :focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -120,13 +129,27 @@ footer{border-top:1px solid var(--line);padding:26px 0 60px;color:var(--mut);fon
     <div class="stat"><b>59</b><span>VoiceNet dims</span></div>
     <div class="stat"><b>40</b><span>EmoNet emotions</span></div>
     <div class="stat"><b>16</b><span>vocal-burst families</span></div>
-    <div class="stat"><b>289</b><span>situations (untrained)</span></div>
-    <div class="stat"><b>59</b><span>acting tasks mapped</span></div>
-    <div class="stat f"><b>34</b><span>coverable now</span></div>
-    <div class="stat p"><b>17</b><span>partial</span></div>
-    <div class="stat n"><b>8</b><span>need new expert</span></div>
+    <div class="stat"><b>289</b><span>extension situations</span></div>
+    <div class="stat"><b>60</b><span>extreme-physical scenarios</span></div>
+    <div class="stat"><b>123</b><span>acting tasks mapped</span></div>
+    <div class="stat f"><b>66</b><span>coverable now</span></div>
+    <div class="stat p"><b>38</b><span>partial</span></div>
+    <div class="stat n"><b>19</b><span>need new expert</span></div>
   </div>
 </div></header>
+
+<section class="wrap tax">
+  <h2 class="cat" style="margin-top:30px">Source taxonomies, made perceivable</h2>
+  <p class="taxnote">Two LAION taxonomies define the space this cookbook maps. The <b>Extension</b> adds 11 situational axes
+  (289 situations) that today's experts don't yet read; the <b>Extreme-Physical</b> set adds 60 high-intensity scenarios —
+  violence, injury, accident, temperature, airway, startle. Every task below is annotated with the existing-expert
+  superposition that <i>approximates</i> it and the new expert (usually one of these axes) that would read it cleanly.</p>
+  <div class="taxgrid">
+    <div class="inv"><h3>Extension — 11 situational axes → proposed expert families</h3><ul style="padding-left:18px"><li><b>Body Posture &amp; Gravitational Alignment</b> — how gravity/skeleton/thoracic compression reshape the tract</li><li><b>Physical Activity &amp; Dynamic Load</b> — metabolic demand, movement &amp; object-handling competing with the signal</li><li><b>Speaking Target &amp; Projection</b> — who/what is addressed — throw, register, feedback loop</li><li><b>Social Situation &amp; Context</b> — the social game — power, stakes, masking</li><li><b>Environment &amp; Acoustic Space</b> — reverb, ambient floor, reflections coloring the voice</li><li><b>Health &amp; Physiological Condition</b> — medical/biological states altering production at the source</li><li><b>Face &amp; Head Obstructions</b> — masks, hands, muffling, mouth interference</li><li><b>Climate &amp; Atmospheric Conditions</b> — cold/heat/wind/altitude shaping breath &amp; effort</li><li><b>Substance &amp; Chemical Influence</b> — alcohol/sedation/stimulants/altered states</li><li><b>Fatigue, Sleep &amp; Energy State</b> — drowsiness, exhaustion, energy level</li><li><b>Pain &amp; Physical Distress</b> — acute &amp; chronic pain expressed through voice</li></ul></div>
+    <div class="inv"><h3>Extreme-Physical — 6 × 10 scenarios</h3>
+      <div style="overflow-x:auto"><table class="epx"><tbody><tr><td class='code'>TENS</td><td><b>Extreme Physical Tension &amp; Exertion</b></td><td class='ex'>Impossible Lifts · Restraints · Grappling · Trapped in Wreckage · Endurance Collapse</td></tr><tr><td class='code'>BRTH</td><td><b>Extreme Breathlessness</b></td><td class='ex'>Oxygen Debt · Near-Drowning · Asthma · Choking · Hyperventilation · Smoke · Free-Dive Panic</td></tr><tr><td class='code'>PAIN</td><td><b>Extreme Physical Pain</b></td><td class='ex'>Gunshot · Burns · Fractures · Impalement · Animal Attack · Electrocution · Surgery-Awake · Crush · Torture</td></tr><tr><td class='code'>TEMP</td><td><b>Extreme Temperature Shock</b></td><td class='ex'>Ice Immersion · Polar Storm · Scalding · Heat Stroke · Burning · Frostbite · Fever Crisis</td></tr><tr><td class='code'>TASTE</td><td><b>Extreme Oral &amp; Gustatory Sensation</b></td><td class='ex'>Capsaicin · Sourness · Scalding · Poison-Bitter · Wasabi · Brain Freeze · Alcohol/Solvent</td></tr><tr><td class='code'>SHOCK</td><td><b>Extreme Surprise &amp; Startle</b></td><td class='ex'>Jump Scares · Explosions · Discovering a Body · Near-Miss Crash · Devastating News · Home Invasion</td></tr></tbody></table></div></div>
+  </div>
+</section>
 
 <section class="wrap method">
   <div>
@@ -152,7 +175,7 @@ footer{border-top:1px solid var(--line);padding:26px 0 60px;color:var(--mut);fon
   <button class="fbtn cov p" data-t="part" aria-pressed="false">● partial</button>
   <button class="fbtn cov n" data-t="new" aria-pressed="false">● needs new expert</button>
   <span class="fsep"></span>
-  <button class='fbtn cat' data-c='Exertion &amp; Body Load' aria-pressed='false'>Exertion &amp; Body Load</button><button class='fbtn cat' data-c='Thermal &amp; Environmental' aria-pressed='false'>Thermal &amp; Environmental</button><button class='fbtn cat' data-c='Illness &amp; Vocal Tract' aria-pressed='false'>Illness &amp; Vocal Tract</button><button class='fbtn cat' data-c='Consciousness &amp; Energy' aria-pressed='false'>Consciousness &amp; Energy</button><button class='fbtn cat' data-c='Substances &amp; Altered' aria-pressed='false'>Substances &amp; Altered</button><button class='fbtn cat' data-c='Vocal Behaviors &amp; Music' aria-pressed='false'>Vocal Behaviors &amp; Music</button><button class='fbtn cat' data-c='Speech Characteristics' aria-pressed='false'>Speech Characteristics</button><button class='fbtn cat' data-c='Emotional Masking' aria-pressed='false'>Emotional Masking</button><button class='fbtn cat' data-c='Social &amp; Cognitive' aria-pressed='false'>Social &amp; Cognitive</button><button class='fbtn cat' data-c='Extreme &amp; Creative' aria-pressed='false'>Extreme &amp; Creative</button>
+  <button class='fbtn cat' data-c='Exertion &amp; Body Load' aria-pressed='false'>Exertion &amp; Body Load</button><button class='fbtn cat' data-c='Thermal &amp; Environmental' aria-pressed='false'>Thermal &amp; Environmental</button><button class='fbtn cat' data-c='Illness &amp; Vocal Tract' aria-pressed='false'>Illness &amp; Vocal Tract</button><button class='fbtn cat' data-c='Consciousness &amp; Energy' aria-pressed='false'>Consciousness &amp; Energy</button><button class='fbtn cat' data-c='Substances &amp; Altered' aria-pressed='false'>Substances &amp; Altered</button><button class='fbtn cat' data-c='Vocal Behaviors &amp; Music' aria-pressed='false'>Vocal Behaviors &amp; Music</button><button class='fbtn cat' data-c='Speech Characteristics' aria-pressed='false'>Speech Characteristics</button><button class='fbtn cat' data-c='Emotional Masking' aria-pressed='false'>Emotional Masking</button><button class='fbtn cat' data-c='Social &amp; Cognitive' aria-pressed='false'>Social &amp; Cognitive</button><button class='fbtn cat' data-c='Extreme &amp; Creative' aria-pressed='false'>Extreme &amp; Creative</button><button class='fbtn cat' data-c='Extreme Exertion &amp; Restraint' aria-pressed='false'>Extreme Exertion &amp; Restraint</button><button class='fbtn cat' data-c='Airway &amp; Breathlessness' aria-pressed='false'>Airway &amp; Breathlessness</button><button class='fbtn cat' data-c='Pain, Injury &amp; Violence' aria-pressed='false'>Pain, Injury &amp; Violence</button><button class='fbtn cat' data-c='Temperature &amp; Fire' aria-pressed='false'>Temperature &amp; Fire</button><button class='fbtn cat' data-c='Oral &amp; Gustatory Shock' aria-pressed='false'>Oral &amp; Gustatory Shock</button><button class='fbtn cat' data-c='Startle, Shock &amp; Catastrophe' aria-pressed='false'>Startle, Shock &amp; Catastrophe</button><button class='fbtn cat' data-c='Intimacy &amp; Sexual (NSFW)' aria-pressed='false'>Intimacy &amp; Sexual (NSFW)</button><button class='fbtn cat' data-c='Altered Consciousness' aria-pressed='false'>Altered Consciousness</button><button class='fbtn cat' data-c='Psycho-Social States' aria-pressed='false'>Psycho-Social States</button>
 </div></nav>
 
 <main class="wrap">
@@ -569,6 +592,454 @@ footer{border-top:1px solid var(--line);padding:26px 0 60px;color:var(--mut);fon
   <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>S_ASMR↑</span><span class='tok'>S_WHIS↑</span><span class='tok'>mouth_and_lip_sounds (intentional)</span><span class='tok'>TEMP↓↓</span><span class='tok'>ESTH↑</span></div>
   <div class="lbl">rank candidates by</div><p class="rank">VoiceNet has ASMR and whisper styles directly — coverable, with blend rating the mouth-sound craft.</p>
   
+</article></div><h2 class='cat' id='Extreme-Exertion-&amp;-Restraint'>Extreme Exertion &amp; Restraint</h2><div class='grid'><article class="card part" data-cov="part" data-cat="Extreme Exertion &amp; Restraint">
+  <div class="card-top"><h3>Impossible lift / pushing beyond capacity</h3><span class="pill part">Partial superposition</span></div>
+  <p class="coach">The body meets a wall that won&#x27;t move, and the voice is the last thing spent. Speech is the overflow of a system at redline.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Words crushed between clenched teeth, Valsalva-held breath bursting into grunts, pitch driven up by torso pressure, trembling sustain.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>TENS↑↑</span><span class='tok'>grunts (burst)</span><span class='tok'>RESP held→burst</span><span class='tok'>ATCK strained</span><span class='tok'>VOLT↑ tremor</span><span class='tok'>Pain (edge)</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Grunt-at-peak timing × strain-onset × Blend of the grunts; Genuineness kills a decorative &#x27;hnngh&#x27;.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Physical-Load / Exertion expert (extension: Physical Activity &amp; Dynamic Load).</p>
+</article><article class="card part" data-cov="part" data-cat="Extreme Exertion &amp; Restraint">
+  <div class="card-top"><h3>Straining against restraints / trapped in wreckage</h3><span class="pill part">Partial superposition</span></div>
+  <p class="coach">Bound, the effort has nowhere to go but the voice — a caged animal&#x27;s mix of rage, plea and grunt.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Rhythmic surges of effort against a fixed load, panic-tinged breath, calls for help fracturing into grunts.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>TENS↑</span><span class='tok'>grunts (burst)</span><span class='tok'>Fear/Distress↑</span><span class='tok'>RESP surging</span><span class='tok'>STNC plea↔demand</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Effort-surge periodicity + fear-blend + help-call bursts; the restraint context needs the physical-load expert.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Restraint/entrapment sub-model (extension: Physical Activity + Health).</p>
+</article><article class="card full" data-cov="full" data-cat="Extreme Exertion &amp; Restraint">
+  <div class="card-top"><h3>Endurance at the edge of collapse</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">Every word is borrowed against reserves that are gone. The voice sags toward the floor with each phrase.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Falling dynamic arc, quavering sustain, breath outpacing voice, will fighting fade.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Fatigue/Exhaustion↑</span><span class='tok'>DARC↓</span><span class='tok'>VOLT↑ quaver</span><span class='tok'>RESP&gt;voice</span><span class='tok'>AROU↓ w/ effort spikes</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">EmoNet Fatigue × falling arc × breath-dominance; strong existing coverage.</p>
+  
+</article></div><h2 class='cat' id='Airway-&amp;-Breathlessness'>Airway &amp; Breathlessness</h2><div class='grid'><article class="card part" data-cov="part" data-cat="Airway &amp; Breathlessness">
+  <div class="card-top"><h3>Choking on food / foreign object</h3><span class="pill part">Partial superposition</span></div>
+  <p class="coach">The airway betrays the actor mid-word. Speech becomes a fight for the next breath, then nothing but the fight.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Abrupt cutoff, silent-then-violent inspiratory stridor, cough-throat spasms, panic escalation, wordless struggle.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>coughing_and_sneezing (burst)</span><span class='tok'>gasps_and_inhales stridor</span><span class='tok'>RESP obstructed</span><span class='tok'>Fear↑↑</span><span class='tok'>screams_and_shrieks (near)</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Obstructed-inspiration texture + cough spasms + fear spike; airway-obstruction detector would firm it.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Airway-obstruction expert (extension: Health &amp; Physiological Condition).</p>
+</article><article class="card new" data-cov="new" data-cat="Airway &amp; Breathlessness">
+  <div class="card-top"><h3>Near-drowning &amp; water inhalation</h3><span class="pill new">Needs a new expert</span></div>
+  <p class="coach">The body has swallowed the wrong element. Speech comes in retching, water-logged gasps between coughs.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Wet gurgling voice, explosive coughs, desperate whooping inhales, sputtering fragments.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>RESP water-logged</span><span class='tok'>coughing_and_sneezing↑↑</span><span class='tok'>gasps whooping</span><span class='tok'>Distress↑</span><span class='tok'>ROUG↑ wet</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">The wet-airway timbre is distinctive but unlabeled; approximate via cough+gasp density.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Aspiration/wet-airway expert (extension: Health).</p>
+</article><article class="card full" data-cov="full" data-cat="Airway &amp; Breathlessness">
+  <div class="card-top"><h3>Hyperventilation &amp; panic spiral</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">The breath runs away from the person. Words get shorter as the CO₂ drops and the fear feeds itself.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Rapid shallow over-breathing, shrinking phrases, rising pitch, tingling-panic tremor, escalating arousal.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>RESP↑↑ rapid-shallow</span><span class='tok'>Fear/Distress↑</span><span class='tok'>CHNK↓↓</span><span class='tok'>AROU↑ runaway</span><span class='tok'>VOLT↑</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Breath-rate + fear + shrinking-phrase arc are all measurable; rank the runaway trajectory.</p>
+  
+</article><article class="card new" data-cov="new" data-cat="Airway &amp; Breathlessness">
+  <div class="card-top"><h3>Severe asthma attack</h3><span class="pill new">Needs a new expert</span></div>
+  <p class="coach">Each breath is drawn through a straw the body keeps pinching. The wheeze becomes the loudest voice in the room.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Audible expiratory wheeze, prolonged effortful exhale, clipped 2–3 word phrases, mounting fear.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>RESP wheeze</span><span class='tok'>CHNK↓</span><span class='tok'>Fear↑</span><span class='tok'>TENS↑ accessory-muscle</span><span class='tok'>breathing (burst)</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Wheeze spectral signature isn&#x27;t a class yet; approximate via effortful-exhale + phrase-clipping.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Respiratory-pathology expert (wheeze/stridor; extension: Health).</p>
+</article></div><h2 class='cat' id='Pain,-Injury-&amp;-Violence'>Pain, Injury &amp; Violence</h2><div class='grid'><article class="card part" data-cov="part" data-cat="Pain, Injury &amp; Violence">
+  <div class="card-top"><h3>Gunshot / penetrating wound</h3><span class="pill part">Partial superposition</span></div>
+  <p class="coach">A switch is thrown the mind can&#x27;t catch up to. Voice lurches from normal to a body that no longer obeys it.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Sudden breath-punch cutoff, delayed cry, shock-flattened then spiking pain, weakening voice, wet undertone.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>ATCK punch</span><span class='tok'>screams_and_shrieks (burst)</span><span class='tok'>Pain↑↑</span><span class='tok'>Astonishment→Pain arc</span><span class='tok'>DARC↓ weakening</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Onset-shock discontinuity × pain-cry burst × Pain-EmoNet × weakening arc; injury-type needs the pain expert.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Injury/pain-type expert (extension: Pain &amp; Physical Distress).</p>
+</article><article class="card part" data-cov="part" data-cat="Pain, Injury &amp; Violence">
+  <div class="card-top"><h3>Severe burns / fire exposure</h3><span class="pill part">Partial superposition</span></div>
+  <p class="coach">Pain without pause — no wave to ride, just a wall. The voice climbs and stays climbed.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Sustained high-pitched cry, ragged continuous scream-breath, no recovery valleys, raw roughness.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Pain↑↑</span><span class='tok'>screams_and_shrieks sustained</span><span class='tok'>RANG↑ pinned-high</span><span class='tok'>ROUG↑ raw</span><span class='tok'>RESP ragged</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Sustained-vs-pulsed cry shape + pain intensity + rawness; burn vs blunt-pain distinction wants the pain expert.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Pain-type expert (thermal vs ballistic vs crush; extension: Pain).</p>
+</article><article class="card part" data-cov="part" data-cat="Pain, Injury &amp; Violence">
+  <div class="card-top"><h3>Compound fracture / crush injury</h3><span class="pill part">Partial superposition</span></div>
+  <p class="coach">The body reports damage in a language older than words — a rising, disbelieving howl.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Sharp intake, rising howl with disbelief, guarding tension, panting between waves.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Pain↑↑</span><span class='tok'>gasps sharp</span><span class='tok'>Astonishment+Pain</span><span class='tok'>TENS↑ guarding</span><span class='tok'>screams (burst)</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Pain-wave periodicity + guarding tension + disbelief blend.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Pain-type expert (shared).</p>
+</article><article class="card new" data-cov="new" data-cat="Pain, Injury &amp; Violence">
+  <div class="card-top"><h3>Electrocution</h3><span class="pill new">Needs a new expert</span></div>
+  <p class="coach">The current speaks for the body — a locked, buzzing, involuntary vocalization no will can shape.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Frozen glottal tone, jittering amplitude at mains-adjacent rate, teeth-locked articulation, release gasp.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>VOLT↑↑ locked-jitter</span><span class='tok'>TENS↑↑ full-body</span><span class='tok'>CLRT↓↓ locked</span><span class='tok'>ATCK frozen</span><span class='tok'>gasp release</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">The locked involuntary buzz is unlike anything labeled; needs a dedicated detector.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Involuntary-seizure/tetany expert (extension: Health / Pain).</p>
+</article><article class="card part" data-cov="part" data-cat="Pain, Injury &amp; Violence">
+  <div class="card-top"><h3>Torture / deliberate sustained pain</h3><span class="pill part">Partial superposition</span></div>
+  <p class="coach">The most demanding thing an actor can voice: agony that must not become melodrama. The breaks are involuntary; the endurance is character.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Cyclic build-break-recover, breath control failing under waves, defiance vs collapse, hoarsening over time.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Pain↑↑</span><span class='tok'>screams/groans (burst)</span><span class='tok'>VOLT↑ waves</span><span class='tok'>Defiance↔Helplessness</span><span class='tok'>ROUG↑ over-time</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Wave-cycle structure × vocal-fatigue accumulation × the defiance/helplessness balance; Genuineness is decisive here.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Pain expert + vocal-fatigue-accumulation expert.</p>
+</article><article class="card part" data-cov="part" data-cat="Pain, Injury &amp; Violence">
+  <div class="card-top"><h3>Animal attack</h3><span class="pill part">Partial superposition</span></div>
+  <p class="coach">Primal terror with no negotiation. Voice reverts to warning, flinch and shriek.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Explosive startle scream, flinch-gasps, breathless terror, fragmented warnings.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>screams_and_shrieks↑↑</span><span class='tok'>Fear↑↑</span><span class='tok'>ATCK explosive</span><span class='tok'>gasps flinch</span><span class='tok'>RESP breathless</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Startle-scream + terror + flinch-gasp density; overlaps generic terror — context-thin.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Threat/startle expert (extension: Social + Health).</p>
+</article><article class="card full" data-cov="full" data-cat="Pain, Injury &amp; Violence">
+  <div class="card-top"><h3>Surgery / medical agony while conscious</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">Trapped politeness meets unbearable sensation — the actor must leak agony through a body trying to cooperate.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Suppressed then breaking cries, clenched compliance, trembling &#x27;I&#x27;m okay&#x27;s, sweat-breath.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Pain↑</span><span class='tok'>suppressed→breaking</span><span class='tok'>TENS↑ compliance</span><span class='tok'>VULN↑</span><span class='tok'>Genuineness (of &#x27;okay&#x27;)↓</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank"><span class=star>★</span> ★ Incongruence: leaked pain under compliance + falling &#x27;I&#x27;m fine&#x27; genuineness — measurable now.</p>
+  
+</article></div><h2 class='cat' id='Temperature-&amp;-Fire'>Temperature &amp; Fire</h2><div class='grid'><article class="card part" data-cov="part" data-cat="Temperature &amp; Fire">
+  <div class="card-top"><h3>Ice-water immersion / cold shock</h3><span class="pill part">Partial superposition</span></div>
+  <p class="coach">The cold punches the breath out and won&#x27;t give it back. The first sound is not a word — it&#x27;s a gasp the body seized.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Explosive cold-shock gasp, uncontrollable hyperventilation, teeth-chatter tremor, clipped can&#x27;t-breathe words.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>gasps explosive</span><span class='tok'>RESP↑↑ hyperventilation</span><span class='tok'>VOLT↑↑ chatter</span><span class='tok'>CLRT↓ clenched</span><span class='tok'>Fear↑</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Cold-shock gasp onset + chatter-tremor periodicity + hyperventilation; the tremor/climate experts sharpen it.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Tremor/Shiver + Climate expert (extension: Climate &amp; Atmospheric).</p>
+</article><article class="card new" data-cov="new" data-cat="Temperature &amp; Fire">
+  <div class="card-top"><h3>Desert heat stroke / hyperthermia</h3><span class="pill new">Needs a new expert</span></div>
+  <p class="coach">The system overheats and slows. Speech turns thick, confused, drifting — the words arrive late and leave early.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Sluggish slurred speech, confusion, weak breath, dry-mouth clicks, fading coherence.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>TEMP↓↓</span><span class='tok'>Confusion↑</span><span class='tok'>CLRT↓ thick</span><span class='tok'>mouth_and_lip_sounds dry</span><span class='tok'>AROU↓ w/ distress</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Reads as intoxication+confusion; heat-specific state needs the climate/health expert.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Climate/thermal-crisis expert (extension: Climate).</p>
+</article><article class="card new" data-cov="new" data-cat="Temperature &amp; Fire">
+  <div class="card-top"><h3>Frostbite onset / extremity loss</h3><span class="pill new">Needs a new expert</span></div>
+  <p class="coach">Cold that has stopped hurting and started to steal. The voice narrows to shock and disbelieving calm.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Numb flat affect over fear, slowed careful speech, shivering that&#x27;s easing ominously.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Emotional Numbness↑</span><span class='tok'>Fear (under)</span><span class='tok'>VOLT↓ easing</span><span class='tok'>TEMP↓</span><span class='tok'>VALN↓ flat</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">The &#x27;ominous calming&#x27; is subtle; needs climate/health context.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Climate expert (extension).</p>
+</article></div><h2 class='cat' id='Oral-&amp;-Gustatory-Shock'>Oral &amp; Gustatory Shock</h2><div class='grid'><article class="card part" data-cov="part" data-cat="Oral &amp; Gustatory Shock">
+  <div class="card-top"><h3>Capsaicin / superhot chili overload</h3><span class="pill part">Partial superposition</span></div>
+  <p class="coach">The mouth is on fire and the voice tries to keep composure it doesn&#x27;t have. Words fight through gasps and fanning breath.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Panting cooling-breath, rising pitch of distress-amusement, sputtering, water-seeking sounds, laughter-pain blend.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Pain+Amusement blend</span><span class='tok'>gasps cooling</span><span class='tok'>RESP panting</span><span class='tok'>mouth_and_lip_sounds</span><span class='tok'>VOLT↑</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Pain+amusement co-activation + cooling-breath density; oral-specific state wants the gustatory expert.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Gustatory-reaction expert (extension: Health / new Oral axis).</p>
+</article><article class="card full" data-cov="full" data-cat="Oral &amp; Gustatory Shock">
+  <div class="card-top"><h3>Extreme sourness</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">The face collapses inward and drags the voice with it — a puckered, involuntary recoil mid-word.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Puckered constricted timbre, sharp intake, involuntary &#x27;ooh&#x27;, clenched articulation.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Sourness (EmoNet)↑</span><span class='tok'>gasps sharp</span><span class='tok'>CLRT↓ puckered</span><span class='tok'>VOLT↑</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">EmoNet actually has Sourness — combine with the puckered-recoil markers; coverable.</p>
+  
+</article><article class="card part" data-cov="part" data-cat="Oral &amp; Gustatory Shock">
+  <div class="card-top"><h3>Brain freeze / ice overload</h3><span class="pill part">Partial superposition</span></div>
+  <p class="coach">A spike behind the eyes stops the sentence cold. Speech pauses, winces, and gingerly resumes.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Abrupt mid-word pause, pained inhale, temple-guarding tension, careful resume.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Pain (sharp brief)</span><span class='tok'>gasps</span><span class='tok'>TENS↑ brief</span><span class='tok'>TEMP break</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Brief-sharp-pain event + resume; a transient-pain micro-detector would catch it cleanly.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Transient-pain-event expert.</p>
+</article></div><h2 class='cat' id='Startle,-Shock-&amp;-Catastrophe'>Startle, Shock &amp; Catastrophe</h2><div class='grid'><article class="card full" data-cov="full" data-cat="Startle, Shock &amp; Catastrophe">
+  <div class="card-top"><h3>Jump scare / sudden appearance</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">A hundred milliseconds where the body decides before the mind. The voice fires before the word forms.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Involuntary scream/gasp, breath-seize, a beat of silence, then shaky recovery and nervous laugh.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>screams/gasps (burst)</span><span class='tok'>ATCK explosive</span><span class='tok'>ARSH↑↑ instant</span><span class='tok'>RESP seize→recover</span><span class='tok'>laughter (nervous) after</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Startle-onset sharpness + instant arousal-jump + recovery arc; the involuntary burst + blend rank realness.</p>
+  
+</article><article class="card full" data-cov="full" data-cat="Startle, Shock &amp; Catastrophe">
+  <div class="card-top"><h3>Discovering a body / catastrophic scene</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">The scene arrives faster than comprehension. Voice drops out, then returns in disbelief that won&#x27;t hold shape.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Breath-punched silence, a small broken sound, disbelieving fragments, dawning horror, backing-away tremor.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Astonishment→Horror arc</span><span class='tok'>gasps</span><span class='tok'>DARC↓ dropout</span><span class='tok'>Distress↑</span><span class='tok'>VOLT↑ dawning</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">The surprise→horror emotional trajectory + dropout + dawning tremor are readable; rank the arc.</p>
+  
+</article><article class="card full" data-cov="full" data-cat="Startle, Shock &amp; Catastrophe">
+  <div class="card-top"><h3>Devastating news received suddenly</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">The world reorganizes in one sentence. The voice that answers is not the one that asked.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">A caught breath, a collapse in pitch and energy, delayed uncomprehending questions, numbness or breaking.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Astonishment→Grief</span><span class='tok'>gasp</span><span class='tok'>DARC↓↓</span><span class='tok'>COGL↑ latency</span><span class='tok'>Emotional Numbness or Sadness</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Surprise-to-grief pivot + energy collapse + latency; strong EmoNet+dynamics coverage.</p>
+  
+</article><article class="card full" data-cov="full" data-cat="Startle, Shock &amp; Catastrophe">
+  <div class="card-top"><h3>Near-miss car accident</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">Adrenaline arrives a half-second after survival. The voice shakes out the fear it didn&#x27;t have time to feel.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Post-event breath explosion, shaking expletives, arousal spiking then crashing, disbelieving laugh.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>ARSH↑→↓</span><span class='tok'>RESP explosion</span><span class='tok'>VOLT↑ shake</span><span class='tok'>Fear→Relief</span><span class='tok'>laughter nervous</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Adrenaline arc (spike→crash) + shake + fear/relief blend; measurable.</p>
+  
+</article></div><h2 class='cat' id='Intimacy-&amp;-Sexual-(NSFW)'>Intimacy &amp; Sexual (NSFW)</h2><div class='grid'><article class="card part" data-cov="part" data-cat="Intimacy &amp; Sexual (NSFW)">
+  <div class="card-top"><h3>Building arousal → climax</h3><span class="pill part">Partial superposition</span></div>
+  <p class="coach">A controlled loss of control. The voice tracks a rising physiological curve it can&#x27;t fully script — and the truth is in whether the breath leads or follows.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Rising breath rate and pitch, voiced exhales, tension-then-release arc, involuntary catches, moan bursts peaking.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Sexual Lust / Pleasure-Ecstasy (EmoNet)</span><span class='tok'>groans_and_moans (burst)</span><span class='tok'>AROU↑ arc</span><span class='tok'>RESP↑</span><span class='tok'>Blend (key)</span><span class='tok'>Genuineness (key)</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">We have the exact heads (Sexual Lust, Pleasure/Ecstasy, moan bursts, blend, genuineness) — rank by the rising-curve fit × moan-blend × genuineness; a graded-arousal expert would order intensity cleanly.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Arousal-level expert (ordinal; extension: Health/affect).</p>
+</article><article class="card full" data-cov="full" data-cat="Intimacy &amp; Sexual (NSFW)">
+  <div class="card-top"><h3>Moaning — genuine vs performed</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">The single most faked sound in performance. Real moans are shaped by breath and involuntary; performed ones are shaped by intent.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Genuine: breath-coupled, irregular, voiced-exhale origin; performed: regular, articulated, detached from breath.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>groans_and_moans (burst)</span><span class='tok'>Blend (decisive)</span><span class='tok'>Genuineness (decisive)</span><span class='tok'>RESP coupling</span><span class='tok'>Pleasure-Ecstasy</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank"><span class=star>★</span> ★ Exactly the blend+genuineness use-case: rank moan-bursts by breath-coupling × naturalness × felt-pleasure.</p>
+  
+</article><article class="card full" data-cov="full" data-cat="Intimacy &amp; Sexual (NSFW)">
+  <div class="card-top"><h3>Seduction / flirtation</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">Invitation without statement. Warmth, low register, unhurried tempo and a smile you can hear — intent carried entirely by prosody.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Lowered warm register, slowed tempo, breathy intimacy, playful pitch glides, close-mic proximity.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>REGS↓ warm</span><span class='tok'>WARM↑</span><span class='tok'>TEMP↓</span><span class='tok'>S_ASMR/intimate</span><span class='tok'>Infatuation/Sexual Lust</span><span class='tok'>STNC inviting</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Register+warmth+tempo+intimacy style + EmoNet Infatuation/Lust cover seduction well; rank the composite.</p>
+  
+</article><article class="card part" data-cov="part" data-cat="Intimacy &amp; Sexual (NSFW)">
+  <div class="card-top"><h3>Denial / edging tension</h3><span class="pill part">Partial superposition</span></div>
+  <p class="coach">Restraint as its own intensity — holding at the threshold, the voice tight with a pleasure it won&#x27;t release.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Held breath, suppressed voiced tension, pitch pressure without release, pleading-control blend.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Pleasure+control</span><span class='tok'>RESP held</span><span class='tok'>TENS↑</span><span class='tok'>VOLT↑ suppressed</span><span class='tok'>Genuineness↑</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Suppression-under-pleasure is an incongruence variant; a graded-arousal + suppression head sharpens it.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Suppression / arousal-level expert (shared).</p>
+</article><article class="card full" data-cov="full" data-cat="Intimacy &amp; Sexual (NSFW)">
+  <div class="card-top"><h3>Post-coital / afterglow</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">The system powering down — sated, loose, unguarded warmth with breath still resettling.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Low arousal, breathy soft voice, warm register, slow resettling breath, contentment.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Contentment/Pleasure</span><span class='tok'>AROU↓</span><span class='tok'>RESP resettling</span><span class='tok'>WARM↑</span><span class='tok'>S_ASMR soft</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Low-arousal contentment + resettling breath + warmth; coverable.</p>
+  
+</article></div><h2 class='cat' id='Altered-Consciousness'>Altered Consciousness</h2><div class='grid'><article class="card part" data-cov="part" data-cat="Altered Consciousness">
+  <div class="card-top"><h3>Dissociation / depersonalization</h3><span class="pill part">Partial superposition</span></div>
+  <p class="coach">Speaking from behind glass. The words are correct but the person is not in them — affect flattened, self at a distance.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Flat monotone over content that should move, derealized even tempo, low arousal decoupled from meaning, emotional absence.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Emotional Numbness↑</span><span class='tok'>VALN flat</span><span class='tok'>AROU↓ decoupled</span><span class='tok'>VOLT↓↓</span><span class='tok'>Genuineness (of affect)↓</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank"><span class=star>★</span> ★ Detect as affect-content decoupling: expected emotion by context absent in voice — measurable as low EmoNet over emotive text; a dissociation expert would formalize it.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Dissociation / affect-decoupling expert (extension: Health).</p>
+</article><article class="card part" data-cov="part" data-cat="Altered Consciousness">
+  <div class="card-top"><h3>Hypnotic trance / deep meditation</h3><span class="pill part">Partial superposition</span></div>
+  <p class="coach">The nervous system idling near sleep but present — speech slow, smooth, weightless, all edges gone.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Very low arousal, glacial smooth tempo, minimal tension, relaxed resonance, even breath.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>AROU↓↓</span><span class='tok'>TEMP↓↓</span><span class='tok'>SMTH↑↑</span><span class='tok'>TENS↓↓</span><span class='tok'>RESP slow-even</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Deep-calm signature (low arousal+slow+smooth+relaxed) is measurable; distinguishing trance from mere calm/sleepy wants a state expert.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Consciousness-state expert (extension: Fatigue/Sleep/Energy).</p>
+</article><article class="card new" data-cov="new" data-cat="Altered Consciousness">
+  <div class="card-top"><h3>Psychotic break / responding to hallucination</h3><span class="pill new">Needs a new expert</span></div>
+  <p class="coach">The actor speaks to a reality no one else shares. Prosody and content split; the voice answers voices.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Incongruent affect, sudden register/target shifts (talking to unseen), disrupted turn-structure, fluctuating arousal.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>affect-content incongruence</span><span class='tok'>target-shift (addressee)</span><span class='tok'>VOLT↑↑</span><span class='tok'>STRU disrupted</span><span class='tok'>Fear/Confusion</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Multi-signal but no single head; needs an incoherence/addressee-shift expert + the affect-decoupling head.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Thought-disorder / incoherence expert (extension: Social + Health).</p>
+</article><article class="card new" data-cov="new" data-cat="Altered Consciousness">
+  <div class="card-top"><h3>Delirium / fever dream</h3><span class="pill new">Needs a new expert</span></div>
+  <p class="coach">The mind unmoored from time — fragments, mumbling, sudden lucid spikes, drifting between here and elsewhere.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Mumbled drifting speech, incoherent fragments, sudden clear-then-lost, weak arousal with spikes.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>CLRT↓↓</span><span class='tok'>Confusion↑</span><span class='tok'>STRU fragmented</span><span class='tok'>AROU drifting</span><span class='tok'>mumbling</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Approximate via incoherence+mumble; delirium-specific needs the health/consciousness expert.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Delirium/consciousness expert (extension: Health).</p>
+</article><article class="card full" data-cov="full" data-cat="Altered Consciousness">
+  <div class="card-top"><h3>Fainting / syncope onset</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">The voice fading as the blood leaves the head — words slowing, slurring, dropping into silence mid-thought.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Progressive slowing and pitch-drop, slur, trailing to silence, a last soft exhale.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>TEMP↓↓ decel</span><span class='tok'>DARC↓↓ to silence</span><span class='tok'>CLRT↓ slur</span><span class='tok'>AROU↓↓</span><span class='tok'>RESP last-exhale</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">The fade-to-silence trajectory is a clean temporal signature (like the death scene); rank the decel-to-silence.</p>
+  
+</article><article class="card new" data-cov="new" data-cat="Altered Consciousness">
+  <div class="card-top"><h3>Post-seizure (postictal) confusion</h3><span class="pill new">Needs a new expert</span></div>
+  <p class="coach">Coming back into a self that isn&#x27;t loaded yet — thick speech, no memory, groping for words.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Very thick slurred speech, long latencies, word-finding failure, low arousal, disoriented questions.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>CLRT↓↓</span><span class='tok'>COGL↑↑ latency</span><span class='tok'>Confusion↑</span><span class='tok'>DFLU↑ word-finding</span><span class='tok'>AROU↓</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Overlaps sedation/stroke; needs a neuro-state expert to separate.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Neuro-state / aphasia expert (extension: Health).</p>
+</article><article class="card new" data-cov="new" data-cat="Altered Consciousness">
+  <div class="card-top"><h3>Stroke / acute aphasia</h3><span class="pill new">Needs a new expert</span></div>
+  <p class="coach">The bridge between thought and word is damaged in real time — the person is present but the language machine misfires.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Effortful groping, phonemic errors, one-sided articulation weakness, frustration, telegraphic speech.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>CLRT↓ asymmetric</span><span class='tok'>DFLU↑↑ groping</span><span class='tok'>Distress/frustration</span><span class='tok'>STRU telegraphic</span><span class='tok'>COGL↑↑</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Aphasia has a specific error signature no head models; high-value clinical expert.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Aphasia / speech-motor expert (extension: Health).</p>
+</article><article class="card new" data-cov="new" data-cat="Altered Consciousness">
+  <div class="card-top"><h3>Waking from coma / anesthesia</h3><span class="pill new">Needs a new expert</span></div>
+  <p class="coach">Consciousness reassembling from static — first breath, first sound, first word, each a milestone.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Pre-verbal groans, extreme slur, disinhibited affect, long latencies, childlike prosody surfacing.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>groans (burst)</span><span class='tok'>CLRT↓↓</span><span class='tok'>VOLT↑ disinhibited</span><span class='tok'>COGL↑↑</span><span class='tok'>Confusion</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Reads as heavy sedation; the arc of re-emergence needs the consciousness expert.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Consciousness-emergence expert (extension: Substance/Health).</p>
+</article><article class="card full" data-cov="full" data-cat="Altered Consciousness">
+  <div class="card-top"><h3>Dying / agonal speech</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">The last words, spent from a body already leaving. Meaning outlasts breath; the voice becomes air.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Breath-dominant fading phrases, long agonal gaps, weak voicing, lucidity flickering, final exhale.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>DARC↓↓ to silence</span><span class='tok'>RESP agonal-gaps</span><span class='tok'>AROU↓↓</span><span class='tok'>Genuineness↑ (weighty)</span><span class='tok'>VALN low</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">The dying arc is measurable; rank by breath-dominance + monotonic fade + agonal gap structure.</p>
+  
+</article><article class="card part" data-cov="part" data-cat="Altered Consciousness">
+  <div class="card-top"><h3>Mystical / religious ecstasy</h3><span class="pill part">Partial superposition</span></div>
+  <p class="coach">Overwhelmed by the sublime — the voice trembles between weeping and rapture, self dissolving upward.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Trembling awe-voice, tears-in-voice, rising rapturous pitch, breath catches, glossolalia-like flow.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Awe↑↑</span><span class='tok'>Elation+crying blend</span><span class='tok'>RANG↑ rising</span><span class='tok'>VOLT↑ tremble</span><span class='tok'>Genuineness↑</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Awe+rapture+tremble+tears blend is largely readable; the specific ecstatic-state wants validation.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Ecstatic-state expert (extension: affect/consciousness).</p>
+</article></div><h2 class='cat' id='Psycho-Social-States'>Psycho-Social States</h2><div class='grid'><article class="card full" data-cov="full" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Panic attack</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">A false alarm the whole body believes. Terror without a tiger — breath, heart and voice convinced of dying.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Hyperventilation, &#x27;I can&#x27;t breathe&#x27; fragments, escalating terror, tremor, derealization creeping in.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Fear/Distress↑↑</span><span class='tok'>RESP↑↑ hyperventilation</span><span class='tok'>VOLT↑ tremor</span><span class='tok'>CHNK↓↓</span><span class='tok'>AROU runaway</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Hyperventilation-breath + terror + tremor + fragment-shrinking arc; rank the runaway (tremor expert sharpens).</p>
+  
+</article><article class="card new" data-cov="new" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>PTSD flashback intrusion</h3><span class="pill new">Needs a new expert</span></div>
+  <p class="coach">The present tears open and the past floods in. Voice snaps from now to then — a sudden terror with no local cause.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Abrupt state-switch to terror mid-neutral-speech, dissociative flattening or panic, addressee confusion.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>sudden Fear intrusion</span><span class='tok'>affect discontinuity</span><span class='tok'>dissociation or panic</span><span class='tok'>ARSH↑↑ step</span><span class='tok'>Genuineness↑</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">The intrusion is a temporal discontinuity into terror/dissociation; needs a state-switch detector.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Trauma-intrusion / state-switch expert (temporal; extension: Health).</p>
+</article><article class="card part" data-cov="part" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Manic episode</h3><span class="pill part">Partial superposition</span></div>
+  <p class="coach">The engine over-revved — pressured speech, racing ideas, grandiosity, joy with a dangerous edge.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Very high tempo, minimal pausing, wide labile pitch, elevated arousal, laughter, tangential leaps.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>TEMP↑↑</span><span class='tok'>AROU↑↑</span><span class='tok'>VOLT↑↑ labile</span><span class='tok'>Elation↑</span><span class='tok'>STRU tangential</span><span class='tok'>CHNK↓↓</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Pressured-speech + labile high arousal + tangential structure approximate mania; a clinical-state head would validate.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Mood-state expert (mania/depression axis; extension: Health).</p>
+</article><article class="card full" data-cov="full" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Depressive flatness / anhedonia</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">Speech with the color drained out. Not sad-crying — sad-empty, every prosodic muscle gone slack.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Monotone, low pitch range, slow, quiet, long latencies, affect absent where it should be.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>VALN↓</span><span class='tok'>AROU↓↓</span><span class='tok'>RANG↓↓ monotone</span><span class='tok'>TEMP↓</span><span class='tok'>Emotional Numbness</span><span class='tok'>Genuineness↑</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Flat monotone + low arousal + narrowed range + latency = measurable; the anti-signature of animation.</p>
+  
+</article><article class="card part" data-cov="part" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Paranoia / hypervigilance</h3><span class="pill part">Partial superposition</span></div>
+  <p class="coach">The voice on a swivel — quick, low, checking exits, trust withdrawn, every phrase half a question to the room.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Hushed guarded tone, quick clipped phrases, suspicious pitch contours, tension, addressee-scanning.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>S_WHIS guarded</span><span class='tok'>TENS↑</span><span class='tok'>Fear (low-grade)</span><span class='tok'>STNC withdrawn</span><span class='tok'>VOLT↑ scanning</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Guarded-hushed + tension + suspicious contour approximate it; a stance/vigilance head sharpens.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Social-vigilance expert (extension: Social Situation).</p>
+</article><article class="card full" data-cov="full" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Acute grief (breaking)</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">The wave that empties you. Speech collapses into sob-breath; words fracture and drown.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Voice-breaks, sob-breath irregularity, pitch collapse, distress bursts, struggling for words.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Sadness/Distress↑↑</span><span class='tok'>crying (burst)</span><span class='tok'>VOLT↑ breaks</span><span class='tok'>RESP sob-irregular</span><span class='tok'>Blend↑</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Acute grief = crying-burst + distress + voice-break + high blend; rank realness by blend×genuineness.</p>
+  
+</article><article class="card full" data-cov="full" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Numb grief (dissociated)</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">Too much to feel, so nothing is felt. The bereaved reports the unbearable in a strangely level voice.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Flat even delivery of devastating content, affect-content decoupled, occasional crack betraying the depth.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Emotional Numbness↑</span><span class='tok'>VALN flat</span><span class='tok'>affect-content decoupling</span><span class='tok'>rare VOLT crack</span><span class='tok'>Genuineness↑</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank"><span class=star>★</span> ★ Detect as devastating-content × flat-affect decoupling (with rare cracks) — the incongruence method.</p>
+  
+</article><article class="card part" data-cov="part" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Anticipatory grief / dread</h3><span class="pill part">Partial superposition</span></div>
+  <p class="coach">Mourning something not yet lost. A heaviness that shadows even ordinary words.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Subtle sadness bleeding into neutral content, weighted pauses, sighs, restrained voice.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Sadness (low)</span><span class='tok'>Longing</span><span class='tok'>DARC↓ subtle</span><span class='tok'>sighs</span><span class='tok'>VALN↓ shadowed</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Subtle affect-bleed is faint; a low-intensity affect head + context improves it.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Fine-grained affect-intensity expert.</p>
+</article><article class="card full" data-cov="full" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Public humiliation</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">Shame with an audience — the voice shrinking, wanting to disappear, cracking under exposure.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Shrinking volume, higher tighter pitch, tremor, self-interruption, wanting-to-vanish register.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Shame/Embarrassment↑↑</span><span class='tok'>DARC↓</span><span class='tok'>RANG↑ tight</span><span class='tok'>VOLT↑</span><span class='tok'>VULN↑</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">EmoNet Shame/Embarrassment + shrinking dynamics + tremor cover it; rank composite.</p>
+  
+</article><article class="card full" data-cov="full" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Betrayal — the moment of realizing</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">Trust and its destruction in one breath. The voice believes, then can&#x27;t, then breaks a new way.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Warm→cold pivot, disbelief, a hardening or shattering, hurt bleeding through anger.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>VALS pivot warm→cold</span><span class='tok'>Astonishment→Anger/Sadness</span><span class='tok'>VOLT↑ at turn</span><span class='tok'>Bitterness</span><span class='tok'>Genuineness↑</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">The valence-shift pivot + emotion-arc is measurable temporally; rank the turn.</p>
+  
+</article><article class="card full" data-cov="full" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Cold contempt / disdain</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">Superiority that doesn&#x27;t raise its voice. Dismissal delivered with a small, even cruelty.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Flat downward contours, slowed dismissive tempo, low warmth, clipped finality, faint sneer timbre.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Contempt↑↑</span><span class='tok'>VALN↓ cold</span><span class='tok'>RANG↓ downward</span><span class='tok'>WARM↓</span><span class='tok'>STNC dominant-dismiss</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">EmoNet has Contempt directly; combine with cold-downward prosody + low warmth. Coverable.</p>
+  
+</article><article class="card full" data-cov="full" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Seething suppressed rage</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">A volcano under a lid. The words stay quiet and precise while the pressure vibrates every edge.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Over-controlled quiet delivery, clipped consonants, tremor of restraint, tension max, occasional leak-spike.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Anger (leak)↑</span><span class='tok'>TENS↑↑</span><span class='tok'>VOLT↑ tremor</span><span class='tok'>SMTH↑ over-control</span><span class='tok'>Genuineness (calm)↓</span><span class='tok'>EMPH clipped</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank"><span class=star>★</span> ★ Suppressed-rage = anger-leak under max control — the incongruence signature; rank leak-under-restraint.</p>
+  
+</article><article class="card full" data-cov="full" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Passive aggression</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">Hostility in a bow-tie. Pleasant words with a poisoned undertone; the sweetness is the weapon.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Over-sweet surface prosody, subtle contempt/irritation leak, exaggerated politeness, sing-song edge.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>surface warm/S_PLAY</span><span class='tok'>Contempt/Impatience (leak)</span><span class='tok'>RANG sing-song</span><span class='tok'>Genuineness (of sweetness)↓</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank"><span class=star>★</span> ★ Surface sweetness × leaked contempt × low genuineness of the niceness — measurable.</p>
+  
+</article><article class="card full" data-cov="full" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Begging / pleading for one&#x27;s life</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">Dignity spent for survival. The voice abandons pride — raw, cracking, promising anything.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Cracking desperate pitch, rapid pleading rhythm, sob-breath, escalating urgency, total vulnerability.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Helplessness/Fear↑↑</span><span class='tok'>VULN↑↑</span><span class='tok'>VOLT↑ crack</span><span class='tok'>crying/gasps</span><span class='tok'>TEMP↑ pleading</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Desperation + vulnerability + crack + sob-breath are readable; rank intensity × genuineness.</p>
+  
+</article><article class="card full" data-cov="full" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Interrogation — holding out</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">Control as resistance. Every answer measured, the fear pushed down, the will not to break audible under the flatness.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Forced-flat control, suppressed fear leak, latency before dangerous answers, tension, defiant stillness.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Fear (leak)↑</span><span class='tok'>SMTH↑ forced-flat</span><span class='tok'>COGL latency</span><span class='tok'>TENS↑</span><span class='tok'>Defiance</span><span class='tok'>Genuineness (calm)↓</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank"><span class=star>★</span> ★ Held-out fear under forced control — incongruence method; rank suppressed-fear-under-flatness.</p>
+  
+</article><article class="card full" data-cov="full" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>False bravado / whistling past the graveyard</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">Courage the actor doesn&#x27;t have, worn loudly. The bigger the swagger, the thinner the floor beneath it.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Over-projected confidence, forced laughter, brittle high-energy, fear leaking at phrase-ends.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>surface S_AUTH/Elation</span><span class='tok'>Fear (leak at ends)</span><span class='tok'>EMPH↑ forced</span><span class='tok'>laughter (forced)</span><span class='tok'>Genuineness↓</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank"><span class=star>★</span> ★ Loud confidence × leaked fear × low genuineness; the bravado mask.</p>
+  
+</article><article class="card full" data-cov="full" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Gloating triumph / schadenfreude</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">Joy sharpened on someone else&#x27;s loss. Warmth turned predatory — delight with a cruel grin in it.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Bright amused prosody with contempt underneath, savoring tempo, mock-sympathy sing-song.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Triumph/Amusement↑</span><span class='tok'>Contempt (under)</span><span class='tok'>TEMP↓ savoring</span><span class='tok'>S_PLAY predatory</span><span class='tok'>VALN↑ w/ edge</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Amusement/Triumph + leaked contempt is measurable; rank the joy-over-cruelty blend.</p>
+  
+</article><article class="card part" data-cov="part" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Love-bombing / grooming charm</h3><span class="pill part">Partial superposition</span></div>
+  <p class="coach">Overwhelming warmth deployed as control. The affection is a tool; the intensity is the tell.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Excessive intimate warmth, urgency of praise, boundary-pressing closeness, low genuineness under the sweetness.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Infatuation (surface)↑↑</span><span class='tok'>WARM↑↑</span><span class='tok'>STNC pressing</span><span class='tok'>Genuineness↓</span><span class='tok'>S_ASMR intimate</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Detect as high-intensity surface warmth with low genuineness + boundary-pressure; flag as manipulation-risk. Needs a manipulation-intent head for confidence.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Manipulation-intent expert (research; ethically flagged; extension: Social).</p>
+</article><article class="card full" data-cov="full" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Intimidation / veiled threat</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">Menace that never raises its voice. Calm as a weapon — the quieter it gets, the more dangerous.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Low slow controlled delivery, downward finality, latent aggression, dominant stance, chilling evenness.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>STNC↑↑ dominant</span><span class='tok'>Malevolence/Malice</span><span class='tok'>TEMP↓ slow</span><span class='tok'>VALN↓ cold</span><span class='tok'>SMTH↑ chilling-even</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">EmoNet Malevolence/Malice + dominance + cold-slow control cover the veiled threat.</p>
+  
+</article><article class="card full" data-cov="full" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Submission / appeasement</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">Shrinking to survive a social predator — pitch up, stance down, agreeing before being asked.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Raised placating pitch, quick agreement, uptalk, lowered volume, tension of appeasement.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>STNC↓↓ submissive</span><span class='tok'>RANG↑ placating</span><span class='tok'>Fear (low)</span><span class='tok'>DARC↓</span><span class='tok'>VULN↑</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Submissive stance + placating pitch + lowered dynamics are readable; rank the appeasement composite.</p>
+  
+</article><article class="card full" data-cov="full" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Protective ferocity / maternal fury</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">Love weaponized. The gentlest person becomes a wall — fear transmuted into unstoppable command.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Sudden authoritative power, fear-driven but controlled, fierce warmth, non-negotiable finality.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>S_AUTH↑↑</span><span class='tok'>Anger+Affection blend</span><span class='tok'>STNC↑↑</span><span class='tok'>EMPH↑ command</span><span class='tok'>Genuineness↑</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Anger+love co-activation + command stance is measurable; distinctive from cold threat by the warmth term.</p>
+  
+</article><article class="card part" data-cov="part" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Existential dread / the sublime vertigo</h3><span class="pill part">Partial superposition</span></div>
+  <p class="coach">The floor of meaning drops away. Voice hushed before something too large — awe bleeding into terror.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Hushed slowed voice, awe+fear blend, trailing unfinished thoughts, breath held before the vast.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Awe+Fear</span><span class='tok'>S_WHIS hushed</span><span class='tok'>TEMP↓</span><span class='tok'>DFLU↑ trailing</span><span class='tok'>RESP held</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Awe+fear co-activation + hushed prosody approximate it; abstract state — context-dependent.</p>
+  <div class="lbl new-lbl">new expert</div><p class="expert">Sublime/awe-state expert (validation).</p>
+</article><article class="card full" data-cov="full" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Learned helplessness / defeat</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">The fight gone out. Not sad, not angry — done. Speech that has stopped expecting to be heard.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Flat quiet monotone, giving-up terminal falls, no arousal, long resigned pauses, absent hope.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Helplessness↑↑</span><span class='tok'>AROU↓↓</span><span class='tok'>VALN↓</span><span class='tok'>DARC↓ terminal-fall</span><span class='tok'>RANG↓ monotone</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">EmoNet Helplessness + resigned flat prosody + terminal falls; coverable.</p>
+  
+</article><article class="card full" data-cov="full" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Social anxiety / blushing dread</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">Wanting to be invisible while being looked at. The voice tightens, rushes, and betrays the wish to flee.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Tight higher pitch, rushed low-volume, self-interruption, nervous fillers, throat tension.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>Embarrassment/Fear↑</span><span class='tok'>TEMP↑ rushed</span><span class='tok'>DARC↓</span><span class='tok'>DFLU↑</span><span class='tok'>TENS↑ throat</span><span class='tok'>RANG↑ tight</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">Embarrassment + rushed-tight-quiet prosody + disfluency cover it; rank composite.</p>
+  
+</article><article class="card full" data-cov="full" data-cat="Psycho-Social States">
+  <div class="card-top"><h3>Dawning hope after despair</h3><span class="pill full">Coverable now</span></div>
+  <p class="coach">The first crack of light — the voice testing whether it&#x27;s allowed to rise, afraid to believe it.</p>
+  <div class="lbl">acoustic signature</div><p class="sig">Slow warming from flat, tentative pitch-rise, breath returning, valence lifting against inertia, fragile.</p>
+  <div class="lbl">detector superposition</div><div class="recipe"><span class='tok'>VALS↑ lifting</span><span class='tok'>Hope/Optimism (emerging)</span><span class='tok'>DARC↑ tentative</span><span class='tok'>AROU↑ slow</span><span class='tok'>Genuineness↑</span></div>
+  <div class="lbl">rank candidates by</div><p class="rank">The valence-lift trajectory from a low baseline is measurable; rank the rise-against-inertia.</p>
+  
 </article></div>
 
 <section class="band">
@@ -588,14 +1059,16 @@ footer{border-top:1px solid var(--line);padding:26px 0 60px;color:var(--mut);fon
   <p>Everything a superposition can only <i>approximate</i> points at a missing head. Grouped, the gaps are coherent —
   most are the physical-situation axes the extension taxonomy already names, plus a few micro-detectors for involuntary
   events. Each would turn a “partial” into a clean, rankable score.</p>
-  <ul class="experts"><li>Physical-Load / Exertion expert (extension: Physical Activity &amp; Dynamic Load) — regress metabolic effort from breath-work interference.</li><li>Effort/Strain expert — detect glottal bracing &amp; Valsalva release.</li><li>Locomotion/gait-cadence expert (extension: Physical Activity).</li><li>Tremor/Shiver expert — a dedicated periodic-modulation head (also serves fear-tremor, cold, adrenaline).</li><li>Climate &amp; Atmospheric Conditions expert (extension).</li><li>Environment/wind-noise expert (extension: Environment &amp; Acoustic Space).</li><li>Respiratory-Load / hypoxia expert (extension: Climate / Health).</li><li>Hiccup expert — a periodic involuntary-glottal-spasm detector (new burst subclass).</li><li>Yawn expert (burst subclass) — also feeds sleepiness.</li><li>Sleepiness / drowsiness expert (extension: Fatigue, Sleep &amp; Energy State).</li><li>Tremor/Shiver expert (shared).</li><li>Intoxication-level expert (extension: Substance &amp; Chemical Influence) — ordinal 0–6.</li><li>Substance/sedation expert (extension).</li><li>Nausea/visceral-distress expert (extension: Health &amp; Physiological).</li><li>Singing detector + singing-style expert (speech↔song boundary, vibrato, style).</li><li>Singing-onset / transition expert (shared with singing detector).</li><li>Disfluency-type expert — classify stutter/stammer/filler/false-start.</li><li>Terminal-intonation / uptalk expert.</li><li>Deception-likelihood expert (research-grade; ethically flagged).</li><li>Prosody-vs-text incongruence expert (multimodal).</li><li>Prosodic-pivot / realization expert (temporal).</li><li>Emotion-co-activation reader (mostly existing) + text pairing.</li><li>Articulatory-constraint expert (lip/jaw-fixed) — niche.</li><li>Impression/voice-transfer expert (baseline-relative).</li><li>Suppressed-reflex expert (sneeze/cough/laugh holds).</li></ul>
+  <ul class="experts"><li>Physical-Load / Exertion expert (extension: Physical Activity &amp; Dynamic Load) — regress metabolic effort from breath-work interference.</li><li>Effort/Strain expert — detect glottal bracing &amp; Valsalva release.</li><li>Locomotion/gait-cadence expert (extension: Physical Activity).</li><li>Tremor/Shiver expert — a dedicated periodic-modulation head (also serves fear-tremor, cold, adrenaline).</li><li>Climate &amp; Atmospheric Conditions expert (extension).</li><li>Environment/wind-noise expert (extension: Environment &amp; Acoustic Space).</li><li>Respiratory-Load / hypoxia expert (extension: Climate / Health).</li><li>Hiccup expert — a periodic involuntary-glottal-spasm detector (new burst subclass).</li><li>Yawn expert (burst subclass) — also feeds sleepiness.</li><li>Sleepiness / drowsiness expert (extension: Fatigue, Sleep &amp; Energy State).</li><li>Tremor/Shiver expert (shared).</li><li>Intoxication-level expert (extension: Substance &amp; Chemical Influence) — ordinal 0–6.</li><li>Substance/sedation expert (extension).</li><li>Nausea/visceral-distress expert (extension: Health &amp; Physiological).</li><li>Singing detector + singing-style expert (speech↔song boundary, vibrato, style).</li><li>Singing-onset / transition expert (shared with singing detector).</li><li>Disfluency-type expert — classify stutter/stammer/filler/false-start.</li><li>Terminal-intonation / uptalk expert.</li><li>Deception-likelihood expert (research-grade; ethically flagged).</li><li>Prosody-vs-text incongruence expert (multimodal).</li><li>Prosodic-pivot / realization expert (temporal).</li><li>Emotion-co-activation reader (mostly existing) + text pairing.</li><li>Articulatory-constraint expert (lip/jaw-fixed) — niche.</li><li>Impression/voice-transfer expert (baseline-relative).</li><li>Suppressed-reflex expert (sneeze/cough/laugh holds).</li><li>Physical-Load / Exertion expert (extension: Physical Activity &amp; Dynamic Load).</li><li>Restraint/entrapment sub-model (extension: Physical Activity + Health).</li><li>Airway-obstruction expert (extension: Health &amp; Physiological Condition).</li><li>Aspiration/wet-airway expert (extension: Health).</li><li>Respiratory-pathology expert (wheeze/stridor; extension: Health).</li><li>Injury/pain-type expert (extension: Pain &amp; Physical Distress).</li><li>Pain-type expert (thermal vs ballistic vs crush; extension: Pain).</li><li>Pain-type expert (shared).</li><li>Involuntary-seizure/tetany expert (extension: Health / Pain).</li><li>Pain expert + vocal-fatigue-accumulation expert.</li><li>Threat/startle expert (extension: Social + Health).</li><li>Tremor/Shiver + Climate expert (extension: Climate &amp; Atmospheric).</li><li>Climate/thermal-crisis expert (extension: Climate).</li><li>Climate expert (extension).</li><li>Gustatory-reaction expert (extension: Health / new Oral axis).</li><li>Transient-pain-event expert.</li><li>Arousal-level expert (ordinal; extension: Health/affect).</li><li>Suppression / arousal-level expert (shared).</li><li>Dissociation / affect-decoupling expert (extension: Health).</li><li>Consciousness-state expert (extension: Fatigue/Sleep/Energy).</li><li>Thought-disorder / incoherence expert (extension: Social + Health).</li><li>Delirium/consciousness expert (extension: Health).</li><li>Neuro-state / aphasia expert (extension: Health).</li><li>Aphasia / speech-motor expert (extension: Health).</li><li>Consciousness-emergence expert (extension: Substance/Health).</li><li>Ecstatic-state expert (extension: affect/consciousness).</li><li>Trauma-intrusion / state-switch expert (temporal; extension: Health).</li><li>Mood-state expert (mania/depression axis; extension: Health).</li><li>Social-vigilance expert (extension: Social Situation).</li><li>Fine-grained affect-intensity expert.</li><li>Manipulation-intent expert (research; ethically flagged; extension: Social).</li><li>Sublime/awe-state expert (validation).</li></ul>
 </section>
 </main>
 
 <footer><div class="wrap">
   Taxonomies: <a href="https://github.com/LAION-AI/voice-taxonomies">LAION-AI/voice-taxonomies</a> — VoiceNet (59) · EmoNet (40) · Vocal-Burst (16) · Extension situations (11 dims / 289).
   Detectors: VoiceNet dim-predictors · Empathic-Insight-Voice-Plus · vocalburst-classifier-single · genuineness · vocal-burst blend.
-  A working document — coverage calls are proposals, not measurements.
+  Extreme, clinical, intimate (NSFW), violent and altered-state scenarios are described only as <b>acoustic/vocal
+  signatures and detector recipes</b> for annotation and candidate-ranking — the professional vocabulary of a casting
+  studio, not content. A working document — coverage calls are proposals, not measurements.
 </div></footer>
 <script>
 const covBtns=[...document.querySelectorAll('.fbtn.cov')];
