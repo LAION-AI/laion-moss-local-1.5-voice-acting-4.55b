@@ -1,0 +1,11 @@
++ sleep 5
++ for i in $(seq 1 240)
++ curl -sf http://127.0.0.1:31711/health
++ curl -sf http://127.0.0.1:31711/v1/models
++ kill -0 1953188
++ sleep 5
+/var/spool/slurmd/job1114325/slurm_script: line 38: 1953188 Bus error               (core dumped) sgl-omni serve --model-path $MODEL --port $PORT --host 127.0.0.1 > $NB/logs/sgl_server_$SLURM_JOB_ID.log 2>&1
++ for i in $(seq 1 240)
++ curl -sf http://127.0.0.1:31711/health
++ curl -sf http://127.0.0.1:31711/v1/models
++ kill -0 1953188

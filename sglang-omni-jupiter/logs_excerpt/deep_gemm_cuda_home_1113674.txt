@@ -1,0 +1,18 @@
+    ENABLE_JIT_DEEPGEMM = _compute_enable_deep_gemm()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File 
+"/e/data1/datasets/playground/mmlaion/schuhmann1/dramabox/env_sglang/lib/python3
+.12/site-packages/sglang/srt/layers/deep_gemm_wrapper/configurer.py", line 25, 
+in _compute_enable_deep_gemm
+    import deep_gemm  # noqa: F401
+    ^^^^^^^^^^^^^^^^
+  File 
+"/e/data1/datasets/playground/mmlaion/schuhmann1/dramabox/env_sglang/lib/python3
+.12/site-packages/deep_gemm/__init__.py", line 276, in <module>
+    _find_cuda_home()
+  File 
+"/e/data1/datasets/playground/mmlaion/schuhmann1/dramabox/env_sglang/lib/python3
+.12/site-packages/deep_gemm/__init__.py", line 37, in _find_cuda_home
+    assert cuda_home is not None
+           ^^^^^^^^^^^^^^^^^^^^^
+AssertionError

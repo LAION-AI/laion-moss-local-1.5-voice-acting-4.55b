@@ -1,0 +1,11 @@
++ export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
++ HF_HUB_OFFLINE=1
++ TRANSFORMERS_OFFLINE=1
++ export NVCC_APPEND_FLAGS=-allow-unsupported-compiler
++ NVCC_APPEND_FLAGS=-allow-unsupported-compiler
++ echo 'SERVER READY after 335s'
+SERVER READY after 335s
+FAILED: HTTPError HTTP Error 500: Internal Server Error
+  conc=  1      7.8x RT    571.6 ms/clip  p50=0.55s p95=0.62s
+  conc=  8     18.3x RT    307.3 ms/clip  p50=1.34s p95=1.82s
+  conc= 32     27.7x RT    181.7 ms/clip  p50=4.79s p95=6.0s
