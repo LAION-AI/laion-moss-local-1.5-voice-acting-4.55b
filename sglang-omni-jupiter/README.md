@@ -201,6 +201,43 @@ curl -s http://127.0.0.1:31711/v1/audio/speech \
 ## Measured performance
 
 **1x GH200 120 GB, `sglang-omni` @ upstream `main`.**
+
+### The single most important finding: clip length dominates everything
+
+| clip length | best throughput | vs `transformers` baseline (18.8x RT) |
+|---|---|---|
+| ~5 s (short lines) | 34x RT / 6.97 clips/s | 1.8x |
+| **~27 s (production-like)** | **85.3x RT / 3.19 clips/s** | **4.5x** |
+
+With short clips the per-request fixed cost dominates and caps throughput. Every knob we
+turned — batch endpoint, `--tts-batch-max-items`, `--cuda-graph-max-bs` — bought **+8.6 %
+combined**. Switching to realistic clip lengths bought **2.5x**. If you benchmark this
+model with one-liners you will optimise the wrong end of the system.
+
+### ~30 s clips (measured `audio_s`, not derived) — job 1117746
+
+| mode | batch | conc | x realtime | clips/s | mean clip | p50 |
+|---|---:|---:|---:|---:|---:|---:|
+| single | 1 | **64** | **85.3** | 3.19 | 26.73 s | 10.39 s |
+| batch | **16** | **2** | **85.0** | 3.34 | 25.47 s | **7.36 s** ← best latency |
+| single | 1 | 128 | 83.2 | 3.15 | 26.37 s | 21.29 s |
+| batch | 32 | 2 | 80.7 | 3.09 | 26.14 s | 18.80 s |
+| batch | 64 | 1 | 72.0 | 2.73 | 26.36 s | 22.56 s |
+| single | 1 | 32 | 56.1 | 2.05 | 27.42 s | 6.44 s |
+| batch | 32 | 1 | 55.0 | 2.11 | 26.06 s | 14.73 s |
+
+**Recommended production setting: `batch=16, concurrency=2`** — within noise of the peak,
+but p50 latency 7.4 s instead of 10.4 s. Bigger batches actively hurt: `batch=64` is 72.0x
+at 3x the latency.
+
+Harness: [`scripts/sgl_bench30.py`](scripts/sgl_bench30.py), raw JSON in
+[`results/sgl30_base.json`](results/sgl30_base.json). Note this harness also fixes a
+measurement bug in the earlier one: batch responses carry base64 under
+`results[].audio_data`, which the old parser did not look for, so it silently reported
+`audio_s = 0` and the x-realtime figure had to be derived from an assumed clip length.
+
+### ~5 s clips (earlier measurements, kept for comparison)
+
 Workload: 8 short German voice-acting lines, **~4.4–4.9 s of audio each**.
 
 | concurrency | x realtime | clips/s | ms/clip | mean clip | p50 latency | p95 latency | ok/n | job |
