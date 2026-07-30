@@ -102,10 +102,32 @@ Raw log excerpts for each are in [`logs_excerpt/`](logs_excerpt/).
   capture (batch sizes `[1, 2, 4, 8, 12, 16]`; 21 s on one job, **135 s** on another) →
   ~25 vocoder CUDA graphs → `torch.compile(mode="max-autotune-no-cudagraphs")` of the frame
   sampler (~3 min).
-* **The vocoder CUDA graphs are captured at `B=16`** (25 T-buckets, `T=1..25` →
-  `audio (16, 2, 96000)`). This is our leading hypothesis for the throughput plateau: the
-  measured knee at concurrency ~96–128 (6.34 → 6.42 clips/s) is consistent with a fixed
-  vocoder batch becoming the bottleneck while the AR stage still has headroom.
+* **The vocoder `B=16` hypothesis was tested and REFUTED.** The vocoder CUDA graphs are
+  captured at `B=16` (25 T-buckets, `T=1..25` → `audio (16, 2, 96000)`), and
+  `DEFAULT_TTS_BATCH_MAX_ITEMS` is 32, so both looked like plausible causes of the plateau.
+  Re-running the server with `--tts-batch-max-items 256 --cuda-graph-max-bs 64` and driving
+  it through the **`POST /v1/audio/speech/batch`** endpoint (server-side batching, instead
+  of N concurrent single requests) produced **no meaningful gain**:
+
+  | batch | concurrency | clips/s |
+  |---:|---:|---:|
+  | 8 | 1 | 5.78 |
+  | 32 | 1 | 6.30 |
+  | **32** | **2** | **6.97** ← best |
+  | 64 | 1 | 6.60 |
+  | 64 | 2 | 6.57 |
+  | 96 | 1 | 6.46 |
+  | 128 | 1 | 6.28 |
+  | 128 | 2 | 6.59 |
+
+  Best batch-endpoint result **6.97 clips/s** vs **6.42 clips/s** on the single-request path
+  — **+8.6 %**, and larger batches get *worse* (128 < 32) while latency grows linearly.
+  **Conclusion: one GH200 saturates at ~6.5–7 clips/s (~34x realtime) regardless of request
+  path or batch limits.** This is a compute plateau, not a batching limit — scale with more
+  GPUs (data-parallel replicas), not bigger batches. Caveat: in this run `audio_s` came back
+  0 because the client did not find the audio payload key in the batch response, so
+  `clips/s` is the measured quantity and the x-realtime figure is derived from the known
+  mean clip length (~4.9 s), not measured directly.
 * **Isolated HTTP 500s under load, reproducibly irreproducible.** 1 of 192 requests at
   concurrency 96 in one job, and 1 of 192 at concurrency 64 in another — both with *no*
   server-side traceback. In the original client this exception propagated out of
