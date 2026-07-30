@@ -167,9 +167,9 @@ Bulk-generation recipe (prompt sources, rewards, throughput planning): [SYNTHETI
 > ships a `moss_tts_local` model, so this model can be served today behind an OpenAI-compatible
 > `POST /v1/audio/speech` endpoint with continuous batching, a staged pipeline and CUDA graphs.
 > We ran it on **JUPITER** (JSC — aarch64 Grace + GH200 120 GB, Slurm, no Docker) and measured
-> **27.7× realtime at concurrency 32 on one GH200**, versus **18.8× realtime** for our tuned
-> `transformers` batched-`generate()` baseline on the same GPU — **1.47× faster**, with
-> saturation not yet reached.
+> **27.7× realtime at concurrency 32** and **31.2× at concurrency 128** on one GH200, versus
+> **18.8× realtime** for our tuned `transformers` batched-`generate()` baseline on the same
+> GPU — **1.47× to 1.66× faster**, saturating around concurrency 96–128.
 > **→ [`sglang-omni-jupiter/`](sglang-omni-jupiter/)** — full runbook: the working environment,
 > the five install/launch failure modes with symptom → cause → fix, the Slurm launcher and
 > benchmark client, an Apptainer definition (Docker is not runnable on HPC), and a

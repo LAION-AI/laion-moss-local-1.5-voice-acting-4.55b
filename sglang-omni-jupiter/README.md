@@ -56,7 +56,7 @@ the autoregressive step and the vocoder, and an **OpenAI-compatible HTTP API**
 is a much better shape than "N copies of a Python loop".
 
 Measured result on 1x GH200: **1.47x the throughput of our tuned `transformers` baseline**
-at concurrency 32, and saturation was not reached. See
+at concurrency 32, rising to **1.66x at concurrency 128**, where it saturates. See
 [Measured performance](#measured-performance) — including why the headline number is
 smaller than the "~35x realtime on A100" figure that circulates for this stack.
 
@@ -72,7 +72,7 @@ smaller than the "~35x realtime on A100" figure that circulates for this stack.
 | **Compute nodes have no network** | everything runs `HF_HUB_OFFLINE=1`; the model must be in the cache first (failures #3, #4) |
 | **`/p` (JUST) is not mounted on booster compute nodes** | venv, caches and weights must all live under `/e` (ExaSTORE) |
 | **HOME quota ~20 GB** | uv's default cache overruns it while resolving this dependency tree (failure #2) |
-| **Cold start 4–8 min** | ~10 s weight load + **135 s** AR CUDA-graph capture + ~25 vocoder graphs + a `torch.compile` — plan job time accordingly |
+| **Cold start 6–15 min** | ~10 s weight load + AR CUDA-graph capture (21 s on one run, **135 s** on another) + ~25 vocoder graphs + a `torch.compile`. Observed ready-times: **335 s** and **905 s** for the same command — plan job time accordingly |
 
 ---
 
@@ -96,18 +96,22 @@ Raw log excerpts for each are in [`logs_excerpt/`](logs_excerpt/).
   coordinator plus one process per pipeline stage; the PID you backgrounded is not the
   process that serves HTTP. **Poll the endpoint** (`/health`, falling back to `/v1/models`)
   — that is all `scripts/wait_for_server.sh` does.
-* **Cold start is 4–8 minutes.** Do not set a readiness timeout below ~15 min. Breakdown
-  from a real run: weight load 10.5 s → AR CUDA graph capture **135 s** (batch sizes
-  `[1, 2, 4, 8, 12, 16]`) → ~25 vocoder CUDA graphs → `torch.compile(mode="max-autotune-no-cudagraphs")`
-  of the frame sampler (~3 min).
+* **Cold start is 6–15 minutes and not reproducible.** The *identical* command reached
+  readiness in **335 s** on one job and **905 s** on another. Do not set a readiness
+  timeout below ~20 min. Breakdown from a real run: weight load 10.5 s → AR CUDA graph
+  capture (batch sizes `[1, 2, 4, 8, 12, 16]`; 21 s on one job, **135 s** on another) →
+  ~25 vocoder CUDA graphs → `torch.compile(mode="max-autotune-no-cudagraphs")` of the frame
+  sampler (~3 min).
 * **The vocoder CUDA graphs are captured at `B=16`** (25 T-buckets, `T=1..25` →
-  `audio (16, 2, 96000)`). That is a plausible ceiling on vocoder batching efficiency and
-  is our leading hypothesis for why throughput does not keep scaling with concurrency.
-* **Isolated HTTP 500s under load.** At concurrency 96, exactly **1 of 192** requests came
-  back `500` with *no* server-side traceback. In the original client this exception
-  propagated out of `ThreadPoolExecutor.map()` and destroyed the whole concurrency level.
-  Benchmark and production clients must tolerate and count single failures — see the
-  `_safe()` wrapper in [`scripts/sgl_bench.py`](scripts/sgl_bench.py).
+  `audio (16, 2, 96000)`). This is our leading hypothesis for the throughput plateau: the
+  measured knee at concurrency ~96–128 (6.34 → 6.42 clips/s) is consistent with a fixed
+  vocoder batch becoming the bottleneck while the AR stage still has headroom.
+* **Isolated HTTP 500s under load, reproducibly irreproducible.** 1 of 192 requests at
+  concurrency 96 in one job, and 1 of 192 at concurrency 64 in another — both with *no*
+  server-side traceback. In the original client this exception propagated out of
+  `ThreadPoolExecutor.map()` and destroyed the whole concurrency level. Benchmark and
+  production clients must tolerate and count single failures — see the `_safe()` wrapper in
+  [`scripts/sgl_bench.py`](scripts/sgl_bench.py).
 * **`Bus error (core dumped)` during startup, intermittently.** One job died this way after
   CUDA-graph capture completed. It did not reproduce on resubmit. Note that each crash
   wrote a multi-GB core file into `$PWD` (we collected ~11 GB in one afternoon) — `env.sh`
@@ -174,41 +178,62 @@ curl -s http://127.0.0.1:31711/v1/audio/speech \
 
 ## Measured performance
 
-**1x GH200 120 GB, `sglang-omni` @ upstream `main`, job 1113953.**
-Workload: 8 short German voice-acting lines, ~5 s of audio each.
+**1x GH200 120 GB, `sglang-omni` @ upstream `main`.**
+Workload: 8 short German voice-acting lines, **~4.4–4.9 s of audio each**.
 
-| concurrency | x realtime | ms/clip | p50 latency | p95 latency |
-|---|---|---|---|---|
-| 1 | 7.8 | 572 | 0.55 s | 0.62 s |
-| 8 | 18.3 | 307 | 1.34 s | 1.82 s |
-| **32** | **27.7** | 182 | 4.79 s | 6.0 s |
+| concurrency | x realtime | clips/s | ms/clip | mean clip | p50 latency | p95 latency | ok/n | job |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 7.8 | 1.75 | 572 | 4.45 s | 0.55 s | 0.62 s | 4/4 | 1113953 |
+| 8 | 18.3 | 3.25 | 307 | 5.64 s | 1.34 s | 1.82 s | 24/24 | 1113953 |
+| 32 | 27.7 | 5.50 | 182 | 5.04 s | 4.79 s | 6.0 s | 64/64 | 1113953 |
+| 32 | 25.3 | 5.23 | 191 | 4.84 s | 5.29 s | 6.28 s | 96/96 | 1115977 |
+| 64 | 27.6 | 5.94 | 168 | 4.65 s | 10.09 s | 11.94 s | 191/192 | 1115977 |
+| 96 | 27.9 | 6.34 | 158 | 4.40 s | 15.01 s | 17.33 s | 288/288 | 1115977 |
+| **128** | **31.2** | **6.42** | 156 | 4.87 s | 19.32 s | 22.17 s | 384/384 | 1115977 |
 
 Baseline: `transformers` batched `.generate()` on the same GPU —
 **18.8x realtime** with codec decode pipelined onto a second CUDA stream,
 15.4x without.
 
-**→ SGLang-Omni is 1.47x faster than the tuned `transformers` baseline at concurrency 32,
-and throughput was still climbing.** Saturation was not reached; a follow-up sweep at
-32/64/96/128 is what `make submit` runs by default.
+**→ SGLang-Omni is 1.47x the baseline at concurrency 32 and 1.66x at concurrency 128.**
+
+**Where it saturates:** look at `clips/s`, not `x realtime` — 5.23 → 5.94 → 6.34 → **6.42**
+across concurrency 32 → 128. Throughput is essentially flat from 96 to 128, so the knee is
+around **concurrency 96–128** and there is little left to gain by pushing further.
+
+The two concurrency-32 rows (27.7 vs 25.3) are the same configuration on different jobs;
+treat **~±10% run-to-run variance** as the noise floor for these numbers.
 
 ### Reading the numbers
 
-Three honest caveats, because this is easy to oversell:
+Four honest caveats, because this is easy to oversell:
 
-1. **Only `x realtime` is comparable across the two systems.** It normalises by the
-   duration of the audio actually produced. **`ms/clip` is not comparable here**: the
-   SGLang benchmark sentences yield ~5 s clips, while the `transformers` measurement used
-   ~11.4 s clips. The apparent ~3.3x advantage in ms/clip (182 ms vs 605 ms) is an
-   **artifact of clip length**, not a real speedup. Quote 1.47x, not 3.3x.
-2. **We did not reproduce the advertised "~35x realtime on an A100" figure.** Our best is
-   27.7x on a GH200. Different clip lengths, different batching, different hardware, and
-   possibly a different concurrency sweet spot. We are reporting what we measured.
-3. **Latency degrades sharply with concurrency.** p95 goes 0.62 s → 6.0 s from concurrency
-   1 to 32. These settings are tuned for *offline bulk generation*, where throughput is
-   what matters. For interactive use, stay at low concurrency and expect ~4.5x realtime
-   single-stream behaviour rather than 27.7x.
+1. **Only `x realtime` is comparable *across systems*.** It normalises by the duration of
+   the audio actually produced. **`ms/clip` is not comparable here**: the SGLang benchmark
+   sentences yield ~4.4–4.9 s clips, while the `transformers` measurement used ~11.4 s
+   clips. The apparent ~3.3x advantage in ms/clip (605 ms → 182 ms) is an **artifact of
+   clip length**, not a speedup. Quote 1.47–1.66x, never 3.3x.
+2. **Within one sweep, `clips/s` is the better saturation signal than `x realtime`.**
+   Sampling makes the mean clip length wander between levels (4.40 s at concurrency 96,
+   4.87 s at 128), so part of the 27.9 → 31.2 jump is longer clips rather than more work
+   done. `clips/s` barely moves over the same step (6.34 → 6.42). Both are in the table
+   above so you can see this for yourself.
+3. **We did not reproduce the advertised "~35x realtime on an A100" figure.** Our best is
+   31.2x on a GH200 at concurrency 128. Different clip lengths, different batching,
+   different hardware. We are reporting what we measured.
+4. **Latency degrades hard with concurrency.** p95 goes 0.62 s → 22.2 s from concurrency
+   1 to 128. These settings are for *offline bulk generation*, where throughput is what
+   matters. For interactive use, stay at low concurrency and expect single-stream
+   behaviour (~7.8x realtime, sub-second p95), not 31x.
 
-Raw numbers: [`results/sgl_bench_results_1113953.json`](results/sgl_bench_results_1113953.json).
+Raw numbers: [`results/sgl_bench_results_1113953.json`](results/sgl_bench_results_1113953.json)
+(concurrency 1/8/32) and
+[`results/sgl_bench_results_1115977.json`](results/sgl_bench_results_1115977.json)
+(saturation sweep 32/64/96/128).
+
+One request in the concurrency-64 level returned HTTP 500 with no server-side traceback
+(191/192) — the same failure seen at concurrency 96 in the earlier run. It is intermittent
+and the client is built to survive it; see [Further pitfalls](#further-pitfalls-not-fatal-but-they-cost-time).
 
 ### Re-running the benchmark
 
@@ -297,7 +322,8 @@ sglang-omni-jupiter/
 ├── container/
 │   └── sglang-omni-jupiter.def      Apptainer recipe — UNBUILT, UNTESTED
 ├── results/
-│   └── sgl_bench_results_1113953.json
+│   ├── sgl_bench_results_1113953.json    concurrency 1 / 8 / 32
+│   └── sgl_bench_results_1115977.json    saturation sweep 32 / 64 / 96 / 128
 └── logs_excerpt/                    one raw excerpt per failure mode
 ```
 

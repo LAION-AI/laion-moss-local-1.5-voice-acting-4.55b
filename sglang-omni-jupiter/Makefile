@@ -28,8 +28,8 @@ install:
 
 check:
 	@set -euo pipefail; \
+	export SGLO_VERBOSE=1; \
 	source $(HERE)/env.sh; \
-	SGLO_VERBOSE=1 source $(HERE)/env.sh; \
 	echo; \
 	python -c "import sglang, sglang_omni; print('sglang', sglang.__version__)"; \
 	python -c "import torch; print('torch', torch.__version__)"; \
