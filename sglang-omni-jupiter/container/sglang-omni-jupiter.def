@@ -1,0 +1,106 @@
+## ---------------------------------------------------------------------------
+## sglang-omni-jupiter.def — Apptainer/Singularity definition for serving
+## MOSS-TTS-Local 4.55B with SGLang-Omni on an aarch64 GH200 node.
+##
+##   STATUS: NOT BUILT, NOT TESTED.
+##   Everything measured in ../README.md was produced by the bare-metal venv
+##   route (`make install`). This file is the container *recipe* we would use;
+##   treat it as a starting point, not as a verified artifact. If you build it,
+##   please open a PR with the corrections.
+##
+## WHY NOT DOCKER?
+##   JUPITER (like essentially every HPC system) does not run a Docker daemon
+##   and does not give users root on compute nodes. The container runtime is
+##   Apptainer/Singularity. `docker run` is simply not available. Upstream
+##   sglang-omni ships docker/Dockerfile, which is fine on a cloud box but
+##   cannot be executed here — and its base image (lmsysorg/sglang:dev) is
+##   x86_64-first, so on Grace you would be emulating or rebuilding anyway.
+##   Build the SIF on a machine where you DO have root (or use
+##   `apptainer build --fakeroot`, if your site enables it), then copy the
+##   .sif to JUPITER and `apptainer exec --nv` it.
+##
+## BUILD (on a machine with root / fakeroot, aarch64):
+##   apptainer build --fakeroot sglang-omni-jupiter.sif sglang-omni-jupiter.def
+##
+## RUN (on a JUPITER compute node, inside an sbatch/srun allocation):
+##   apptainer exec --nv \
+##     --bind /e:/e \
+##     --env HF_HUB_CACHE=$HF_HUB_CACHE \
+##     --env HUGGINGFACE_HUB_CACHE=$HF_HUB_CACHE \
+##     --env HF_HUB_OFFLINE=1 --env TRANSFORMERS_OFFLINE=1 \
+##     sglang-omni-jupiter.sif \
+##     sgl-omni serve --model-path $SGLO_MODEL_PATH --host 127.0.0.1 --port 31711
+##
+## The model weights are deliberately NOT baked into the image (they are ~9 GB
+## and change independently). Bind-mount the HF cache instead.
+## ---------------------------------------------------------------------------
+
+Bootstrap: docker
+## CUDA 13 devel base. It MUST be CUDA 13, not 12.x:
+##   - the pinned torch is 2.11.0+cu130
+##   - deep_gemm JIT-compiles at first use and needs a matching CUDA_HOME
+##   - CUDA 12.6's nvcc refuses any host GCC newer than 13
+From: nvidia/cuda:13.0.0-devel-ubuntu24.04
+
+%labels
+    Maintainer  LAION
+    Purpose     SGLang-Omni serving of MOSS-TTS-Local 4.55B on aarch64/GH200
+    Upstream    https://github.com/sgl-project/sglang-omni
+    Model       https://huggingface.co/laion/moss-tts-local-transformer-4.55b-voice-acting
+    Status      UNTESTED — recipe only
+
+%files
+    # Bring the patched pyproject in if you keep a local fork; otherwise the
+    # %post section patches upstream in place.
+
+%post
+    set -eux
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update
+    apt-get install -y --no-install-recommends \
+        git curl ca-certificates build-essential \
+        libnuma-dev libibverbs-dev pkg-config \
+        python3.12 python3.12-venv python3.12-dev
+    rm -rf /var/lib/apt/lists/*
+
+    export CUDA_HOME=/usr/local/cuda
+    export PATH=$CUDA_HOME/bin:$PATH
+    export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$CUDA_HOME/nvvm/lib64:${LD_LIBRARY_PATH:-}
+    # The base image ships GCC 13/14 depending on the tag; allow either.
+    export NVCC_APPEND_FLAGS=-allow-unsupported-compiler
+
+    curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin sh
+
+    git clone --depth 1 https://github.com/sgl-project/sglang-omni /opt/sglang-omni
+    cd /opt/sglang-omni
+
+    ## FAILURE MODE #1: nemo_text_processing -> pynini -> OpenFST does not
+    ## build on aarch64 ("fatal error: fst/util.h: No such file or directory").
+    ## It is a ZONOS2-only dependency; MOSS-TTS-Local never touches it.
+    sed -i -E 's|^(\s*)("nemo_text_processing[^,]*",)|\1# \2  # aarch64: pynini/OpenFST unbuildable, ZONOS2-only|' pyproject.toml
+
+    uv venv --python 3.12 /opt/venv
+    ## FAILURE MODE #2: keep uv's cache off any quota'd filesystem.
+    UV_CACHE_DIR=/tmp/uvcache TMPDIR=/tmp \
+        uv pip install --python /opt/venv/bin/python -e /opt/sglang-omni
+    rm -rf /tmp/uvcache
+
+    /opt/venv/bin/python -c "import sglang, sglang_omni; print('sglang', sglang.__version__)"
+
+%environment
+    export CUDA_HOME=/usr/local/cuda
+    export PATH=/opt/venv/bin:$CUDA_HOME/bin:$PATH
+    export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$CUDA_HOME/nvvm/lib64:${LD_LIBRARY_PATH:-}
+    export NVCC_APPEND_FLAGS=-allow-unsupported-compiler
+    export TOKENIZERS_PARALLELISM=false
+    export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+    # HF_HUB_CACHE / HUGGINGFACE_HUB_CACHE / HF_HUB_OFFLINE are intentionally
+    # NOT set here — pass them in with --env so the container reads the same
+    # cache your login-node download populated (failure mode #4).
+
+%runscript
+    exec sgl-omni "$@"
+
+%test
+    /opt/venv/bin/python -c "import sglang_omni; print('sglang_omni import OK')"
+    nvcc --version

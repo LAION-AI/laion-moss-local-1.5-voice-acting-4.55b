@@ -1,0 +1,10 @@
++ export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
++ HF_HUB_OFFLINE=1
++ TRANSFORMERS_OFFLINE=1
+    raise OfflineModeIsEnabled(
+huggingface_hub.errors.OfflineModeIsEnabled: Cannot reach 
+/main: offline mode is enabled. To disable it, please unset the `HF_HUB_OFFLINE`
+Traceback (most recent call last):
+    raise LocalEntryNotFoundError(
+huggingface_hub.errors.LocalEntryNotFoundError: Cannot find an appropriate 
+'HF_HUB_OFFLINE=0' as environment variable.

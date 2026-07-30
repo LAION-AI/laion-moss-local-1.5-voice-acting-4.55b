@@ -1,0 +1,11 @@
+ Downloaded nvidia-cutlass-dsl-libs-cu13
+ Downloaded tokenspeed-triton
+ Downloaded nixl-cu13
+  × Failed to download `flashinfer-cubin==0.6.11.post1`
+  ├─▶ Failed to extract archive: flashinfer_cubin-0.6.11.post1-py3-none-any.whl
+  ├─▶ I/O operation failed during extraction
+  ╰─▶ failed to create file
+      `/e/home/jusers/schuhmann1/jupiter/.cache/uv/.tmpip6dlv/flashinfer_cubin/cubins/1d876ee612888821b168c25ffa75a9dcbb963aaa/fmha/trtllm-gen/fmhaSm100fKernel_QkvE4m3OBfloat16HQk576HV512HVPerCta256PagedKvDenseP32VarSeqQ32Kv64PersistentSwapsAbForGen.cubin`:
+      Disk quota exceeded (os error 122)
+
+hint: `flashinfer-cubin` (v0.6.11.post1) was included because `sglang-omni` (v0.1.0) depends on `sglang` (v0.5.12.post1) which depends on `flashinfer-cubin`BUILD4_EXIT=1

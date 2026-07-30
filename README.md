@@ -163,6 +163,21 @@ Bulk-generation recipe (prompt sources, rewards, throughput planning): [SYNTHETI
 
 ## Going faster: SGLang, and streaming
 
+> **Update — `MossTTSLocal` now has an SGLang path.** [SGLang-Omni](https://github.com/sgl-project/sglang-omni)
+> ships a `moss_tts_local` model, so this model can be served today behind an OpenAI-compatible
+> `POST /v1/audio/speech` endpoint with continuous batching, a staged pipeline and CUDA graphs.
+> We ran it on **JUPITER** (JSC — aarch64 Grace + GH200 120 GB, Slurm, no Docker) and measured
+> **27.7× realtime at concurrency 32** and **31.2× at concurrency 128** on one GH200, versus
+> **18.8× realtime** for our tuned `transformers` batched-`generate()` baseline on the same
+> GPU — **1.47× to 1.66× faster**, saturating around concurrency 96–128.
+> **→ [`sglang-omni-jupiter/`](sglang-omni-jupiter/)** — full runbook: the working environment,
+> the five install/launch failure modes with symptom → cause → fix, the Slurm launcher and
+> benchmark client, an Apptainer definition (Docker is not runnable on HPC), and a
+> troubleshooting table keyed by exact error string.
+> *Caveat, stated up front: only ×realtime is comparable between the two systems — ms/clip is not,
+> because the two measurements used different clip lengths. And we did **not** reproduce the
+> "~35× on A100" figure quoted below.*
+
 The upstream [OpenMOSS MOSS-TTS repository](https://github.com/OpenMOSS/MOSS-TTS) ships an
 [SGLang backend](https://github.com/OpenMOSS/sglang) for the **`MossTTSDelay`** architecture —
 a fused TTS+codec serving path with continuous batching, reported **~3× generation throughput**.
@@ -195,6 +210,7 @@ Parakeet WER, VoiceCLAP blend/genuineness and Empathic-Insight-Plus emotion head
 - **Model:** [`laion/moss-tts-local-transformer-4.55b-voice-acting`](https://huggingface.co/laion/moss-tts-local-transformer-4.55b-voice-acting)
 - **8B sibling:** [`laion/moss-tts-v1.5-8b-voice-acting`](https://huggingface.co/laion/moss-tts-v1.5-8b-voice-acting)
 - **Upstream architecture & tooling:** [OpenMOSS/MOSS-TTS](https://github.com/OpenMOSS/MOSS-TTS) · [OpenMOSS/sglang](https://github.com/OpenMOSS/sglang)
+- **Serving on HPC:** [`sglang-omni-jupiter/`](sglang-omni-jupiter/) — SGLang-Omni on JUPITER (aarch64 / GH200), runbook + benchmark · upstream [sgl-project/sglang-omni](https://github.com/sgl-project/sglang-omni)
 - **Audio tokenizer:** [`OpenMOSS-Team/MOSS-Audio-Tokenizer-v2`](https://huggingface.co/OpenMOSS-Team/MOSS-Audio-Tokenizer-v2)
 
 ## License

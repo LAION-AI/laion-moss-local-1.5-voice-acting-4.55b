@@ -1,0 +1,11 @@
+      -Wunreachable-code -DNDEBUG -g -O3 -Wall -O3 -fstack-protector
+      -fstack-clash-protection -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2
+      -I/e/data1/datasets/playground/mmlaion/schuhmann1/dramabox/uvpython/cpython-3.12.13-linux-aarch64-gnu/include/python3.12
+      -c extensions/_pywrapfst.cpp -o
+      build/temp.linux-aarch64-cpython-312/extensions/_pywrapfst.o -std=c++17
+      extensions/_pywrapfst.cpp:1199:10: fatal error: fst/util.h: No such file
+       1199 | #include <fst/util.h>
+      error: command
+      '/e/software/default/stages/2026/software/GCCcore/14.3.0/bin/c++' failed
+hint: `pynini` (v2.1.6.post1) was included because `sglang-omni` (v0.1.0) depends on `nemo-text-processing` (v1.2.0) which depends on `pynini`
+hint: This error likely indicates that you need to install a library that provides "fst/util.h" for `pynini@2.1.6.post1`
