@@ -5,9 +5,22 @@ architecture: fantasy characters (orc / dragon / fairy / goblin), shouting, whis
 bursts** (laughs, gasps, sighs, giggles, moans) driven by natural-language director instructions,
 in **English and German**, at **native 48 kHz**.
 
-> **Model checkpoint (merged, off-the-shelf):**
-> **[`laion/moss-tts-local-transformer-4.55b-voice-acting`](https://huggingface.co/laion/moss-tts-local-transformer-4.55b-voice-acting)**
-> — Apache-2.0, no adapter handling needed.
+> ## ⚠️ **Which checkpoint to use — read this first**
+>
+> | | repo | use it for |
+> |---|---|---|
+> | ✅ **CURRENT — v2** | **[`laion/moss-tts-local-transformer-4.55b-voice-acting-v2`](https://huggingface.co/laion/moss-tts-local-transformer-4.55b-voice-acting-v2)** | **everything new.** This is the base that **all published LoRA adapters are trained against** — emotion LoRAs, character LoRAs and the [vocal-burst adapters](https://huggingface.co/laion/vocal-burst-lora-adapters). An adapter trained on v2 will **not** behave correctly on the v1 checkpoint. |
+> | previous | [`laion/moss-tts-local-transformer-4.55b-voice-acting`](https://huggingface.co/laion/moss-tts-local-transformer-4.55b-voice-acting) | reproducing older results on this page. Merged, Apache-2.0, no adapter handling needed. |
+>
+> Most of the demo grids linked below were generated with **v2**. If you are pairing this
+> model with any LoRA from LAION, **use v2**.
+
+> 🎛️ **Vocal-burst LoRA adapters (64 classes):**
+> **[`laion/vocal-burst-lora-adapters`](https://huggingface.co/laion/vocal-burst-lora-adapters)**
+> — one adapter per non-verbal vocal burst (chuckle, gasp, sob, whistle, moan, …), each
+> confirmed by a listening audit against real recordings and a no-LoRA baseline.
+> 🎧 **[Listen to all 77 classes side by side →](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/vocal_burst_loras.html)**
+> (real recordings vs no-LoRA baseline vs top-3 per rank, with all scores)
 
 > ## 🏆🎭 **THE FINAL SHOWCASE — [13 Character Voices, Directed by Prompt](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/voices.html)**
 > The **capstone** of the character voice-acting study: the round-5 **best-of-64 champions** for all **13 voices**
@@ -19,6 +32,19 @@ in **English and German**, at **native 48 kHz**.
 
 🎧 **Hear it:** [production best-of-64 grid](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/production_best50.html)
 — top-3 takes per group across 40 emotions with full quality scores, generated with this model.
+
+🗣️ **Cross-lingual voice cloning from Japanese references:**
+[German &amp; English from Japanese anime reference audio](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/jpref_grid.html)
+— 20 distinct Japanese reference speakers (verified: mean pairwise ECAPA cosine 0.105), prompted
+in German and English across four emotions. **Identity transfers partially: 0.416 ECAPA against a
+0.105 unrelated-speaker floor and 1.000 self-similarity.** The measured finding is that the
+**emotion-LoRA merge dose destroys speaker identity monotonically** — 0.62 at dose 0, 0.50 at
+dose 1.0, **−0.03 at dose 1.5**, i.e. below the unrelated-speaker floor. Keep emotion merges
+≤ 0.5 when reference fidelity matters. Per-emotion pages:
+[neutral](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/jpref_neutral.html) ·
+[angry](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/jpref_angry.html) ·
+[sad](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/jpref_sad.html) ·
+[amused](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/jpref_amused.html).
 
 🎭 **Reinterpretations:** [original vs top-3 side-by-side](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/dramabox_reinterpretations_preview.html)
 — 30 full DramaBox performances, each voice-cloned and re-performed 64×; the 3 best takes (ranked by
