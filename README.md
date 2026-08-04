@@ -46,6 +46,13 @@ dose 1.0, **−0.03 at dose 1.5**, i.e. below the unrelated-speaker floor. Keep 
 [sad](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/jpref_sad.html) ·
 [amused](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/jpref_amused.html).
 
+🎧 **NEW — [25 originals vs their 3 best reinterpretations](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/reinterpretations_25.html)**
+— side-by-side players: the source recording next to the three highest-reward re-performances of the
+same script out of **64 candidates**, stratified across 25 distinct edge-case categories. Each clip
+shows its reward decomposition (emotion similarity / target strength / burst blend / genuineness),
+WER, detected vocal-burst spans, ASR text and the full prompt. Dataset:
+[`laion/dramabox-reinterpretations-top3`](https://huggingface.co/datasets/laion/dramabox-reinterpretations-top3).
+
 🎭 **Reinterpretations:** [original vs top-3 side-by-side](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/dramabox_reinterpretations_preview.html)
 — 30 full DramaBox performances, each voice-cloned and re-performed 64×; the 3 best takes (ranked by
 (blend + genuineness + 1.25× 42-dim Empathic-Insight emotion-profile similarity) × invWER) next to the
