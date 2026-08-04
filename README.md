@@ -22,6 +22,16 @@ in **English and German**, at **native 48 kHz**.
 > 🎧 **[Listen to all 77 classes side by side →](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/vocal_burst_loras.html)**
 > (real recordings vs no-LoRA baseline vs top-3 per rank, with all scores)
 
+> 📣 **Sports-commentator LoRA adapters (3):**
+> **[`laion/moss-sports-commentator-lora`](https://huggingface.co/laion/moss-sports-commentator-lora)**
+> — the three best cells of a 13-cell rank × epoch sweep, trained on 820 filtered English
+> generations + 468 **real German** Mediathek commentary segments.
+> 🎧 **[Listening evaluation →](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/sports_commentator_lora.html)**
+> **Read the headline before using them:** the un-adapted base model (1.750/2) is statistically
+> indistinguishable from *real human* commentary (1.775/2), so the task is near-saturated and
+> **no cell survives multiple-comparison correction**. The adapters raise consistency (97 % vs
+> 75 % of clips at the top rating), not capability.
+
 > ## 🏆🎭 **THE FINAL SHOWCASE — [13 Character Voices, Directed by Prompt](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/voices.html)**
 > The **capstone** of the character voice-acting study: the round-5 **best-of-64 champions** for all **13 voices**
 > (zombie · ork · goblin · dragon · evil-ghost · mouse · fairy · ranting · pain-scream · ASMR man/woman · grieving woman/man),
