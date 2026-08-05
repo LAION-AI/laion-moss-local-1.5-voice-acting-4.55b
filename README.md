@@ -22,6 +22,15 @@ in **English and German**, at **native 48 kHz**.
 > 🎧 **[Listen to all 77 classes side by side →](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/vocal_burst_loras.html)**
 > (real recordings vs no-LoRA baseline vs top-3 per rank, with all scores)
 
+> 🇩🇪 **German Mediathek HQ LoRA adapters (3):**
+> **[`laion/moss-mediathek-hq-lora`](https://huggingface.co/laion/moss-mediathek-hq-lora)**
+> — rank 16/32/64 trained on **43,612 segments / 185 h** of high-quality expressive German
+> public-broadcast speech (an emotion half at EmoNet > 2.5, class-balanced, plus an equal quality
+> half ranked by vocal-burst blend + genuineness). Take **`r64_epoch3`**.
+> 🎧 **[7 emotions × German/English, with and without the emotion adapter →](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/mediathek_hq_lora_emotions.html)**
+> **It is a German adapter:** English output runs long (10–22 s for a 13-word line vs 3.7–4.8 s
+> for German). Use it for German; for English, control length explicitly.
+
 > 📣 **Sports-commentator LoRA adapters (3):**
 > **[`laion/moss-sports-commentator-lora`](https://huggingface.co/laion/moss-sports-commentator-lora)**
 > — the three best cells of a 13-cell rank × epoch sweep, trained on 820 filtered English
