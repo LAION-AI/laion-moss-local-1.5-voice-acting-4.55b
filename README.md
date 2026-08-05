@@ -55,8 +55,13 @@ in **English and German**, at **native 48 kHz**.
 🗣️ **Cross-lingual voice cloning from Japanese references:**
 [German &amp; English from Japanese anime reference audio](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/jpref_grid.html)
 — 20 distinct Japanese reference speakers (verified: mean pairwise ECAPA cosine 0.105), prompted
-in German and English across four emotions. **Identity transfers partially: 0.416 ECAPA against a
-0.105 unrelated-speaker floor and 1.000 self-similarity.** The measured finding is that the
+in German and English across four emotions. **Identity does NOT transfer: 0.188 mean ECAPA over
+all 20 references / 1,280 generations, against a 0.105 unrelated-speaker floor and 1.000
+self-similarity.** (An earlier version of this page quoted 0.416 — that came from a *single*
+reference measured before the full scoring job had run.) What does carry is **pitch**: r = 0.591
+between reference and generation median F0, though compressed toward the model's own register
+(182 Hz → 157 Hz; 7 of 20 references above 200 Hz vs 1 of 20 generations). Treat this as a way to
+mine **new** character voices, not as a cloning method. The other measured finding is that the
 **emotion-LoRA merge dose destroys speaker identity monotonically** — 0.62 at dose 0, 0.50 at
 dose 1.0, **−0.03 at dose 1.5**, i.e. below the unrelated-speaker floor. Keep emotion merges
 ≤ 0.5 when reference fidelity matters. Per-emotion pages:
