@@ -22,6 +22,15 @@ in **English and German**, at **native 48 kHz**.
 > 🎧 **[Listen to all 77 classes side by side →](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/vocal_burst_loras.html)**
 > (real recordings vs no-LoRA baseline vs top-3 per rank, with all scores)
 
+> 🎬 **Casting sessions — 9 agents, 3 rounds each:**
+> 🎧 **[projects.laion.ai/moss-acting-casting →](https://projects.laion.ai/moss-acting-casting/)**
+> — ~30 s performances with a dramatic arc, each written as 2–4 parts, generated best-of-16 and
+> assembled as a whole. Every take lists the agent's intended arc, the exact GENERAL/SCRIPT
+> prompt per part, all LoRAs and merge doses, the sampling, the voice reference used, and both
+> the agent's own score and a listening model's.
+> *(Hosted in [its own repo](https://github.com/LAION-AI/moss-acting-casting) — this repo's Pages
+> build fails now that it is past ~500 MB.)*
+
 > 🇩🇪 **German Mediathek HQ LoRA adapters (3):**
 > **[`laion/moss-mediathek-hq-lora`](https://huggingface.co/laion/moss-mediathek-hq-lora)**
 > — rank 16/32/64 trained on **43,612 segments / 185 h** of high-quality expressive German
