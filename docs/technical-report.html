@@ -92,6 +92,7 @@ sup a{border:0;font-size:.75em}
 <a href="trajectory-corpus.html">Trajectory corpus</a>
 </div>
 
+<div class="box warn"><b>Superseded, 2026-08-28.</b> The negative steering result on this page was measured on a grid whose smallest strength was &alpha;&nbsp;=&nbsp;0.5, where the output is already destroyed. Re-run at &alpha; = 0.05&ndash;0.30 on <code>h20</code> with a matched random direction at every strength, steering <b>does</b> work: at &alpha; = 0.10 the emotion percentile rises 0.435 &rarr; 0.584 while the word error rate falls from 0.166 to 0.115, and the matched random direction moves emotion by 0.014 (paired over 24 prompts, dim&minus;rand +0.135, t = 3.11). The cost is genuineness, 3.77 &rarr; 3.15. Everything above &alpha; = 0.3 stands as written. Full table: <a href="https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/layer-forensics.html">the layer-forensics report</a>; numbers in <code>layer-forensics/w3/steer_lowalpha.json</code>.</div>
 <h1>Directing a speech model</h1>
 <p class="lede">A technical report on the MOSS voice-acting line: how a general-purpose
 text-to-speech base model was turned, over two full fine-tunes and roughly a thousand adapters,

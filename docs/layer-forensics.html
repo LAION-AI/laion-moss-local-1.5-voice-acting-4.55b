@@ -57,9 +57,10 @@ ones closest to the audio decoder — are among the <i>worst</i>.</li>
 <li><b>Reading several layers at once helps, and the help is real.</b> Six layers instead of one
 lifts emotion from 0.466 to 0.507. It survives a control that gives the single-layer probe exactly
 the same number of inputs, so it is information, not capacity.</li>
-<li><b>But you cannot yet steer with any of this.</b> Injecting these directions during generation
-destroys the output at every strength tried — and a <i>random</i> direction of the same size does
-the same damage. The breakage is the perturbation, not the meaning.</li>
+<li><b>And you can steer with it — gently.</b> At &alpha; = 0.10 on layer 20 the emotion percentile
+rises 0.435 → 0.584 while the word error rate <i>falls</i>, and a matched random direction moves
+emotion by 0.014. Above &alpha; = 0.3 it all collapses, which is why the first grid — which started
+at 0.5 — read as a flat negative. The cost is paid in genuineness.</li>
 <li><b>Speaker memorisation is nearly absent</b>, which was the main thing that could have
 invalidated all of the above. It is real for exactly one attribute: "does this sound genuine".</li>
 </ol>
@@ -324,40 +325,73 @@ dimensions at both ends, plus genuineness and blend.</p>
 match the earlier export <b>bit for bit</b> (maximum difference exactly 0 over 97 × 38 × 3
 vectors).</p>
 
-<div class="box bad">
-<b>It does not work. At any strength, in any configuration tested.</b>
+<div class="box ok">
+<b>It works &mdash; below &alpha; = 0.3, which the first grid never tested.</b> The original
+injection grid started at &alpha; = 0.5, where the output is already destroyed, and concluded from
+that that steering fails. Re-run at <b>&alpha; = 0.05, 0.10, 0.15, 0.20 and 0.30</b> on
+<code>h20</code>, with a matched random direction at every one of those strengths, the picture is
+the opposite: emotion moves, the words survive, and the movement is <b>direction-specific</b>.
 </div>
 
 <table>
-<tr><th>what was injected</th><th class="n">strength</th><th class="n">word error rate</th>
-    <th class="n">duration error</th><th class="n">genuineness (of 6)</th></tr>
-<tr><td><b>nothing</b> (baseline, 336 samples)</td><td class="n">0</td>
-    <td class="n"><b>0.094</b></td><td class="n">0.09 s</td><td class="n"><b>3.67</b></td></tr>
-<tr><td>a real emotion direction at layer 20</td><td class="n">0.5</td>
-    <td class="n">1.139</td><td class="n">0.30 s</td><td class="n">1.85</td></tr>
-<tr><td>a real emotion direction at layer 20</td><td class="n">2.0</td>
-    <td class="n">0.989</td><td class="n">7.66 s</td><td class="n">0.82</td></tr>
-<tr><td>five layers at once</td><td class="n">1.0</td>
-    <td class="n">1.050</td><td class="n">11.39 s</td><td class="n">1.49</td></tr>
-<tr><td><b>a random direction of the same size</b></td><td class="n">1.0</td>
-    <td class="n"><b>2.065</b></td><td class="n">0.09 s</td><td class="n">2.19</td></tr>
+<tr><th>injected at <code>h20</code></th><th class="n">&alpha;</th><th class="n">emotion percentile</th>
+    <th class="n">&Delta; vs baseline</th><th class="n">WER (mean / median)</th>
+    <th class="n">share WER &le; 0.2</th><th class="n">genuineness (of 6)</th></tr>
+<tr><td><b>nothing</b> (same code path, zero delta)</td><td class="n">0</td>
+    <td class="n">0.4354</td><td class="n">&mdash;</td><td class="n">0.166 / 0.089</td>
+    <td class="n">0.84</td><td class="n">3.77</td></tr>
+<tr><td>the real emotion direction</td><td class="n">0.05</td><td class="n">0.5267</td>
+    <td class="n good">+0.091</td><td class="n">0.153 / 0.091</td><td class="n">0.82</td>
+    <td class="n">3.64</td></tr>
+<tr><td>the real emotion direction</td><td class="n"><b>0.10</b></td><td class="n"><b>0.5840</b></td>
+    <td class="n good">+0.149</td><td class="n"><b>0.115 / 0.091</b></td><td class="n"><b>0.91</b></td>
+    <td class="n">3.15</td></tr>
+<tr><td>the real emotion direction</td><td class="n">0.15</td><td class="n">0.6224</td>
+    <td class="n good">+0.187</td><td class="n">0.229 / 0.136</td><td class="n">0.75</td>
+    <td class="n">2.92</td></tr>
+<tr><td>the real emotion direction</td><td class="n">0.20</td><td class="n">0.6155</td>
+    <td class="n">+0.180</td><td class="n">0.285 / 0.200</td><td class="n">0.51</td>
+    <td class="n">2.41</td></tr>
+<tr><td>the real emotion direction</td><td class="n">0.30</td><td class="n">0.6595</td>
+    <td class="n">+0.224</td><td class="n bad">0.545 / 0.493</td><td class="n">0.27</td>
+    <td class="n">1.90</td></tr>
+<tr><td><b>a random direction</b>, same size</td><td class="n">0.10</td><td class="n">0.4490</td>
+    <td class="n">+0.014</td><td class="n">0.132 / 0.088</td><td class="n">0.84</td>
+    <td class="n">3.69</td></tr>
+<tr><td><b>a random direction</b>, same size</td><td class="n">0.20</td><td class="n">0.4395</td>
+    <td class="n">+0.004</td><td class="n">0.118 / 0.091</td><td class="n">0.85</td>
+    <td class="n">3.90</td></tr>
 </table>
 
-<p>A word error rate of 0.094 means the model says what it was told to say. At 1.0 it is producing
-something else entirely. <b>The random direction is the decisive row</b>: it does as much damage as
-any meaningful one, and at strength 1.0 it does <i>more</i>. So the breakage is the act of pushing
-the hidden state off its manifold, not the content of the push. 27 configurations, 1,565 generated
-samples.</p>
+<p><b>The random control is what makes this a result.</b> At &alpha; = 0.5 and above a random
+direction did as much damage as a real one, which is why the first read was that the perturbation,
+not its content, was doing the work. Below 0.3 the two separate cleanly. Paired over the same
+24 prompts, the real direction beats the random one on emotion by <b>+0.135 at &alpha; = 0.10</b>
+(t = 3.11, higher on 16 of 24 prompts) and by +0.193 at &alpha; = 0.15 (t = 3.76, 17 of 24). The
+random direction moves emotion by +0.014 at &alpha; = 0.10 (t = 0.48) &mdash; nothing.</p>
+
+<p><b>&alpha; = 0.10 is free.</b> Emotion rises 0.435 &rarr; 0.584 while the word error rate
+<i>falls</i> from 0.166 to 0.115 and the share of clean clips rises from 0.84 to 0.91. Nothing was
+paid for that except genuineness.</p>
 
 <div class="box warn">
-<b>Watch out for the apparent "gains".</b> At high strength the quality scorers report genuineness
-and blend at percentile 1.000 — looking like a huge win. The raw values behind those percentiles are
-<b>1.31 out of 6</b> and <b>1.97 out of 10</b>, against 3.67 and 4.48 unsteered. The scoring models
-saturate on broken audio. Any steering result reported as a percentile without its raw value should
-be disbelieved.
+<b>And genuineness is what it costs.</b> On the real direction it falls monotonically &mdash; 3.77,
+3.64, 3.15, 2.92, 2.41, 1.90 &mdash; while the random direction holds it at 3.6&ndash;4.2 all the
+way. That is exactly the geometry W3 measured and no longer just a correlation: the cosine between
+an emotion direction and the quality axis runs <b>&minus;0.62 to &minus;0.95</b>, so pushing a
+voice towards an emotion pushes it away from what the quality scorers reward. The low-&alpha; sweep
+turns that measurement into a causal statement, and it is the honest price list for this control:
+<b>emotion is bought with perceived authenticity</b>, at roughly 0.6 of 6 for the first 0.15 of
+emotion percentile.
 </div>
 
-<h3>Why it probably fails — three measurements, not a story</h3>
+<p>Above 0.3 everything in the original grid still stands: at &alpha; = 0.5 the WER is 1.139, at
+2.0 the duration error is 7.66 s, and a random direction at &alpha; = 1.0 reaches WER 2.065. The
+error was not in those numbers, it was in reading a curve from its far tail. 264 generations,
+11 configurations, 24 prompts &times; 4 samples each, same scorers and same prompt template as
+every other evaluation in this project.</p>
+
+<h3>Why the far tail behaves as it does — three measurements, not a story</h3>
 
 <ul>
 <li><b>The two tails of an attribute are not opposite directions.</b> "High arousal" and "low
@@ -405,8 +439,9 @@ merge weight.</li>
 <li><b>If you probe, probe the middle, and probe several layers.</b> Layer 12 for anything about the
 voice, layer 20 for anything about feeling, layers 18–19 for bursts. Six layers instead of one is
 worth +0.039 on emotion and it is not a capacity artefact.</li>
-<li><b>Do not build a product on the steering vectors.</b> They are published as research material
-with the negative result attached. The random-direction control is the reason.</li>
+<li><b>The steering vectors are usable at &alpha; &le; 0.15, and only there.</b> Below that the
+effect is direction-specific and the words survive; above 0.3 the output collapses. Anything
+built on them has to carry the genuineness cost and the random-direction control with it.</li>
 <li><b>The capture window needs to move</b> before vocal bursts can be studied properly. 82 % of
 bursts are invisible to the current extraction, and which ones are invisible depends on the class.</li>
 <li><b>Genuineness is the one attribute where speaker identity matters.</b> Any measurement of it
