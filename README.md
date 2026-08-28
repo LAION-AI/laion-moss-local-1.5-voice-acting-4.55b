@@ -5,6 +5,24 @@ architecture: fantasy characters (orc / dragon / fairy / goblin), shouting, whis
 bursts** (laughs, gasps, sighs, giggles, moans) driven by natural-language director instructions,
 in **English and German**, at **native 48 kHz**.
 
+> ## 📄 **Technical report — how this model line was built, and what did not work**
+>
+> A full write-up of the research round: the base model and the two full fine-tunes, the
+> measurement instruments, the ~1,000 adapters, the timed-script prompt format, three supervised
+> rounds, seven preference runs across four corpora, five GRPO runs, the specialist adapters, the
+> engineering failures, and a section on every case where a training metric lied. Every number is
+> measured and its source is named.
+>
+> | | |
+> |---|---|
+> | 📄 **[Directing a speech model — the technical report](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/technical-report.html)** | 23 sections. Timing control is solved to a median 0.08 s; emotional-intensity control is not, and the report is largely about why. |
+> | 🔬 **[Steering and probes](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/steering-and-probes.html)** | What is linearly decodable from the model's activations (voice quality R² 0.82, emotion 0.43), and a clean negative result when those directions are injected during generation. |
+> | 📈 **[The trajectory corpus](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/trajectory-corpus.html)** | 7.6 M published specifications of a single speaker walking a single emotional or vocal dimension. No audio — the rows name the clips. |
+>
+> Current best checkpoint: [`laion/moss-tts-local-transformer-4.55b-voice-acting-v2-sft3`](https://huggingface.co/laion/moss-tts-local-transformer-4.55b-voice-acting-v2-sft3)
+> with [`laion/moss-va-sft3-dpo-lora-p2`](https://huggingface.co/laion/moss-va-sft3-dpo-lora-p2)
+> stacked (do **not** merge it — the audio heads are weight-tied to the audio embeddings).
+
 > ## ⚠️ **Which checkpoint to use — read this first**
 >
 > | | repo | use it for |
@@ -278,6 +296,9 @@ Parakeet WER, VoiceCLAP blend/genuineness and Empathic-Insight-Plus emotion head
 - **Upstream architecture & tooling:** [OpenMOSS/MOSS-TTS](https://github.com/OpenMOSS/MOSS-TTS) · [OpenMOSS/sglang](https://github.com/OpenMOSS/sglang)
 - **Serving on HPC:** [`sglang-omni-jupiter/`](sglang-omni-jupiter/) — SGLang-Omni on JUPITER (aarch64 / GH200), runbook + benchmark · upstream [sgl-project/sglang-omni](https://github.com/sgl-project/sglang-omni)
 - **Audio tokenizer:** [`OpenMOSS-Team/MOSS-Audio-Tokenizer-v2`](https://huggingface.co/OpenMOSS-Team/MOSS-Audio-Tokenizer-v2)
+- **Technical report:** [technical-report.html](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/technical-report.html) · [steering-and-probes.html](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/steering-and-probes.html) · [trajectory-corpus.html](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/trajectory-corpus.html)
+- **Research checkpoints:** [`…-v2-sft3`](https://huggingface.co/laion/moss-tts-local-transformer-4.55b-voice-acting-v2-sft3) · [`moss-va-sft3-dpo-lora-p2`](https://huggingface.co/laion/moss-va-sft3-dpo-lora-p2) · [40 emotion LoRAs](https://huggingface.co/laion/moss-va-sft3-emotion-loras) · [500 voice LoRAs](https://huggingface.co/laion/moss-va-sft3-voice-loras)
+- **Trajectory corpus:** [`datasets/laion/moss-va-trajectory-corpus`](https://huggingface.co/datasets/laion/moss-va-trajectory-corpus)
 
 ## License
 

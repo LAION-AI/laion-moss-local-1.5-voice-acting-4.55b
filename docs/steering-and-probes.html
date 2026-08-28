@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Steering and probes — what is written in the MOSS voice-acting activations</title>
+<style>
+:root{
+  --bg:#fbfbfa; --fg:#1a1a19; --muted:#5d5d58; --rule:#dcdcd6; --soft:#f2f2ee;
+  --accent:#8a3b12; --accent2:#1f5c4a; --bad:#9b2226; --good:#1f5c4a; --code:#f4f3ef;
+  --shadow:0 1px 2px rgba(0,0,0,.05);
+}
+@media (prefers-color-scheme: dark){
+:root{
+  --bg:#141413; --fg:#e8e6e1; --muted:#a3a099; --rule:#2f2e2b; --soft:#1c1c1a;
+  --accent:#e39a6a; --accent2:#78c2a8; --bad:#e08585; --good:#78c2a8; --code:#1c1c1a;
+  --shadow:none;
+}
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
+body{
+  margin:0; background:var(--bg); color:var(--fg);
+  font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  font-size:17px; line-height:1.62;
+}
+.wrap{max-width:52rem;margin:0 auto;padding:3rem 1.25rem 6rem}
+h1{font-size:2.1rem;line-height:1.2;margin:0 0 .4rem;letter-spacing:-.01em}
+h2{font-size:1.45rem;margin:3.2rem 0 .8rem;padding-top:1.2rem;border-top:1px solid var(--rule);letter-spacing:-.01em}
+h3{font-size:1.14rem;margin:2.1rem 0 .5rem}
+h4{font-size:.82rem;margin:1.5rem 0 .35rem;color:var(--muted);font-weight:600;letter-spacing:.02em;text-transform:uppercase}
+.part{margin:4rem 0 0;padding:1.1rem 0 0;border-top:3px double var(--rule);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:.8rem;
+  text-transform:uppercase;letter-spacing:.14em;color:var(--accent);font-weight:700}
+p{margin:.8rem 0}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in srgb, var(--accent) 35%, transparent)}
+a:hover{border-bottom-color:var(--accent)}
+code,kbd{font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;font-size:.86em;background:var(--code);padding:.1em .32em;border-radius:3px}
+pre{background:var(--code);border:1px solid var(--rule);border-radius:6px;padding:.9rem 1rem;overflow-x:auto;font-size:.8rem;line-height:1.5}
+pre code{background:none;padding:0;font-size:1em}
+.lede{font-size:1.12rem;color:var(--muted);margin:1.2rem 0 2rem}
+.meta{font-size:.85rem;color:var(--muted);margin:.2rem 0 0}
+.tw{overflow-x:auto;margin:1.2rem 0;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:.88rem;font-variant-numeric:tabular-nums;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+th,td{text-align:left;padding:.42rem .6rem;border-bottom:1px solid var(--rule);vertical-align:top}
+thead th{border-bottom:2px solid var(--rule);font-weight:600;font-size:.8rem;letter-spacing:.02em;color:var(--muted);text-transform:uppercase}
+tbody tr:hover{background:var(--soft)}
+td.n,th.n{text-align:right}
+.best{font-weight:700;color:var(--good)}
+.worse{color:var(--bad)}
+blockquote{margin:1.2rem 0;padding:.1rem 0 .1rem 1.1rem;border-left:3px solid var(--rule);color:var(--muted)}
+.callout{background:var(--soft);border:1px solid var(--rule);border-left:3px solid var(--accent);
+  border-radius:0 6px 6px 0;padding:.9rem 1.1rem;margin:1.4rem 0}
+.callout p:first-child{margin-top:0}
+.callout p:last-child{margin-bottom:0}
+.callout.warn{border-left-color:var(--bad)}
+.callout.ok{border-left-color:var(--accent2)}
+.k{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:.78rem;
+  text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;margin-bottom:.3rem}
+ul,ol{padding-left:1.3rem}
+li{margin:.35rem 0}
+hr{border:0;border-top:1px solid var(--rule);margin:2.5rem 0}
+.toc{background:var(--soft);border:1px solid var(--rule);border-radius:8px;padding:1rem 1.3rem;margin:2rem 0;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:.9rem}
+.toc ol{margin:.4rem 0;padding-left:1.4rem}
+.toc li{margin:.18rem 0}
+.toc a{border:0}
+.toc .ph{margin:.7rem 0 .2rem;font-size:.74rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:700}
+.small{font-size:.85rem;color:var(--muted)}
+figure{margin:1.4rem 0}
+figcaption{font-size:.82rem;color:var(--muted);margin-top:.5rem}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:1rem;margin:1.2rem 0}
+.card{border:1px solid var(--rule);border-radius:8px;padding:.9rem 1rem;background:var(--soft)}
+.card .k{margin-bottom:.2rem}
+sup a{border:0;font-size:.75em}
+.chain{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:.82rem;
+  background:var(--soft);border:1px solid var(--rule);border-radius:8px;padding:1rem 1.1rem;margin:1.4rem 0;line-height:1.9}
+.chain b{font-family:inherit}
+.nav{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:.82rem;
+  margin:0 0 1.6rem;padding:.6rem 0 .7rem;border-bottom:1px solid var(--rule);color:var(--muted)}
+.nav a{margin-right:1.1rem;border:0;font-weight:600}
+.nav a.here{color:var(--muted);font-weight:400}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="nav">
+<a href="technical-report.html">← Technical report</a>
+<a class="here">Steering and probes</a>
+<a href="trajectory-corpus.html">Trajectory corpus</a>
+</div>
+
+<h1>What is written in the activations, and what happens when you push on it</h1>
+
+<p class="lede">A companion to the MOSS voice-acting technical report. Hidden states were extracted
+from the model while it followed real recordings; probes were trained to read five different things
+out of them; the resulting directions were then injected back into generation to see whether the
+model could be <em>steered</em>. The probes found a clear, stable, replicated ordering. The steering
+destroyed the output at every strength tested, and this page reports that as the result it is.</p>
+
+<p class="meta">LAION · MOSS voice-acting line · written 28 August 2026 on JUPITER (Jülich
+Supercomputing Centre). Sources: <code>out/actforensics/report/answers.json</code>,
+<code>layer_ranking.parquet</code> and <code>release.json</code>; the task definitions in
+<code>actf_probe.py::build_targets</code>; the vector construction in <code>actf_vectors.py</code>;
+the injection scheme in <code>actf_steer.py</code>; and the 393 per-clip records in
+<code>out/actforensics/steer/*.jsonl</code>.</p>
+
+<div class="callout">
+<p><strong>The one-paragraph version.</strong> Voice quality is almost fully recoverable from a
+single middle layer — macro R² 0.82 over 57 VoiceNet dimensions, against 0.20 for a probe that sees
+only metadata. Genuineness reaches 0.67, vocal-burst blend 0.50, and the 40 emotion scores 0.43.
+Every one of those peaks between layer 12 and layer 23 of a 36-layer stack; the embeddings are the
+worst tap for four of the five, and nothing peaks at the top. By the time the representation reaches
+the acoustic decoder, <strong>39 % of the decodable emotion variance is gone</strong>. Injecting the
+probe directions during generation destroys the output at every strength tried: word error rate goes
+from 0.094 unsteered to 1.14 at the smallest non-zero strength, and the one condition that
+<em>looks</em> like a success is the scoring models saturating on 13.76 seconds of unintelligible
+audio.</p>
+</div>
+
+<div class="toc">
+<div class="k">Contents</div>
+<ol>
+<li><a href="#why">The question this was built to answer</a></li>
+<li><a href="#capture">What was captured, and the regime it was captured in</a></li>
+<li><a href="#tasks">The five probe tasks, defined</a></li>
+<li><a href="#results">Results, task by task</a></li>
+<li><a href="#across">What holds across all five</a></li>
+<li><a href="#decay">Where the emotion signal goes on its way to the decoder</a></li>
+<li><a href="#taskA">Task A, and why 0.13 is not a representation finding</a></li>
+<li><a href="#defect">A defect in this project's own write-up of these numbers</a></li>
+<li><a href="#vectors">The steering vectors, and the geometry that shaped them</a></li>
+<li><a href="#steer">The steering grid: a clean negative result</a></li>
+<li><a href="#steerread">Reading the steering failure</a></li>
+<li><a href="#next">What would be worth trying next</a></li>
+<li><a href="#prov">Provenance, artefacts and limits</a></li>
+</ol>
+</div>
+
+<h2 id="why">1. The question this was built to answer</h2>
+
+<p>The main report's central unresolved problem is that the model will not perform an emotion at a
+<em>requested intensity</em>. Ask for the 90th-to-98th percentile of a named emotion and it delivers
+something around the 35th. Four training objectives have been aimed at that gap and none of them
+moved it. Before spending compute on a fifth, there is a prior question, and it splits in two:</p>
+
+<ol>
+<li><strong>Is the information even there?</strong> If the model's internal state does not represent
+&ldquo;how angry is this&rdquo;, no amount of preference tuning will give it a handle to pull, and
+the remaining lever is data.</li>
+<li><strong>If it is there, can it be used directly?</strong> If a direction in activation space
+corresponds to an attribute, adding a multiple of that direction during generation should move the
+attribute — the intervention usually called <em>activation steering</em>. That would be a control
+surface requiring no training at all.</li>
+</ol>
+
+<p>Question 1 is answered by <em>probing</em>: freeze the model, collect one hidden-state vector per
+clip, train a small supervised model to predict an attribute from that vector alone. If the
+attribute can be read out, it is present. Question 2 is answered by taking the direction and
+injecting it. Both were run. The answers are, respectively, <em>largely yes, and it depends sharply
+on which attribute</em>, and <em>no</em>.</p>
+
+<h2 id="capture">2. What was captured, and the regime it was captured in</h2>
+
+<p>One forward pass per corpus row, <strong>teacher-forced</strong>: the row's own audio codes are
+placed on the assistant side and the whole example is packed byte-identically to how the supervised
+trainer packs a training example. Nothing is generated and nothing is re-scored — the extraction
+code says so in its own docstring, in those words. The model is <em>reading</em> a real recording.</p>
+
+<p>From that pass, a window of frames is averaged: <strong>from 80 % of the way through the
+assistant audio span to its end</strong>, capped at 100 frames (8.0 s at 12.5 frames per second) and
+floored at 8 frames for short clips. The tail of the utterance was chosen on the reasoning that
+whatever summary the model has assembled of the performance is most complete there.</p>
+
+<p>The averaged state is kept at <strong>38 taps</strong>:</p>
+
+<div class="tw"><table>
+<thead><tr><th>Tap</th><th>What it is</th></tr></thead>
+<tbody>
+<tr><td><code>h00</code></td><td>The embedding output, before any transformer layer.</td></tr>
+<tr><td><code>h01</code>…<code>h35</code></td><td>The output of each of the 35 transformer layers
+that carry a tap.</td></tr>
+<tr><td><code>h36</code></td><td>The final norm. In this checkpoint the projection from the global
+stack into the local one is the identity, so <code>h36</code> is <em>also</em> the 80-millisecond
+vector handed to the acoustic decoder — the two coincide, which is what makes &sect;6
+possible.</td></tr>
+<tr><td><code>loc</code></td><td>The frame-slot state of the one-layer local transformer that the
+twelve audio heads actually read. It is genuinely a distinct object rather than a copy of
+<code>h36</code>: the cosine between them is <strong>0.156</strong>.</td></tr>
+</tbody>
+</table></div>
+
+<p>Each tap is a 2,560-dimensional vector. Storage is float16 and <em>tap-major</em> — one
+<code>[N, 2560]</code> array per tap rather than one array per row — because every downstream
+operation reads one tap across all rows and none reads one row across all taps.</p>
+
+<div class="tw"><table>
+<thead><tr><th>Extraction</th><th class="n">Rows</th><th class="n">Size</th><th>What it is</th></tr></thead>
+<tbody>
+<tr><td><code>main</code></td><td class="n">58,377</td><td class="n">11.36 GB</td>
+<td>The primary split: clips drawn from the emotion and VoiceNet buckets</td></tr>
+<tr><td><code>p3</code></td><td class="n">217,583</td><td class="n">42.33 GB</td>
+<td>The large extraction, from which the steering vectors are built</td></tr>
+<tr><td><code>pairs</code></td><td class="n">53,325</td><td class="n">10.37 GB</td>
+<td>Rows drawn from the preference corpus, for contrast directions</td></tr>
+<tr><td><code>neutral</code></td><td class="n">58,714</td><td class="n">11.42 GB</td>
+<td>A separate extraction on neutral-direction rows, used as a replication set</td></tr>
+<tr><td><strong>total</strong></td><td class="n"><strong>387,999</strong></td><td class="n"><strong>75.49 GB</strong></td>
+<td>float16, tap-major. The containing directory is 144 GB; 75.5 GB is the tap tensors alone.</td></tr>
+</tbody>
+</table></div>
+
+<div class="callout warn">
+<div class="k">The limitation is structural, and the extraction code states it</div>
+<p>These are <strong>teacher-forced</strong> activations, conditioned on a ground-truth audio
+prefix. A high probe score answers &ldquo;is this attribute linearly present in layer L <em>while
+the model follows a real recording</em>&rdquo;. It does not answer &ldquo;does the model use this
+information when it generates on its own&rdquo;. Those are different questions, and &sect;10 is what
+happens when the second one is put directly.</p>
+</div>
+
+<p>The model under the taps is the SFT-3 export with the best preference adapter attached and
+<strong>never merged</strong> — base <code>out/sft3/export</code>, adapter
+<code>out/dpo_sft3_p2/ckpt-step5022/adapter</code>, 36 layers, hidden size 2,560. Those are the
+artefacts published as
+<a href="https://huggingface.co/laion/moss-tts-local-transformer-4.55b-voice-acting-v2-sft3">…-v2-sft3</a>
+and <a href="https://huggingface.co/laion/moss-va-sft3-dpo-lora-p2">laion/moss-va-sft3-dpo-lora-p2</a>.
+(Merging is not an option here for the reason the main report gives in &sect;17.2: the audio heads
+are weight-tied to the audio embeddings.)</p>
+
+<h2 id="tasks">3. The five probe tasks, defined</h2>
+
+<p>The results were originally reported by task letter, and the letters were not defined anywhere in
+the released artefacts — a gap serious enough that the project's 28 August status record listed
+&ldquo;recover the A–E mapping before any of these numbers are quoted&rdquo; as an open task. They
+were recovered from <code>actf_probe.py::build_targets</code>, and every definition below is that
+function's own.</p>
+
+<div class="tw"><table>
+<thead><tr><th>Task</th><th>Target</th><th class="n">Outputs</th><th class="n">n<sub>test</sub></th></tr></thead>
+<tbody>
+<tr><td><strong>A</strong></td><td>The z-scored raw score of the <em>one</em> emotion head or
+VoiceNet axis that this clip's bucket was built around. A clip drawn from the Anger bucket is scored
+on <code>emo_Anger</code>; one from the <code>S_WHIS</code>-bottom bucket on <code>vn_S_WHIS</code>.
+Standardised within each dimension on the training split, so the scales are comparable.</td>
+<td class="n">1</td><td class="n">6,203</td></tr>
+<tr><td><strong>B</strong></td><td>All 40 emotion scores at once — the raw output of every
+Empathic-Insight emotion head on this clip, each z-scored. Macro R² is the mean over the 40
+heads.</td><td class="n">40</td><td class="n">7,975</td></tr>
+<tr><td><strong>C</strong></td><td>All 57 VoiceNet dimensions at once — arousal, valence, tension,
+pace, timbre, clarity, breathiness, the style axes — each z-scored.</td><td class="n">57</td>
+<td class="n">7,975</td></tr>
+<tr><td><strong>D</strong></td><td>Genuineness: one number, the project's 0–6 measure of whether a
+performance sounds authentic rather than acted, z-scored.</td><td class="n">1</td><td class="n">7,975</td></tr>
+<tr><td><strong>E</strong></td><td>Vocal-burst blend: one number, the 0–10 measure of how naturally
+a non-speech vocalisation is woven into the surrounding speech, z-scored.</td><td class="n">1</td>
+<td class="n">7,975</td></tr>
+</tbody>
+</table></div>
+
+<h3>3.1 The splits, which are not what they look like</h3>
+
+<p>This is worth stating carefully because getting it backwards is the source of the error in
+&sect;8. The <strong>primary split is by voice</strong>: no clip identifier and <em>no speaker</em>
+appears in both the training and the test half. That is the strong condition, and it is the default.
+A second run uses a <strong>uid-only</strong> split, where clips are disjoint but a speaker may
+appear on both sides — the weaker control. The gap between the two is the measurement of how much a
+probe is reading speaker identity rather than the attribute.</p>
+
+<p>That gap is <strong>below 0.007 R² on four of the five tasks</strong>. The exception is Task D,
+where the uid-only split scores +0.062 higher — genuineness is partly a speaker property, which is
+unsurprising and is exactly what the control exists to reveal.</p>
+
+<p>Two further checks were run. The <code>neutral</code> extraction repeats everything on a
+different set of rows. And a <strong>caption control</strong> removes the emotion caption from the
+prompt before extraction, to test whether the probe is reading the model's own instruction back out
+rather than anything about the audio: stripping it costs <strong>at most 0.015 R², under 3.4 %
+relative, on every task</strong>. The probes are reading the performance, not the prompt.</p>
+
+<h3>3.2 The missing sixth task</h3>
+
+<p>There is also a <strong>Task A2</strong> in the same function — Task A with the question supplied
+to the input as a one-hot of the assigned dimension — built specifically to measure what the missing
+conditioning is worth. <strong>No A2 results exist.</strong> <code>answers.json</code> carries keys
+A–E only and the layer ranking's task column holds only <code>A</code>…<code>E</code>. The
+experiment was defined and queued and its numbers were never produced. It is the single most
+informative missing number in this line of work, for the reason &sect;7 sets out.</p>
+
+<h2 id="results">4. Results, task by task</h2>
+
+<p>Best tap and macro R² under the MLP probe on the primary voice-disjoint split, ordered by result.
+The <strong>metadata-only baseline</strong> is the same probe trained on the row's metadata alone —
+speaker, language, duration — with no activations at all. It is the number to beat before any claim
+about the representation can be made.</p>
+
+<div class="tw"><table>
+<thead><tr><th>Task</th><th>What it reads</th><th class="n">Best tap</th><th class="n">Macro R²</th><th class="n">Metadata-only</th><th class="n">Ridge, same split</th></tr></thead>
+<tbody>
+<tr><td><strong>C</strong></td><td>57 VoiceNet dimensions</td><td class="n">h12</td>
+<td class="n"><span class="best">0.8159</span></td><td class="n">0.2042</td><td class="n">0.7640 (h13)</td></tr>
+<tr><td><strong>D</strong></td><td>genuineness</td><td class="n">h23</td>
+<td class="n"><span class="best">0.6685</span></td><td class="n">0.1965</td><td class="n">0.5999 (h20)</td></tr>
+<tr><td><strong>E</strong></td><td>vocal-burst blend</td><td class="n">h22</td>
+<td class="n">0.4972</td><td class="n">0.1049</td><td class="n">0.4295 (h20)</td></tr>
+<tr><td><strong>B</strong></td><td>40 emotion scores</td><td class="n">h20</td>
+<td class="n">0.4328</td><td class="n">0.0507</td><td class="n">0.4140 (h20)</td></tr>
+<tr><td><strong>A</strong></td><td>the selected dimension's own score</td><td class="n">h14</td>
+<td class="n"><span class="worse">0.1321</span></td><td class="n">0.0254</td><td class="n">0.1327 (h21)</td></tr>
+</tbody>
+</table></div>
+
+<h3>4.1 Task C — voice quality is written down early, clearly, and robustly</h3>
+
+<div class="tw"><table>
+<thead><tr><th>Probe / split</th><th class="n">Peak tap</th><th class="n">Macro R²</th></tr></thead>
+<tbody>
+<tr><td>MLP probe, primary (voice-disjoint) split</td><td class="n">h12</td><td class="n"><strong>0.8159</strong></td></tr>
+<tr><td>Ridge, same split</td><td class="n">h13</td><td class="n">0.7640</td></tr>
+<tr><td>uid-only split</td><td class="n">h12</td><td class="n">0.8154</td></tr>
+<tr><td>Neutral extraction</td><td class="n">h12</td><td class="n">0.8138</td></tr>
+<tr><td>Metadata-only baseline</td><td class="n">—</td><td class="n">0.2042</td></tr>
+</tbody>
+</table></div>
+
+<p>This is the clearest result in the set and by far the most robust: the same peak tap and
+essentially the same number under four conditions, including one where no speaker is shared between
+training and test. The whole 57-dimension VoiceNet description of a clip is recoverable from one
+mid-stack layer at R² 0.82, and even the <em>worst</em> of the 57 dimensions reaches 0.675. It peaks
+earliest of the five, at h12, and is already at 0.39 in the embeddings. Timbre, pace and clarity are
+low-level properties; they are encoded early and they stay encoded.</p>
+
+<p>It is also one of only two tasks whose peak resolves to a <em>single</em> layer rather than a
+band: h12's margin over its runner-up h26 is <em>t</em> = 10.38.</p>
+
+<h3>4.2 Task D — genuineness is present, and is the least linear of the five</h3>
+
+<div class="tw"><table>
+<thead><tr><th>Probe / split</th><th class="n">Peak tap</th><th class="n">Macro R²</th></tr></thead>
+<tbody>
+<tr><td>MLP probe, primary (voice-disjoint) split</td><td class="n">h23</td><td class="n"><strong>0.6685</strong></td></tr>
+<tr><td>Ridge, same split</td><td class="n">h20</td><td class="n">0.5999</td></tr>
+<tr><td>uid-only split</td><td class="n">h20</td><td class="n">0.7309</td></tr>
+<tr><td>Neutral extraction</td><td class="n">h18</td><td class="n">0.6712</td></tr>
+<tr><td>Metadata-only baseline</td><td class="n">—</td><td class="n">0.1965</td></tr>
+</tbody>
+</table></div>
+
+<p>&ldquo;Does this sound like a person rather than a reading?&rdquo; is not an abstract judgement
+the model assembles at the top of the stack. It is legible in the middle, at R² 0.67 against a
+metadata baseline of 0.20. Two properties are specific to this task. It has the largest gap between
+the MLP probe and ridge of any task — 0.67 against 0.60 — so the encoding is real but <em>not
+linear</em>. And it is the only task where relaxing the split from voice-disjoint to uid-only buys a
+material gain (+0.062), which says that part of what a genuineness probe reads is <em>who is
+speaking</em>. Both matter for &sect;10: a linear intervention is the wrong instrument for an
+attribute that a linear read-out recovers worst.</p>
+
+<h3>4.3 Task E — vocal-burst blend is middling and late</h3>
+
+<div class="tw"><table>
+<thead><tr><th>Probe / split</th><th class="n">Peak tap</th><th class="n">Macro R²</th></tr></thead>
+<tbody>
+<tr><td>MLP probe, primary (voice-disjoint) split</td><td class="n">h22</td><td class="n"><strong>0.4972</strong></td></tr>
+<tr><td>Ridge, same split</td><td class="n">h20</td><td class="n">0.4295</td></tr>
+<tr><td>uid-only split</td><td class="n">h18</td><td class="n">0.4670</td></tr>
+<tr><td>Neutral extraction</td><td class="n">h21</td><td class="n">0.5081</td></tr>
+<tr><td>Metadata-only baseline</td><td class="n">—</td><td class="n">0.1049</td></tr>
+</tbody>
+</table></div>
+
+<p>Blend peaks at h22, the latest peak of any task, and reaches only 0.50. Whether a sigh is
+<em>woven in</em> naturally is evidently a more distributed property than either voice quality or
+genuineness — consistent with what the quantity means, since it depends on the relation between a
+burst and the speech around it rather than on either alone. It is also the only task where the
+neutral extraction scores <em>higher</em> than the primary one, and the only one whose worst tap is
+h01 rather than the embeddings.</p>
+
+<h3>4.4 Task B — emotion is present, but only half-legibly</h3>
+
+<div class="tw"><table>
+<thead><tr><th>Probe / split</th><th class="n">Peak tap</th><th class="n">Macro R²</th></tr></thead>
+<tbody>
+<tr><td>MLP probe, primary (voice-disjoint) split</td><td class="n">h20</td><td class="n"><strong>0.4328</strong></td></tr>
+<tr><td>Ridge, same split</td><td class="n">h20</td><td class="n">0.4140</td></tr>
+<tr><td>uid-only split</td><td class="n">h18</td><td class="n">0.4394</td></tr>
+<tr><td>Neutral extraction</td><td class="n">h21</td><td class="n">0.4224</td></tr>
+<tr><td>Metadata-only baseline</td><td class="n">—</td><td class="n">0.0507</td></tr>
+</tbody>
+</table></div>
+
+<p>The macro R² of 0.43 against a metadata baseline of 0.05 says the representation carries far more
+about emotion than speaker and length do. But the spread <em>across the 40 heads</em> runs from
+0.181 to 0.666. Some emotions are written clearly into the activations and others are barely there
+at all — the same asymmetry the generation-side work keeps finding, arriving this time from the
+inside. h18 is a statistical tie with the h20 peak (<em>t</em> = 1.08), so Task B's location should
+be read as &ldquo;h18–h20&rdquo; rather than as one layer.</p>
+
+<div class="callout">
+<p><strong>The comparison that matters is C against B.</strong> Under one probe, on one model, at
+one capture window: <em>how a voice sounds</em> is recoverable at 0.82 and <em>what it feels</em> at
+0.43, against metadata baselines of 0.20 and 0.05. The main report's running finding — that this
+model line controls timbre, pace and timing far better than it controls affect — has an internal
+correlate. That is not proof of a causal story; a representation can be legible and unused, which is
+exactly what &sect;10 goes on to demonstrate. But it is the first evidence for that finding that
+does not come from generating audio and scoring it.</p>
+</div>
+
+<h2 id="across">5. What holds across all five</h2>
+
+<ul>
+<li><strong>The information sits in the middle of the stack.</strong> Every task peaks between h12
+and h23 of a 36-layer model. <code>h00</code> — the embeddings — is the worst tap for four of the
+five (E's worst is h01). Nothing peaks at the top of the network.</li>
+<li><strong>The ordering is stable.</strong> C (0.82) &gt; D (0.67) &gt; E (0.50) &gt; B (0.43)
+&gt;&gt; A (0.13) holds under the MLP probe, under ridge, under the uid-only split and on the
+separate neutral extraction. It is not an artefact of one split.</li>
+<li><strong>Ridge is close behind the MLP everywhere except D.</strong> Most of what is present is
+linearly available; genuineness is the exception.</li>
+<li><strong>Speaker identity is not doing the work.</strong> Going from a uid-only to a fully
+voice-disjoint split costs under 0.007 R² on four of five tasks. That is the first thing a probe
+result of this kind is usually guilty of, and it is ruled out here.</li>
+<li><strong>Nor is the prompt.</strong> Stripping the emotion caption before extraction costs at
+most 0.015 R² anywhere — under 3.4 % relative.</li>
+<li><strong>Only two of the five localise to a layer.</strong> B (h20) and C (h12) resolve; A, D and
+E are <em>bands</em>, with their top taps within 0.006–0.013 R² of each other. Quoting a single
+best tap for A, D or E over-states what the ranking supports, which is one reason the disagreement
+in &sect;8 arose at all.</li>
+</ul>
+
+<h2 id="decay">6. Where the emotion signal goes on its way to the decoder</h2>
+
+<p>Because the projection from the global stack into the local one is the identity in this
+checkpoint, the final tap <code>h36</code> <em>is</em> the vector handed to the acoustic decoder.
+That makes one comparison available that is otherwise hard to get:</p>
+
+<div class="callout warn">
+<p>On Task B, <strong><code>h36</code> retains 0.262 against 0.433 at h20.</strong>
+<strong>39 % of the decodable emotion variance is gone by the time the representation reaches the
+decoder.</strong></p>
+</div>
+
+<p>That is a single number and it should not be asked to carry more than it can. It does not
+establish that the loss <em>causes</em> the intensity ceiling — a decoder does not need a linearly
+decodable copy of an attribute in order to realise it, and 0.262 is still five times the metadata
+baseline. What it does say is that the emotion representation is at its strongest in the middle of
+the stack and is substantially attenuated by the point where audio codes are actually chosen, while
+the VoiceNet representation peaks eight layers earlier and is what the model demonstrably controls
+best. It is the most concrete internal candidate this project has for the emotion/timbre asymmetry,
+and it is cheap to follow up: the same measurement on C, D and E is already on disk in the layer
+ranking and has not been pulled out.</p>
+
+<h2 id="taskA">7. Task A, and why 0.13 is not a representation finding</h2>
+
+<p>Task A is the one task the probe essentially fails, and the code says why in its own comment:
+<strong>the question is not in the input.</strong> The probe is handed a hidden state and asked for a
+number, but nothing tells it <em>which dimension is being asked about</em>. A row drawn from the
+Anger bucket and a row drawn from the whisper-bottom bucket present the probe with two vectors and
+two targets on unrelated axes, and it has no way to tell which is which.</p>
+
+<p>The decomposition confirms it. On the test split, <strong>54.8 %</strong> of Task A's target
+variance sits <em>between</em> the three bucket families — emotion, VoiceNet-high, VoiceNet-low —
+whose identity the probe cannot see. And within each family the probe scores <em>worse than that
+family's own mean</em>: R² of <strong>−0.02, −5.46 and −4.32</strong> respectively. A negative R²
+of −5.46 is not a weak result; it is a probe answering a question it was never given.</p>
+
+<p>R² = 0.13 is therefore a statement about an under-specified question, not about the
+representation. The strongest evidence that it is the question and not the model: Task B asks for
+all 40 emotion scores <em>at once</em> from the same activations and reaches 0.43.</p>
+
+<p>This is exactly what Task A2 was written to measure, and A2 was never run.
+<strong>Task A should not be quoted as a result</strong>, and it is on this page only so that a
+reader who meets the number elsewhere knows what it is.</p>
+
+<h2 id="defect">8. A defect in this project's own write-up of these numbers</h2>
+
+<p>Two internal records report the probe table with different numbers for tasks B and D. The cause
+has been found, and it is worth publishing because it is a mistake that is easy to make and
+invisible without the source data.</p>
+
+<div class="tw"><table>
+<thead><tr><th>Task</th><th class="n">Internal probe write-up</th><th class="n">28 August status record</th><th class="n">Correct, from <code>answers.json</code></th></tr></thead>
+<tbody>
+<tr><td>A</td><td class="n">0.1321 · h14</td><td class="n">0.132 · h14</td><td class="n">0.1321 · h14</td></tr>
+<tr><td>B</td><td class="n"><span class="worse">0.4394 · h18</span></td><td class="n">0.433 · h20</td><td class="n"><strong>0.4328 · h20</strong></td></tr>
+<tr><td>C</td><td class="n">0.8159 · h12</td><td class="n">0.816 · h12</td><td class="n">0.8159 · h12</td></tr>
+<tr><td>D</td><td class="n"><span class="worse">0.7309 · h20</span></td><td class="n">0.669 · h23</td><td class="n"><strong>0.6685 · h23</strong></td></tr>
+<tr><td>E</td><td class="n">0.4972 · h22</td><td class="n">0.497 · h22</td><td class="n">0.4972 · h22</td></tr>
+</tbody>
+</table></div>
+
+<p><strong>The write-up's B and D figures are the uid-split values reported as if they were the
+primary result.</strong> The tell is visible in the write-up itself: for exactly those two tasks its
+&ldquo;main split&rdquo; row and its second row are byte-identical, which cannot happen if they are
+two different splits. Two related errors travel with it — that page states n<sub>test</sub> = 8,673
+for B and D, which is the uid-split test-set size rather than the primary 7,975; and it labels the
+second row &ldquo;speaker-disjoint split&rdquo; when in fact the <em>primary</em> split is the
+speaker-disjoint one and the second is the weaker uid-only control.</p>
+
+<p>The status record's numbers were right and were distrusted, because the status record also — and
+correctly — said that the A–E mapping had not yet been recovered from the artefacts, and a table
+whose row labels are unknown invites the assumption that its values are unreliable too. They were
+not. <strong>The values used on this page are the primary-split values from
+<code>answers.json</code>, cross-checked against the layer-ranking parquet and the run's own report
+page.</strong></p>
+
+<p>None of this changes any conclusion. Corrected, D falls from 0.73 to 0.67 and B from 0.44 to
+0.43; the ordering, the middle-of-the-stack finding, the C-against-B comparison and the steering
+result all stand unchanged. It is recorded because the alternative — quietly using the right numbers
+— would leave two of this project's own pages disagreeing with no explanation.</p>
+
+<h2 id="vectors">9. The steering vectors, and the geometry that shaped them</h2>
+
+<p>A probe direction is a vector in the 2,560-dimensional space of one tap. The vectors used here
+are <em>difference-of-means</em> directions rather than probe weights, which is the more common and
+more robust construction: take the mean activation of clips that are high on a dimension, subtract
+the mean of clips that are low, and the difference points from one to the other.</p>
+
+<p>For each of 97 dimensions — the 40 emotion heads plus the 57 VoiceNet axes — and each of the 38
+taps, three buckets are drawn: <code>top1</code> (the top 1 % on the corpus percentile scale),
+<code>bot1</code> (the bottom 1 %) and <code>mid</code> (the 5–10 % slice). From those,
+<code>d_hi_lo</code>, <code>d_hi_mid</code> and <code>d_mid_lo</code>.</p>
+
+<div class="callout">
+<div class="k">One construction decision that had to be made, and what it cost</div>
+<p>Within each bucket, rows are sorted by mean quality — the average of the genuineness and blend
+percentiles — and cut at 2,000. The reason is the main report's &sect;13.1 finding: <em>the most
+intense recordings are on average the least genuine</em>, with median genuineness percentile falling
+from 0.391 in the top 10 % of a head to 0.360 in the top 1 %. Without the cut, an
+&ldquo;intensity&rdquo; direction would be substantially a &ldquo;bad recording&rdquo; direction.</p>
+<p>The vector code states the price of the fix in the same breath, which is the right way to record
+a trade: <code>mean(top1) − mean(bot1)</code> is now <em>a difference of two quality-matched
+extremes, not of two raw extremes</em>. Something real was removed along with the confound.</p>
+</div>
+
+<p>Two further vectors exist for the same reason. A <strong>quality vector</strong>
+<code>d_qual</code> — the mean of the 2,000 highest-quality rows of the whole <code>p3</code>
+extraction minus the mean of the 2,000 lowest — and an <strong>orthogonalised</strong> dimension
+vector <code>d_dim_orth</code>, which is <code>d_hi_lo</code> with its quality component projected
+out.</p>
+
+<p>That orthogonalisation is not a formality. Measured:</p>
+
+<div class="tw"><table>
+<thead><tr><th>Direction pair</th><th class="n">Signed cosine</th><th>What it means</th></tr></thead>
+<tbody>
+<tr><td>emotion <code>d_hi_lo</code> vs <code>d_qual</code>, at h20</td><td class="n"><span class="worse">−0.75</span></td>
+<td>Moving toward more of an emotion moves substantially <em>away</em> from higher measured
+quality.</td></tr>
+<tr><td>emotion <code>d_hi_lo</code> vs <code>d_qual</code>, at <code>loc</code></td><td class="n"><span class="worse">−0.954</span></td>
+<td>At the frame slot the two are very nearly anti-parallel.</td></tr>
+<tr><td>VoiceNet <code>d_hi_lo</code> vs <code>d_qual</code></td><td class="n">+0.46</td>
+<td>The opposite sign: more of a VoiceNet axis goes <em>with</em> higher quality.</td></tr>
+</tbody>
+</table></div>
+
+<p><strong>This is the &sect;13.1 finding restated as geometry, and it is sharper inside the model
+than outside it.</strong> The corpus observation was a correlation between two scores. This is a
+cosine of −0.954 between two directions in the very last state before audio codes are chosen: at
+that point, in this model, &ldquo;more emotional&rdquo; and &ldquo;more genuine&rdquo; are close to
+opposite instructions. Any method that pushes on emotional intensity without controlling for it is
+pushing on quality in the wrong direction, and that includes every merge-weight sweep and every
+reward term in the main report. It is the strongest available argument for the quality gate that
+&sect;13.1 imposes on training data, and it arrives from a completely different direction.</p>
+
+<h2 id="steer">10. The steering grid: a clean negative result</h2>
+
+<p>The injection rule is</p>
+
+<pre><code>h  ←  h + α · (v / ‖v‖) · ‖h‖</code></pre>
+
+<p>so <strong>α is dimensionless</strong>: it is the fraction of the current hidden state's own
+magnitude added along the steering direction. α = 1 doubles the norm. Injection points are the taps
+themselves — tap 0 into the input embeddings, taps 1–35 by a forward hook on the corresponding
+layer, tap 36 into the last hidden state, and <code>loc</code> into the local transformer's state at
+the frame slot only, not the eleven within-frame channel steps. Steering is applied during
+generation only.</p>
+
+<p>The grid is <strong>393 clip records over 27 cells</strong>, each clip record being four sampled
+completions — 6 emotions × 2 languages × 4 samples per cell. Every clip is scored by the same
+instruments and the same harness as the rest of the project. The α = 0 control is shared across the
+grid and therefore carries 84 clip records rather than 12.</p>
+
+<h3>10.1 The α sweep on the dimension vector</h3>
+
+<div class="tw"><table>
+<thead><tr><th class="n">α</th><th class="n">Clip records</th><th class="n">WER</th><th class="n">Duration error</th><th class="n">Emotion pct</th><th class="n">Reward</th></tr></thead>
+<tbody>
+<tr><td class="n">−2.0</td><td class="n">12</td><td class="n"><span class="worse">0.9941</span></td><td class="n">9.54 s</td><td class="n">0.4033</td><td class="n">0.2347</td></tr>
+<tr><td class="n">−1.0</td><td class="n">12</td><td class="n"><span class="worse">1.0760</span></td><td class="n">2.58 s</td><td class="n">0.4833</td><td class="n">0.2245</td></tr>
+<tr><td class="n">−0.5</td><td class="n">12</td><td class="n"><span class="worse">1.0623</span></td><td class="n">0.68 s</td><td class="n">0.3959</td><td class="n">0.2286</td></tr>
+<tr><td class="n"><strong>0 (control)</strong></td><td class="n">84</td><td class="n"><span class="best">0.0941</span></td><td class="n"><span class="best">0.01 s</span></td><td class="n">0.4579</td><td class="n"><span class="best">0.4925</span></td></tr>
+<tr><td class="n">+0.5</td><td class="n">12</td><td class="n"><span class="worse">1.1394</span></td><td class="n">0.27 s</td><td class="n">0.4218</td><td class="n">0.2425</td></tr>
+<tr><td class="n">+1.0</td><td class="n">12</td><td class="n"><span class="worse">1.0822</span></td><td class="n">1.27 s</td><td class="n">0.3617</td><td class="n">0.2266</td></tr>
+<tr><td class="n">+2.0</td><td class="n">12</td><td class="n"><span class="worse">0.9887</span></td><td class="n">7.66 s</td><td class="n">0.3909</td><td class="n">0.2196</td></tr>
+</tbody>
+</table></div>
+
+<p><strong>At every non-zero strength, in both directions, the output collapses.</strong> Unsteered,
+the model transcribes at word error rate 0.094 and lands within 0.01 s of the length its own script
+asks for. At α = +0.5 — the smallest positive strength tried — the word error rate is already 1.14,
+which means the recogniser produces more errors than there are words in the script. The composite
+reward halves at every non-zero cell and never recovers. The emotion percentile does not rise: it is
+0.458 unsteered and lower at +0.5, +1.0 and +2.0.</p>
+
+<h3>10.2 The rest of the grid</h3>
+
+<div class="tw"><table>
+<thead><tr><th>Cell</th><th>Vector</th><th>Taps</th><th class="n">α</th><th class="n">WER</th><th class="n">Duration error</th><th class="n">Emotion pct</th></tr></thead>
+<tbody>
+<tr><td>random control</td><td><code>rand</code></td><td>h20</td><td class="n">0.5</td><td class="n">0.9485</td><td class="n">0.00 s</td><td class="n">0.3686</td></tr>
+<tr><td>random control</td><td><code>rand</code></td><td>h20</td><td class="n">1.0</td><td class="n"><span class="worse">2.0654</span></td><td class="n">0.04 s</td><td class="n">0.3978</td></tr>
+<tr><td>random control</td><td><code>rand</code></td><td>h20</td><td class="n">2.0</td><td class="n">0.9956</td><td class="n">9.59 s</td><td class="n">0.3410</td></tr>
+<tr><td>quality-orthogonal</td><td><code>dim_orth</code></td><td>h20</td><td class="n">−1.0</td><td class="n">1.1867</td><td class="n">0.87 s</td><td class="n">0.2933</td></tr>
+<tr><td>quality-orthogonal</td><td><code>dim_orth</code></td><td>h20</td><td class="n">1.0</td><td class="n">1.1361</td><td class="n">3.73 s</td><td class="n">0.3327</td></tr>
+<tr><td>quality-orthogonal</td><td><code>dim_orth</code></td><td>h20</td><td class="n">2.0</td><td class="n">1.0711</td><td class="n">8.77 s</td><td class="n">0.2890</td></tr>
+<tr><td>two taps</td><td><code>dim</code></td><td>h20, h18</td><td class="n">1.0</td><td class="n">1.1205</td><td class="n">4.80 s</td><td class="n">0.3943</td></tr>
+<tr><td>three taps</td><td><code>dim</code></td><td>h20, h18, h21</td><td class="n">1.0</td><td class="n">0.9900</td><td class="n">11.54 s</td><td class="n">0.3020</td></tr>
+<tr><td>four taps</td><td><code>dim</code></td><td>+ h19</td><td class="n">1.0</td><td class="n">0.9915</td><td class="n">11.16 s</td><td class="n">0.3938</td></tr>
+<tr><td>five taps</td><td><code>dim</code></td><td>+ h22</td><td class="n">1.0</td><td class="n">1.0495</td><td class="n">6.14 s</td><td class="n">0.4810</td></tr>
+<tr><td>early layer</td><td><code>dim</code></td><td>h06</td><td class="n">1.0</td><td class="n">0.9978</td><td class="n">13.03 s</td><td class="n">0.4774</td></tr>
+<tr><td>final norm</td><td><code>dim</code></td><td>h36</td><td class="n">1.0</td><td class="n">1.1522</td><td class="n">0.26 s</td><td class="n">0.3506</td></tr>
+<tr><td>frame slot</td><td><code>dim</code></td><td><code>loc</code></td><td class="n">1.0</td><td class="n"><span class="worse">0.8626</span></td><td class="n">1.32 s</td><td class="n">0.3746</td></tr>
+<tr><td>quality vector</td><td><code>qual</code></td><td>h22</td><td class="n">−1.0</td><td class="n">1.1072</td><td class="n">0.05 s</td><td class="n">0.2993</td></tr>
+<tr><td>quality vector</td><td><code>qual</code></td><td>h22</td><td class="n">0.5</td><td class="n">1.1620</td><td class="n">2.99 s</td><td class="n">0.4957</td></tr>
+<tr><td>quality vector</td><td><code>qual</code></td><td>h22</td><td class="n">1.0</td><td class="n">1.0339</td><td class="n"><span class="worse">13.76 s</span></td><td class="n">0.5134</td></tr>
+<tr><td><strong>quality vector</strong></td><td><code>qual</code></td><td>h22</td><td class="n">2.0</td><td class="n">1.0297</td><td class="n"><span class="worse">13.76 s</span></td><td class="n">0.5482</td></tr>
+<tr><td>quality, two taps</td><td><code>qual</code></td><td>h22, h18</td><td class="n">1.0</td><td class="n">1.0754</td><td class="n">13.76 s</td><td class="n">0.5120</td></tr>
+<tr><td>quality, three taps</td><td><code>qual</code></td><td>+ h23</td><td class="n">1.0</td><td class="n">0.9903</td><td class="n">14.25 s</td><td class="n">0.5015</td></tr>
+<tr><td>quality, five taps</td><td><code>qual</code></td><td>+ h20, h24</td><td class="n">1.0</td><td class="n">0.9962</td><td class="n">13.76 s</td><td class="n">0.5070</td></tr>
+</tbody>
+</table></div>
+
+<p class="small">Tap order for the multi-tap stacks came from the ranking: the dimension vector
+follows Task B's layer ordering (h20, h18, h21, h19, h22) and the quality vector follows Task E's
+(h22, h18, h23, h20, h24). One cell (<code>dim</code>, five taps) lost one clip record to a
+generation failure and carries 11 rather than 12.</p>
+
+<div class="callout warn">
+<div class="k">The row that would have been the headline, and why it is not</div>
+<p>The <strong>quality vector at α = 2.0</strong> reports the highest emotion percentile of the grid
+(0.548) and, in the reward's own terms, <strong>a perfect 1.000 on both genuineness and vocal-burst
+blend</strong>. Read alone, that is a spectacular success. Read with its neighbours it is the
+opposite: the same clips transcribe at word error rate 1.030 and are <strong>13.76 seconds</strong>
+away from their requested duration. What is being scored is not better speech.</p>
+<p>And the &ldquo;1.000&rdquo; is worse than it looks, because it is a <em>percentile reward term</em>,
+not a score. The <em>raw</em> values at that cell are genuineness <strong>1.31 out of 6</strong> and
+blend <strong>1.97 out of 10</strong> — near the bottom of both scales. The percentile mapping,
+built on a corpus of speech, has no idea what to do with audio that is not speech, and it maps it to
+the top. Every quality-vector cell in the table, at every α and every tap stack, reports exactly
+1.000 on both terms. That constancy is the giveaway.</p>
+<p>This is the sharpest instance in the whole project of a measurement instrument being confidently
+wrong, and it is precisely the failure the main report's &sect;16 was written about. A steering
+result reported on quality scores alone, without word-error and duration controls alongside, would
+have been published as a win.</p>
+</div>
+
+<p><strong>The random-vector control is what makes the result clean.</strong> A random Gaussian
+direction of matched magnitude at α = 1.0 gives word error rate 2.065 — roughly twice as damaging as
+the probe direction at the same strength — so the probe directions are not merely noise; they do
+less damage than chance. But at α = 0.5 the random direction gives 0.949 against the dimension
+vector's 1.139, i.e. it is <em>less</em> damaging there, and its emotion percentiles (0.34–0.40) sit
+inside the same range as the real directions. <strong>No cell of the grid shows the dimension vector
+moving its own attribute in a way a matched random vector does not.</strong> That is the
+result.</p>
+
+<div class="callout warn">
+<div class="k">A superseded claim in the project's own protocol</div>
+<p>The running protocol records an earlier reading of Phase 3 — &ldquo;α = 1 at h20 raises
+<code>emo_pct</code> by +0.075, but a random direction of the same magnitude raises it by
++0.135&rdquo; — and correctly concludes from it that <em>the causal claim is not established</em>.
+Those two figures come from the smoke test, taken when the full grid was still queued: the
+aggregated artefacts under <code>report/</code> hold one grid row and eight clips. The executed
+grid, run the following evening into <code>steer/*.jsonl</code>, gives α = 1 at h20 an emotion
+percentile of <strong>0.362 against the control's 0.458</strong> — a fall, not a rise — and the
+random direction 0.398, also below control. <strong>The conclusion is unchanged and is if anything
+stronger; only the supporting numbers move.</strong> The grid was never re-aggregated into the
+report artefacts, so anything reading <code>report/steer_grid.parquet</code> is still reading the
+smoke test. The tables above are aggregated from the raw per-clip records.</p>
+</div>
+
+<h2 id="steerread">11. Reading the steering failure</h2>
+
+<p>Four readings are consistent with the grid. They are not mutually exclusive and none is tested
+yet.</p>
+
+<ol>
+<li><strong>The intervention is in the wrong place.</strong> The vectors are differences of means
+over a <em>window average</em> — a summary that exists nowhere in the model as a single activation.
+Adding it at one tap at every generated frame is not the inverse of the operation that produced it.
+A direction found by averaging is not necessarily a direction the model can be pushed along.</li>
+<li><strong>The regimes do not match.</strong> The directions were extracted teacher-forced, with
+real audio on the assistant side, and are injected while the model generates freely. That is the gap
+the extraction code warns about, and this grid is the measurement of how large it is. The probes say
+an attribute is <em>decodable</em> while the model follows a recording; the steering says the model
+cannot be <em>driven</em> along that direction while it generates.</li>
+<li><strong>The output space is brittle in a way a text model's is not.</strong> The target is
+discrete residual-vector-quantised audio codes across 13 channels. A perturbation that would leave a
+text model producing odd but well-formed sentences leaves this one producing codes that decode to
+something a recogniser cannot read. The collapse appearing already at α = 0.5 — small by the
+standards of the text-steering literature — is consistent with that, as is the fact that
+<code>h36</code>, the very last state, is one of the <em>most</em> damaging injection points
+(WER 1.152) despite having the least network left to propagate through.</li>
+<li><strong>The dimension direction may be mostly a quality direction.</strong> &sect;9 measured
+cos(<code>d_hi_lo</code>, <code>d_qual</code>) = −0.75 at h20 for emotion heads. Adding an emotion
+direction is therefore substantially <em>subtracting</em> a quality direction, which is one concrete
+mechanism for the degradation. The orthogonalised vector was built to test exactly this — and it
+degrades the output too, at every α, so if this is part of the story it is not the whole of
+it.</li>
+</ol>
+
+<p>Reading 1 is the cheapest to test; reading 3 is the most likely to be decisive. The practical
+conclusion for this project is narrower and firmer than any of them: <strong>activation steering is
+not currently a route to intensity control here</strong>, and the budget that would have gone into
+tuning it is better spent on the data-side levers the main report identifies.</p>
+
+<h2 id="next">12. What would be worth trying next</h2>
+
+<ol>
+<li><strong>Run Task A2 and write its numbers out.</strong> It already exists in the code. It turns
+Task A from an under-specified question into a specified one, and the difference between A and A2 is
+a direct measurement of what conditioning is worth — the same quantity the entire intensity problem
+turns on.</li>
+<li><strong>Pull the <code>h36</code> retention figure for C, D and E.</strong> The 39 % emotion
+loss into the decoder is the most suggestive single number here, and the layer ranking already
+contains everything needed to say whether the other four attributes survive the same journey better.
+It costs no GPU time.</li>
+<li><strong>Sweep below α = 0.5.</strong> The grid's smallest non-zero strength already produces a
+word error rate above 1.0. Whether there is a usable window between 0 and 0.5 or the collapse is
+immediate is unknown and costs one afternoon.</li>
+<li><strong>Probe the generating model, not the teacher-forced one.</strong> Extract activations
+from free generation and ask whether the same attributes are decodable there. If they are not, that
+is a more interesting negative result than this one and it would explain the steering failure
+outright.</li>
+<li><strong>Use the <code>pairs</code> extraction.</strong> 53,325 rows were captured from the
+preference corpus specifically so that a chosen-minus-rejected contrast direction could be built.
+That direction is not in the grid above.</li>
+<li><strong>Re-aggregate the grid into the report artefacts</strong>, so that
+<code>report/steer_grid.parquet</code> stops describing a smoke test.</li>
+</ol>
+
+<h2 id="prov">13. Provenance, artefacts and limits</h2>
+
+<div class="tw"><table>
+<tbody>
+<tr><td>Base model</td><td><code>out/sft3/export</code> — published as
+<a href="https://huggingface.co/laion/moss-tts-local-transformer-4.55b-voice-acting-v2-sft3">…-v2-sft3</a></td></tr>
+<tr><td>Adapter (stacked, never merged)</td><td><code>out/dpo_sft3_p2/ckpt-step5022/adapter</code> —
+published as <a href="https://huggingface.co/laion/moss-va-sft3-dpo-lora-p2">laion/moss-va-sft3-dpo-lora-p2</a></td></tr>
+<tr><td>Shape</td><td>36 layers, hidden 2,560; 38 taps per row</td></tr>
+<tr><td>Capture window</td><td>from 80 % through the assistant audio span to its end, capped at 100
+frames, floored at 8</td></tr>
+<tr><td>Extraction / consolidation</td><td><code>actf_extract.py</code>, <code>actf_consolidate.py</code></td></tr>
+<tr><td>Task definitions</td><td><code>actf_probe.py::build_targets</code></td></tr>
+<tr><td>Vector construction</td><td><code>actf_vectors.py</code>; vectors at
+<code>vectors/p3_vectors.npz</code> (97 dimensions × 38 taps × 2,560, plus the quality vector and
+diagnostics)</td></tr>
+<tr><td>Injection</td><td><code>actf_steer.py</code>; executed grid plan
+<code>grids/prio_all.json</code> (27 cells)</td></tr>
+<tr><td>Probe results</td><td><code>report/answers.json</code>, <code>layer_ranking.parquet</code>
+(1,160 rows = 390 main/voice + 380 main/uid + 390 neutral/voice, where each 380 is 2 models ×
+5 tasks × 38 taps and each 390 adds 10 baseline rows)</td></tr>
+<tr><td>Steering results</td><td><code>steer/*.jsonl</code>, 393 clip records over 27 cells. The
+aggregated <code>report/steer_grid.parquet</code> is the earlier smoke test and should not be
+read.</td></tr>
+<tr><td>Activation taps on disk</td><td>75.5 GB, float16, tap-major, <code>out/actforensics/taps/</code>
+— <strong>not published.</strong> They encode the source corpus, and whether teacher-forced
+activations of non-public recordings can be released, and under what licence, is unresolved.</td></tr>
+<tr><td>Probe weights and steering vectors</td><td>254 MB,
+<code>out/actforensics/{vectors,probe,probe2}/</code> — small and publishable</td></tr>
+</tbody>
+</table></div>
+
+<h3>13.1 Limits of everything above</h3>
+
+<ul>
+<li><strong>Teacher forcing.</strong> Repeated because it bounds every probe number on this page:
+these activations are conditioned on ground-truth audio. Decodability under teacher forcing is not
+evidence of use during generation, and &sect;10 is the direct evidence that the two come apart.</li>
+<li><strong>The targets are themselves model outputs.</strong> Tasks B, C, D and E predict the
+scores of learned scorers, not human labels. A probe reaching R² 0.82 on Task C has learned to
+predict the VoiceNet regressor, including whatever that regressor gets wrong. The main report's
+&sect;6 sets out how far these instruments can be trusted; those caveats are inherited here in full,
+and &sect;10's quality-vector row is what happens when they break.</li>
+<li><strong>Difference-of-means vectors are quality-matched by construction</strong> (&sect;9), so
+they are deliberately <em>not</em> the raw intensity direction. A steering failure with these vectors
+is not a steering failure with every possible vector.</li>
+<li><strong>One capture window.</strong> The tail of the utterance was chosen on an argument, not
+measured against alternatives. An attribute that lives early in a clip is under-represented in every
+number here.</li>
+<li><strong>One model.</strong> All of it is the SFT-3 export with one adapter. Whether the same
+layers carry the same attributes in the base model, or before preference tuning, is not
+measured.</li>
+<li><strong>Small cells.</strong> Each steering cell is 12 clip records over 6 emotions and 2
+languages. That is enough to see a collapse from WER 0.09 to WER 1.1 and nowhere near enough to
+resolve a difference of 0.03 in emotion percentile between cells. Nothing on this page leans on
+one.</li>
+<li><strong>No human listening anywhere in this line of work</strong>, including on the steered
+clips — where a listener would have settled the &ldquo;quality 1.000&rdquo; row in four
+seconds.</li>
+</ul>
+
+<hr>
+
+<p class="small">Part of the MOSS voice-acting documentation set:
+<a href="technical-report.html">the technical report</a> ·
+<a href="trajectory-corpus.html">the trajectory corpus</a>. Every number on this page was read from
+a named on-disk artefact; where two of this project's own records disagreed, &sect;8 and &sect;10
+show both and say which is right and why.</p>
+
+</div>
+</body>
+</html>

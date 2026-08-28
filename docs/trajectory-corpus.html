@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The trajectory corpus — MOSS voice-acting</title>
+<style>
+:root{
+  --bg:#fbfbfa; --fg:#1a1a19; --muted:#5d5d58; --rule:#dcdcd6; --soft:#f2f2ee;
+  --accent:#8a3b12; --accent2:#1f5c4a; --bad:#9b2226; --good:#1f5c4a; --code:#f4f3ef;
+  --shadow:0 1px 2px rgba(0,0,0,.05);
+}
+@media (prefers-color-scheme: dark){
+:root{
+  --bg:#141413; --fg:#e8e6e1; --muted:#a3a099; --rule:#2f2e2b; --soft:#1c1c1a;
+  --accent:#e39a6a; --accent2:#78c2a8; --bad:#e08585; --good:#78c2a8; --code:#1c1c1a;
+  --shadow:none;
+}
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
+body{
+  margin:0; background:var(--bg); color:var(--fg);
+  font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  font-size:17px; line-height:1.62;
+}
+.wrap{max-width:52rem;margin:0 auto;padding:3rem 1.25rem 6rem}
+h1{font-size:2.1rem;line-height:1.2;margin:0 0 .4rem;letter-spacing:-.01em}
+h2{font-size:1.45rem;margin:3.2rem 0 .8rem;padding-top:1.2rem;border-top:1px solid var(--rule);letter-spacing:-.01em}
+h3{font-size:1.14rem;margin:2.1rem 0 .5rem}
+h4{font-size:.82rem;margin:1.5rem 0 .35rem;color:var(--muted);font-weight:600;letter-spacing:.02em;text-transform:uppercase}
+.part{margin:4rem 0 0;padding:1.1rem 0 0;border-top:3px double var(--rule);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:.8rem;
+  text-transform:uppercase;letter-spacing:.14em;color:var(--accent);font-weight:700}
+p{margin:.8rem 0}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in srgb, var(--accent) 35%, transparent)}
+a:hover{border-bottom-color:var(--accent)}
+code,kbd{font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;font-size:.86em;background:var(--code);padding:.1em .32em;border-radius:3px}
+pre{background:var(--code);border:1px solid var(--rule);border-radius:6px;padding:.9rem 1rem;overflow-x:auto;font-size:.8rem;line-height:1.5}
+pre code{background:none;padding:0;font-size:1em}
+.lede{font-size:1.12rem;color:var(--muted);margin:1.2rem 0 2rem}
+.meta{font-size:.85rem;color:var(--muted);margin:.2rem 0 0}
+.tw{overflow-x:auto;margin:1.2rem 0;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:.88rem;font-variant-numeric:tabular-nums;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+th,td{text-align:left;padding:.42rem .6rem;border-bottom:1px solid var(--rule);vertical-align:top}
+thead th{border-bottom:2px solid var(--rule);font-weight:600;font-size:.8rem;letter-spacing:.02em;color:var(--muted);text-transform:uppercase}
+tbody tr:hover{background:var(--soft)}
+td.n,th.n{text-align:right}
+.best{font-weight:700;color:var(--good)}
+.worse{color:var(--bad)}
+blockquote{margin:1.2rem 0;padding:.1rem 0 .1rem 1.1rem;border-left:3px solid var(--rule);color:var(--muted)}
+.callout{background:var(--soft);border:1px solid var(--rule);border-left:3px solid var(--accent);
+  border-radius:0 6px 6px 0;padding:.9rem 1.1rem;margin:1.4rem 0}
+.callout p:first-child{margin-top:0}
+.callout p:last-child{margin-bottom:0}
+.callout.warn{border-left-color:var(--bad)}
+.callout.ok{border-left-color:var(--accent2)}
+.k{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:.78rem;
+  text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;margin-bottom:.3rem}
+ul,ol{padding-left:1.3rem}
+li{margin:.35rem 0}
+hr{border:0;border-top:1px solid var(--rule);margin:2.5rem 0}
+.toc{background:var(--soft);border:1px solid var(--rule);border-radius:8px;padding:1rem 1.3rem;margin:2rem 0;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:.9rem}
+.toc ol{margin:.4rem 0;padding-left:1.4rem}
+.toc li{margin:.18rem 0}
+.toc a{border:0}
+.toc .ph{margin:.7rem 0 .2rem;font-size:.74rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:700}
+.small{font-size:.85rem;color:var(--muted)}
+figure{margin:1.4rem 0}
+figcaption{font-size:.82rem;color:var(--muted);margin-top:.5rem}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:1rem;margin:1.2rem 0}
+.card{border:1px solid var(--rule);border-radius:8px;padding:.9rem 1rem;background:var(--soft)}
+.card .k{margin-bottom:.2rem}
+sup a{border:0;font-size:.75em}
+.chain{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:.82rem;
+  background:var(--soft);border:1px solid var(--rule);border-radius:8px;padding:1rem 1.1rem;margin:1.4rem 0;line-height:1.9}
+.chain b{font-family:inherit}
+.nav{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:.82rem;
+  margin:0 0 1.6rem;padding:.6rem 0 .7rem;border-bottom:1px solid var(--rule);color:var(--muted)}
+.nav a{margin-right:1.1rem;border:0;font-weight:600}
+.nav a.here{color:var(--muted);font-weight:400}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="nav">
+<a href="technical-report.html">← Technical report</a>
+<a href="steering-and-probes.html">Steering and probes</a>
+<a class="here">Trajectory corpus</a>
+</div>
+
+<h1>The trajectory corpus</h1>
+
+<p class="lede">Ten and a half million ordered lists of clips, each one a single speaker walking a
+single emotional or vocal dimension from one end towards the other. It contains no audio at all —
+every row is a <em>specification</em> that names the clips by identifier and records where on the
+dimension each step sits. It exists because a model that can hit &ldquo;angry&rdquo; on demand
+still has to be able to <em>get</em> angry gradually, and nothing in this project measured that.</p>
+
+<p class="meta">LAION · MOSS voice-acting line · published 28 August 2026.
+Public subset: <a href="https://huggingface.co/datasets/laion/moss-va-trajectory-corpus">huggingface.co/datasets/laion/moss-va-trajectory-corpus</a>
+(7,638,961 rows, 419 MB, CC-BY-4.0). The unfiltered corpus (10,653,713 rows, 581 MB) is kept
+private for the reason given in &sect;6.</p>
+
+<div class="toc">
+<div class="k">Contents</div>
+<ol>
+<li><a href="#why">Why a corpus of trajectories</a></li>
+<li><a href="#row">What is in a row</a></li>
+<li><a href="#families">The four construction families</a></li>
+<li><a href="#size">Size and shape</a></li>
+<li><a href="#sources">Where the clips come from</a></li>
+<li><a href="#held">What is held back, and one open judgement call</a></li>
+<li><a href="#use">How to use it, and what you have to supply yourself</a></li>
+<li><a href="#limits">Limitations</a></li>
+</ol>
+</div>
+
+<h2 id="why">1. Why a corpus of trajectories</h2>
+
+<p>Every measurement in the main technical report is a measurement of <strong>one utterance in
+isolation</strong>. A clip is generated, four scorers are run on it, and it is compared against
+what the prompt asked for. That is the right unit for &ldquo;can this model perform contempt at the
+95th percentile&rdquo;, and it is the wrong unit for almost everything a director actually asks
+for.</p>
+
+<p>Direction is about <em>change</em>. A line reading is built out of a starting state, a movement
+and an arrival. The interesting instructions are &ldquo;start polite and let it curdle&rdquo;,
+&ldquo;come down off it slowly&rdquo;, &ldquo;he gets angrier with every sentence&rdquo;. None of
+those is expressible as a single target percentile, none of them can be scored by running an
+instrument on one clip, and consequently nothing in this project has ever trained on or evaluated
+one.</p>
+
+<p>A <strong>trajectory</strong> is the smallest object that makes that measurable: an ordered list
+of clips from <em>one speaker</em> in which one measured dimension moves monotonically. Because
+every clip in the underlying corpus already carries the full 40-emotion and 57-VoiceNet annotation
+described in the main report, such sequences can be mined rather than recorded. The corpus is what
+falls out when you do that exhaustively.</p>
+
+<div class="callout">
+<p><strong>What this is not.</strong> It is not a dataset of emotional arcs performed by actors, and
+it is not a set of recordings of anyone deliberately becoming angry. It is a <em>selection</em> over
+existing annotated speech: clips that happen to sit at increasing values of one dimension, from one
+speaker, ordered. Whether such a sequence sounds like a genuine emotional progression when played
+back is exactly the question the corpus is meant to let someone ask, and it has not been asked
+yet.</p>
+</div>
+
+<h2 id="row">2. What is in a row</h2>
+
+<p>A row is a specification, not a container. The whole 7.6-million-row public release is 419 MB
+precisely because there is no audio in it — roughly 55 bytes per trajectory.</p>
+
+<div class="tw"><table>
+<thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><code>uids</code></td><td>The trajectory itself: comma-separated clip identifiers,
+<strong>in order</strong>. This is the payload; everything else describes it.</td></tr>
+<tr><td><code>speaker</code></td><td>The speaker all clips in the row share. Every trajectory is
+within one speaker by construction — otherwise a &ldquo;rise in anger&rdquo; would be confounded
+with a change of voice.</td></tr>
+<tr><td><code>dataset</code>, <code>lang</code>, <code>lang_iso</code></td><td>Provenance and
+language of the source clips.</td></tr>
+<tr><td><code>family</code>, <code>rule</code></td><td>How the trajectory was constructed — one of
+the four families of &sect;3, with its rule code (<code>B1</code>, <code>VN1</code>,
+<code>PXR</code>, <code>AB2</code>).</td></tr>
+<tr><td><code>dim_a</code>, <code>dim_b</code></td><td>The dimension or dimensions being walked,
+named in the corpus's own vocabulary — e.g. <code>emo_Contemplation</code>. <code>dim_b</code> is
+not confined to the two-sided family: the example below is a single-dimension
+<code>emotion</code> row that carries one anyway.</td></tr>
+<tr><td><code>d_a</code>, <code>d_b</code></td><td>The total distance covered on each dimension
+from the first clip to the last.</td></tr>
+<tr><td><code>step_a</code>, <code>step_b</code></td><td>The per-step distance — the granularity of
+the walk.</td></tr>
+<tr><td><code>T</code>, <code>C</code>, <code>k</code></td><td>The selection constants:
+<code>T</code> the <em>monotonicity</em> threshold (how strictly each step must move in the
+intended direction), <code>C</code> the <em>consistency</em> threshold, and <code>k</code> the
+number of steps.</td></tr>
+<tr><td><code>qmax</code>, <code>cmax</code></td><td>Quality bounds the trajectory satisfies, so a
+consumer can filter for cleanly recorded sequences without re-scoring anything.</td></tr>
+<tr><td><code>contiguous</code></td><td>Whether the clips are adjacent in the source recording — see
+&sect;4, because this is the field that most changes what a row means.</td></tr>
+<tr><td><code>total_dur</code></td><td>Total duration of the referenced audio, in seconds.</td></tr>
+<tr><td><code>emit_frac</code>, <code>spk_basis</code>, <code>proxy_map</code>, <code>track</code></td>
+<td>Selection bookkeeping — which sampling fraction produced the row, what speaker basis was used,
+which proxy mapping applied, and which generation track it belongs to. Kept so the build is
+reconstructible.</td></tr>
+</tbody>
+</table></div>
+
+<p><code>contiguous</code> deserves the explanation. A trajectory whose clips are adjacent segments
+of one continuous recording is a genuine progression: the speaker really did move that way, in real
+time, in one take. A trajectory assembled from non-adjacent clips of the same speaker is a
+<em>construction</em> — the values move monotonically, but the movement never happened as a
+performance. Both are useful and they are not the same object, which is why the flag is on the row
+rather than being applied as a filter before release. <strong>59.3 % of the full corpus is
+contiguous; 82.7 % of the public subset is</strong>, because the sources held back for publication
+reasons happen to be the ones that contributed most of the non-contiguous material.</p>
+
+<div class="callout warn">
+<div class="k">One thing the schema does not record</div>
+<p>There is no <em>endpoint</em> column. <code>d_a</code> and <code>d_b</code> give the distance
+covered and <code>step_a</code> / <code>step_b</code> the per-step size, but the absolute value of
+the dimension at the first and last clip is not stored. A consumer who needs to know that a
+trajectory runs from the 30th to the 80th percentile of anger — rather than merely that it covers
+0.26 of the axis — has to re-derive it from the annotation of the named clips. This is worth stating
+because the corpus is otherwise easy to mistake for a self-contained description of an arc, and it
+is not: it is a description of a <em>movement</em>.</p>
+</div>
+
+<h3>2.1 A row, verbatim</h3>
+
+<p>The first row of the public file, unedited:</p>
+
+<pre><code>dataset      mls
+rule         B1
+family       emotion
+T            0.2
+C            0.25
+k            2
+speaker      10065
+track        10065|esther_00_fillion_64kb.mp3
+lang         french          lang_iso   fr
+spk_basis    exact
+dim_a        emo_Contemplation             d_a  -0.2555   step_a  0.2555
+dim_b        emo_Thankfulness_Gratitude    d_b  +0.2271   step_b  0.2271
+qmax         0.2271          cmax       0.2271
+contiguous   true
+total_dur    29.52
+emit_frac    0.6858
+proxy_map    null
+uids         10065_10699_000250,10065_10699_000203</code></pre>
+
+<p>Two steps, from one Multilingual LibriSpeech speaker, contiguous in the source, 29.5 seconds of
+referenced audio, walking contemplation downward while gratitude rises. The whole row is 24 columns
+and about 300 characters. That is the entire object.</p>
+
+<h2 id="families">3. The four construction families</h2>
+
+<div class="tw"><table>
+<thead><tr><th>Family</th><th>Rule</th><th>What it walks</th><th class="n">Full</th><th class="n">Public</th></tr></thead>
+<tbody>
+<tr><td><code>emotion</code></td><td><code>B1</code></td><td>One emotion head, monotonically — the
+straightforward case. A speaker's clips ordered by increasing (or decreasing) score on one of the
+40 emotion heads.</td><td class="n">5,069,820</td><td class="n">3,545,392</td></tr>
+<tr><td><code>voicenet</code></td><td><code>VN1</code></td><td>One VoiceNet dimension —
+arousal, tension, pitch range, breathiness, pace and the rest. The same construction on the
+57-dimension vocal description rather than on emotion.</td><td class="n">3,072,000</td><td class="n">2,160,000</td></tr>
+<tr><td><code>proxy_taillift</code></td><td><code>PXR</code></td><td>A <em>proxy</em> dimension
+driven into its tail. Where a dimension's own extreme is too thinly populated for a speaker to
+supply a walk, a correlated dimension stands in and the trajectory lifts that instead — which is
+how the corpus reaches the extremes at all for the rarer axes.</td><td class="n">1,260,345</td><td class="n">977,981</td></tr>
+<tr><td><code>emotion_twosided</code></td><td><code>AB2</code></td><td>Two emotions at once, moving
+in <em>opposite</em> directions — one rising while the other falls. This is the family that
+expresses a change of state rather than an intensification: relief displacing fear, contempt
+displacing affection.</td><td class="n">1,251,548</td><td class="n">955,588</td></tr>
+</tbody>
+</table></div>
+
+<p>The two-sided family is the smallest and by some distance the most interesting one. A
+single-dimension walk asks the model to do more of something. A two-sided walk asks it to
+<em>trade</em> — and every acting note about a turn, a realisation or a change of heart is a trade,
+not an intensification. If any part of this corpus turns out to be the useful part, that is the
+prediction.</p>
+
+<h2 id="size">4. Size and shape</h2>
+
+<div class="tw"><table>
+<thead><tr><th></th><th class="n">Full corpus</th><th class="n">Public subset</th></tr></thead>
+<tbody>
+<tr><td>Trajectories</td><td class="n">10,653,713</td><td class="n">7,638,961 (71.7 %)</td></tr>
+<tr><td>Distinct clips referenced</td><td class="n">24,922,343</td><td class="n">17,722,101</td></tr>
+<tr><td>Speakers</td><td class="n">1,507,064</td><td class="n">1,214,241</td></tr>
+<tr><td>Referenced audio</td><td class="n">114,920 h</td><td class="n">74,858 h</td></tr>
+<tr><td>Clips per trajectory, mean</td><td class="n">3.52</td><td class="n">3.51</td></tr>
+<tr><td>Contiguous in the source</td><td class="n">59.3 %</td><td class="n">82.7 %</td></tr>
+<tr><td>File size</td><td class="n">581 MB<br><span class="small">580,816,509 B = 554 MiB</span></td><td class="n">419 MB<br><span class="small">419,038,652 B = 400 MiB</span></td></tr>
+</tbody>
+</table></div>
+
+<p>Steps per trajectory in the public subset:</p>
+
+<div class="tw"><table>
+<thead><tr><th class="n">Steps</th><th class="n">Trajectories</th><th class="n">Share</th></tr></thead>
+<tbody>
+<tr><td class="n">2</td><td class="n">1,611,017</td><td class="n">21.1 %</td></tr>
+<tr><td class="n">3</td><td class="n">2,303,104</td><td class="n">30.2 %</td></tr>
+<tr><td class="n">4</td><td class="n">1,974,481</td><td class="n">25.8 %</td></tr>
+<tr><td class="n">5</td><td class="n">1,750,359</td><td class="n">22.9 %</td></tr>
+<tr><td class="n"><strong>total</strong></td><td class="n"><strong>7,638,961</strong></td><td class="n">100 %</td></tr>
+</tbody>
+</table></div>
+
+<p>The full corpus has the same shape: 2 → 2,205,844 · 3 → 3,193,827 · 4 → 2,773,292 ·
+5 → 2,480,750, which likewise sums exactly to 10,653,713.</p>
+
+<p>Those counts sum exactly to their row totals, so <strong>the histogram is complete: there are no
+trajectories of six steps or more</strong> in either version, and the mean of 3.51 is a mean over a
+range of 2 to 5. That is worth stating plainly because &ldquo;10.6 million trajectories&rdquo;
+invites a picture of long arcs, and the real object is short: a two-to-five-clip walk. A
+two-step trajectory is a before and an after.</p>
+
+<p>The 24.9 million distinct referenced clips against 10.7 million trajectories at 3.52 clips each
+— 37.5 million clip <em>slots</em> — means the average clip appears in about 1.5 trajectories.
+Reuse is therefore real but modest, and a consumer sampling trajectories at random is not
+repeatedly drawing the same audio.</p>
+
+<h2 id="sources">5. Where the clips come from</h2>
+
+<div class="tw"><table>
+<thead><tr><th>Source dataset</th><th class="n">Full</th><th class="n">Public</th><th>What it is</th></tr></thead>
+<tbody>
+<tr><td><code>emolia</code></td><td class="n">5,893,310</td><td class="n">5,893,310</td>
+<td>The German emotional-speech corpus that supplies most of this project's real expressive
+material. Released in full.</td></tr>
+<tr><td><code>podcast</code></td><td class="n">2,657,451</td><td class="n"><span class="worse">held back</span></td>
+<td>Podcast speech from publicly available feeds.</td></tr>
+<tr><td><code>kartoffelphon</code></td><td class="n">897,830</td><td class="n">897,830</td>
+<td>German speech. Released in full.</td></tr>
+<tr><td><code>eurospeech</code></td><td class="n">729,876</td><td class="n">729,876</td>
+<td>European parliamentary and public speech. Released in full.</td></tr>
+<tr><td><code>snippets</code></td><td class="n">277,398</td><td class="n"><span class="worse">held back</span></td>
+<td>See &sect;6 — this one is a judgement call, not a settled decision.</td></tr>
+<tr><td><code>mls</code></td><td class="n">117,945</td><td class="n">117,945</td>
+<td>Multilingual LibriSpeech. Released in full.</td></tr>
+<tr><td><code>evasnippets</code></td><td class="n">79,903</td><td class="n"><span class="worse">held back</span></td>
+<td>A synthetic-origin snippet set.</td></tr>
+</tbody>
+</table></div>
+
+<p>Both columns add up: the four released sources sum to 7,638,961 and all seven to 10,653,713.
+The public release is a clean removal of three sources, not a resampling — so a public row is
+byte-identical to the full-corpus row it came from, and any statistic computed on the public subset
+can be compared directly against the full-corpus figure without worrying about a shifted
+selection.</p>
+
+<p>The corpus is more multilingual than the model that motivated it. The model line handles English
+and German; the released trajectory rows carry language tags for English, German, French, Spanish,
+Italian, Portuguese, Dutch and Polish, inherited from the source corpora — the example row of
+&sect;2.1 is French. Whether that is useful or
+merely present depends entirely on what a consumer intends to do with it.</p>
+
+<h2 id="held">6. What is held back, and one open judgement call</h2>
+
+<p>Three sources — <code>podcast</code>, <code>snippets</code> and <code>evasnippets</code> — are
+excluded from the public release. The reason is not the audio and not the annotation: it is that
+<strong>a trajectory row names exactly which segments were used</strong>. Those transcripts are not
+part of this project's open real-speech release, and publishing an ordered list of their segment
+identifiers is publishing a precise index into material that was deliberately not published. That
+is a weaker disclosure than releasing the transcripts, and it is not nothing, so the rows go.</p>
+
+<div class="callout warn">
+<div class="k">An open judgement call, recorded rather than hidden</div>
+<p><code>snippets</code> (277,398 rows) was excluded alongside <code>evasnippets</code>. The
+instruction that governed the filter said &ldquo;AI snippets&rdquo;, which is ambiguous between the
+two source names, and the decision was made in the direction of holding <em>more</em> back rather
+than less. That may be more conservative than intended. If <code>snippets</code> is in fact
+publishable, the public subset can be rebuilt with it included — the filter is a single predicate
+over the <code>dataset</code> column and the full corpus is intact. Until someone confirms, the
+release stays as it is, and this paragraph is here so that a reader does not mistake a cautious
+default for a considered exclusion.</p>
+</div>
+
+<p>The full corpus is retained privately at <code>TTS-AGI/moss-va-trajectory-corpus-full</code>
+(581 MB, verified after upload the same way every other artefact in this project is — by re-reading
+the repository metadata and size-comparing every file rather than trusting the uploader's success
+message).</p>
+
+<h2 id="use">7. How to use it, and what you have to supply yourself</h2>
+
+<p>The corpus is a specification. It names clips; it does not contain them. To do anything with a
+trajectory you need the source audio or the source annotation keyed by the same identifiers, and
+for three of the seven sources that material is not public. This is a deliberate trade — it makes
+the corpus small enough to release and to iterate on, and it pushes the licensing question onto the
+audio rather than onto the sequence.</p>
+
+<p>Three uses it was built for:</p>
+
+<ol>
+<li><strong>Training on progression.</strong> Render a trajectory as one training example: the
+concatenated clips as the target, and a prompt that states the movement rather than a single band —
+&ldquo;start at the 40th percentile of anger and reach the 95th over four sentences&rdquo;. Nothing
+in this project's supervised or preference corpora carries that shape, and the standing hypothesis
+for why intensity control fails (main report &sect;10.4) is precisely that the model has seen too
+little contrast to learn what an intensity word controls. A trajectory is contrast by
+construction.</li>
+<li><strong>Evaluating progression.</strong> Use the trajectory as a reference arc: prompt the
+model with the same movement and score whether its own generated sequence walks the dimension the
+way the reference does. That is an evaluation this project currently cannot perform at all.</li>
+<li><strong>Selection and curriculum.</strong> The <code>T</code>, <code>C</code>, <code>k</code>,
+<code>qmax</code> and <code>cmax</code> fields let a consumer ask for strictly monotone,
+high-quality, five-step walks without re-scoring 25 million clips — which is most of the work of
+building such a set.</li>
+</ol>
+
+<h2 id="limits">8. Limitations</h2>
+
+<ul>
+<li><strong>No audio, and three sources whose audio is not public.</strong> Roughly a quarter of the
+full corpus by row count is unusable to an outside consumer even in principle, and the public
+subset is the part that is not.</li>
+<li><strong>Monotone in a measured score is not the same as a performed arc.</strong> The 40.7 % of
+the full corpus that is not contiguous consists of sequences assembled from clips that were never
+performed in that order. They will satisfy any measurement of monotonicity and they may not sound
+like anything.</li>
+<li><strong>The dimensions are scorer outputs.</strong> A trajectory that walks
+<code>emo_Contemplation</code> walks the Empathic-Insight contemplation head, with whatever that
+head gets wrong. The main report's &sect;6 sets out how far these instruments can be trusted, and
+&sect;6.4 there records one head that is never read at all because of a key mismatch. Those caveats
+are inherited here in full.</li>
+<li><strong>Short.</strong> Two to five clips, mean 3.51. This supports &ldquo;a change over a few
+sentences&rdquo; and does not support anything at the scale of a scene.</li>
+<li><strong>Nothing has been trained on it yet.</strong> The corpus was built and published on 28
+August 2026; no model in this project has been trained or evaluated on a trajectory. Every use
+listed in &sect;7 is a proposal, and the corpus's value is entirely unmeasured.</li>
+<li><strong>No listening check.</strong> Consistent with the rest of this project: no human has
+played a trajectory back to hear whether the progression is audible.</li>
+</ul>
+
+<hr>
+
+<p class="small">Part of the MOSS voice-acting documentation set:
+<a href="technical-report.html">the technical report</a> ·
+<a href="steering-and-probes.html">steering and probes</a>. Dataset:
+<a href="https://huggingface.co/datasets/laion/moss-va-trajectory-corpus">laion/moss-va-trajectory-corpus</a>.</p>
+
+</div>
+</body>
+</html>
