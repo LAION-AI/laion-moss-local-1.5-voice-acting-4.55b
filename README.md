@@ -17,6 +17,7 @@ in **English and German**, at **native 48 kHz**.
 > |---|---|
 > | 📄 **[Directing a speech model — the technical report](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/technical-report.html)** | 23 sections. Timing control is solved to a median 0.08 s; emotional-intensity control is not, and the report is largely about why. |
 > | 🔬 **[Steering and probes](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/steering-and-probes.html)** | What is linearly decodable from the model's activations (voice quality R² 0.82, emotion 0.43), and a clean negative result when those directions are injected during generation. |
+> | 🧠 **[Inside the model — the layer forensics](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/layer-forensics.html)** | Where each attribute is decodable, layer by layer: voice quality R² 0.85 at layer 12, emotion 0.47 at layer 20, vocal bursts at 18–19. What reading six layers at once adds, and why steering with these directions still fails. |
 > | 📈 **[The trajectory corpus](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/trajectory-corpus.html)** | 7.6 M published specifications of a single speaker walking a single emotional or vocal dimension. No audio — the rows name the clips. |
 >
 > Current best checkpoint: [`laion/moss-tts-local-transformer-4.55b-voice-acting-v2-sft3`](https://huggingface.co/laion/moss-tts-local-transformer-4.55b-voice-acting-v2-sft3)
@@ -32,6 +33,12 @@ in **English and German**, at **native 48 kHz**.
 >
 > Most of the demo grids linked below were generated with **v2**. If you are pairing this
 > model with any LoRA from LAION, **use v2**.
+
+> 🎚️ **VoiceNet delivery-tail adapters (15, rank 16, on SFT3):**
+> **[`laion/moss-va-sft3-voicenet-lora-adapters`](https://huggingface.co/laion/moss-va-sft3-voicenet-lora-adapters)**
+> — one LoRA per extreme tail of a VoiceNet delivery axis (arousal, valence, tension,
+> volatility, vulnerability, ranting, ASMR, dramatic, …), each trained on the top or bottom
+> 1 % of a 3.1 M-utterance corpus along that one axis. A pilot, and **not yet evaluated**.
 
 > 🎛️ **Vocal-burst LoRA adapters (64 classes):**
 > **[`laion/vocal-burst-lora-adapters`](https://huggingface.co/laion/vocal-burst-lora-adapters)**
@@ -296,7 +303,7 @@ Parakeet WER, VoiceCLAP blend/genuineness and Empathic-Insight-Plus emotion head
 - **Upstream architecture & tooling:** [OpenMOSS/MOSS-TTS](https://github.com/OpenMOSS/MOSS-TTS) · [OpenMOSS/sglang](https://github.com/OpenMOSS/sglang)
 - **Serving on HPC:** [`sglang-omni-jupiter/`](sglang-omni-jupiter/) — SGLang-Omni on JUPITER (aarch64 / GH200), runbook + benchmark · upstream [sgl-project/sglang-omni](https://github.com/sgl-project/sglang-omni)
 - **Audio tokenizer:** [`OpenMOSS-Team/MOSS-Audio-Tokenizer-v2`](https://huggingface.co/OpenMOSS-Team/MOSS-Audio-Tokenizer-v2)
-- **Technical report:** [technical-report.html](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/technical-report.html) · [steering-and-probes.html](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/steering-and-probes.html) · [trajectory-corpus.html](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/trajectory-corpus.html)
+- **Technical report:** [technical-report.html](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/technical-report.html) · [steering-and-probes.html](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/steering-and-probes.html) · [trajectory-corpus.html](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/trajectory-corpus.html) · [layer-forensics.html](https://projects.laion.ai/laion-moss-local-1.5-voice-acting-4.55b/layer-forensics.html)
 - **Research checkpoints:** [`…-v2-sft3`](https://huggingface.co/laion/moss-tts-local-transformer-4.55b-voice-acting-v2-sft3) · [`moss-va-sft3-dpo-lora-p2`](https://huggingface.co/laion/moss-va-sft3-dpo-lora-p2) · [40 emotion LoRAs](https://huggingface.co/laion/moss-va-sft3-emotion-loras) · [500 voice LoRAs](https://huggingface.co/laion/moss-va-sft3-voice-loras)
 - **Trajectory corpus:** [`datasets/laion/moss-va-trajectory-corpus`](https://huggingface.co/datasets/laion/moss-va-trajectory-corpus)
 
