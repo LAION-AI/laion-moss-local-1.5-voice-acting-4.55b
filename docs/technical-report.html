@@ -1773,20 +1773,11 @@ contains (425 of the intoxication rows use that phrasing verbatim), and the mode
 trained on those pairings. It is kept for comparability and flagged as the first thing to revisit if
 intensity control still lags for those emotions.</p>
 
-<h4>Two prompt bugs found and fixed on 25 August, before the round-3 run started</h4>
-
-<ol>
-<li><strong>The intensity band was read from a column the training corpus does not have.</strong>
-It came from an <code>in_extreme</code> flag; the supervised corpus carries no such column, so the
-lookup always returned <code>None</code> and every row would have rendered &ldquo;clearly&rdquo; —
-the <em>moderate</em> band. The model would never have seen an intense or extreme direction, which
-was the entire point of the round. Fixed to read the row's own <code>emo_strength</code> percentile
-with the same cutoffs as the reward; 83 % of rows now carry intense or extreme wording.</li>
-<li><strong>The untimed 30 % carried no direction at all</strong>, because directions attach to
-duration tags and untimed scripts have none. A caller supplying a direction without durations would
-have been out of distribution. Fixed by placing one direction at the head of the line. Direction
-coverage rose from 57.7 % to <strong>79.5 %</strong> of samples.</li>
-</ol>
+<p><strong>Two bugs in this generator were found and fixed on 25 August, seventeen minutes
+before the round-3 run launched</strong> — one that would have made every row render the same
+intensity word, and one that left the untimed 30 % of samples with no direction at all. Both would
+have made the round meaningless without changing any training-time number. §10.4 gives them in
+full, with the pre-fix code.</p>
 
 <h3>9.3 What varies between training samples</h3>
 
