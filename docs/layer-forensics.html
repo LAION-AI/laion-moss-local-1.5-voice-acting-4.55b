@@ -1,0 +1,459 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inside the model — the layer forensics, in plain language</title>
+<style>
+:root{--bg:#fbfbfa;--fg:#1a1a19;--mut:#6b6b66;--line:#e4e3df;--card:#fff;--ok:#1a7f4b;
+      --warn:#a8631a;--bad:#a52a2a;--acc:#2b5fa8;--code:#f4f3f0}
+@media (prefers-color-scheme:dark){:root{--bg:#17171a;--fg:#e9e8e5;--mut:#9d9c97;--line:#2f2f34;
+      --card:#1e1e22;--ok:#5fca92;--warn:#e0a350;--bad:#e8756e;--acc:#7fb0f0;--code:#232329}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);margin:0;padding:34px 18px 90px;
+     font:15px/1.62 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif}
+main{max-width:1160px;margin:0 auto}
+h1{font-size:27px;margin:0 0 4px}h2{font-size:20px;margin:46px 0 12px;padding-bottom:7px;
+   border-bottom:2px solid var(--line)}h3{font-size:16px;margin:26px 0 6px}
+.sub{color:var(--mut);margin:0 0 22px;font-size:13.5px}
+a{color:var(--acc)}
+code{background:var(--code);padding:1px 5px;border-radius:5px;
+     font:12.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13px;display:block;
+      overflow-x:auto}
+th,td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+th{background:var(--code);font-weight:600}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.note{color:var(--mut);font-size:13px;margin:6px 0 10px}
+.box{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--acc);
+     border-radius:7px;padding:13px 16px;margin:16px 0}
+.box.ok{border-left-color:var(--ok)}.box.warn{border-left-color:var(--warn)}
+.box.bad{border-left-color:var(--bad)}
+.good{color:var(--ok);font-weight:600}.bad{color:var(--bad);font-weight:600}
+ul,ol{margin:8px 0 8px 20px;padding:0}li{margin:6px 0}
+.done::before{content:"● ";color:var(--ok)}
+.open::before{content:"○ ";color:var(--warn)}
+.tldr{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:4px 18px 14px;
+      margin:18px 0 28px}
+.bar{display:inline-block;height:9px;background:var(--acc);border-radius:2px;vertical-align:middle}
+</style>
+<main>
+
+<h1>Inside the model — what the layer forensics found</h1>
+<p class="sub">28 August 2026 · a plain-language report on four parallel investigations into the
+4.55 B voice-acting model's internal representations. Every number here was measured on held-out
+data with speakers held out; nothing is an estimate. The technical artefacts, the code and the
+raw grids are in
+<a href="https://github.com/LAION-AI/Voice-Acting-Pipeline-WIP">Voice-Acting-Pipeline-WIP</a>
+under <code>research-log-2026-08/layer-forensics/</code>.</p>
+
+<div class="tldr">
+<h3>The short version</h3>
+<ol>
+<li><b>The model knows what a voice sounds like far better than it knows what it feels.</b> From a
+single layer you can recover 57 voice-quality dimensions at R² 0.85, and 40 emotion scores at only
+0.47. That gap is the central fact of this whole project, and it now has an internal explanation,
+not just an output-side one.</li>
+<li><b>Everything useful sits in the middle of the network.</b> Voice quality peaks at layer 12,
+emotion at layer 20, vocal bursts at layers 18–19. Nothing peaks at the top. The last layers — the
+ones closest to the audio decoder — are among the <i>worst</i>.</li>
+<li><b>Reading several layers at once helps, and the help is real.</b> Six layers instead of one
+lifts emotion from 0.466 to 0.507. It survives a control that gives the single-layer probe exactly
+the same number of inputs, so it is information, not capacity.</li>
+<li><b>But you cannot yet steer with any of this.</b> Injecting these directions during generation
+destroys the output at every strength tried — and a <i>random</i> direction of the same size does
+the same damage. The breakage is the perturbation, not the meaning.</li>
+<li><b>Speaker memorisation is nearly absent</b>, which was the main thing that could have
+invalidated all of the above. It is real for exactly one attribute: "does this sound genuine".</li>
+</ol>
+</div>
+
+<h2>1. What was actually measured, in one page</h2>
+
+<p>The model is a 36-layer transformer that reads a director's brief and writes audio tokens. While
+it works, each layer holds a 2,560-number "hidden state" for every position. The question of this
+whole programme is: <b>if you freeze the model and look at those numbers, what can you tell about
+the performance?</b></p>
+
+<p>The procedure, concretely:</p>
+
+<ul>
+<li>Take a real recording, and let the model read it with the true audio already in place
+(<b>teacher forcing</b>) — so it is <i>listening</i>, not inventing.</li>
+<li>Average the hidden state over the <b>last 20 % of the audio</b>. That gives one 2,560-number
+vector per recording per layer.</li>
+<li>Keep <b>38 such taps</b>: <code>h00</code> the input embeddings, <code>h01…h35</code> the
+outputs of the 35 transformer layers, <code>h36</code> the final normalisation, and
+<code>loc</code>, the small "local transformer" that sits between the language model and the audio
+codec.</li>
+<li>Train a small predictor (a "<b>probe</b>") on those vectors to guess one attribute — say, how
+angry the clip is — and score it on recordings from <b>speakers the probe has never heard</b>.</li>
+</ul>
+
+<p>The score is <b>R²</b>: 0 means the probe does no better than always guessing the average, 1
+means perfect. A probe that scores 0.85 has essentially recovered the attribute; one that scores
+0.20 has found a hint of it.</p>
+
+<div class="box warn">
+<b>The one caveat that limits every number on this page.</b> These are <i>listening</i>
+activations. A high score means the attribute is written legibly into the model's state
+<b>while it follows a real recording</b>. It is <b>not</b> evidence that the model uses that
+information when it generates on its own. Those are different questions, and section 5 is what
+happened when we tried to answer the second one.
+</div>
+
+<p>Scale: 217,583 recordings in the main extraction, 38 taps each, 2,560 numbers per tap —
+<b>75.5 GB</b> of activations on disk, and roughly 26 GPU-hours of probing on top.</p>
+
+<h2>2. W1 — where each thing lives</h2>
+
+<p>One probe per layer, predicting all 99 attributes at once: 40 emotion scores, 57 voice-quality
+dimensions, "genuineness" and "vocal-burst blend". 38 fits cover the entire grid.</p>
+
+<table>
+<tr><th>what</th><th class="n">how many</th><th>best layer</th><th class="n">score (R²)</th>
+    <th class="n">what speaker + length alone give</th><th>layers within 0.01 of best</th></tr>
+<tr><td><b>Voice quality</b> (VoiceNet, 57 dims)</td><td class="n">57</td><td><code>h12</code></td>
+    <td class="n"><b>0.846</b></td><td class="n">0.280</td><td>7</td></tr>
+<tr><td>&nbsp;&nbsp;of which performance style (<code>S_*</code>)</td><td class="n">15</td>
+    <td><code>h12</code></td><td class="n">0.859</td><td class="n">—</td><td>9</td></tr>
+<tr><td><b>Genuineness</b> (does it sound real)</td><td class="n">1</td><td><code>h12</code></td>
+    <td class="n">0.719</td><td class="n">0.197</td><td>6</td></tr>
+<tr><td><b>Emotion</b> (40 EmoNet heads)</td><td class="n">40</td><td><code>h20</code></td>
+    <td class="n"><b>0.473</b></td><td class="n">0.108</td><td>4</td></tr>
+<tr><td><b>Vocal-burst blend</b></td><td class="n">1</td><td><code>h25</code></td>
+    <td class="n">0.435</td><td class="n">0.105</td><td>4</td></tr>
+</table>
+
+<p><b>Read the two headline numbers together.</b> 0.846 against 0.473. The model represents
+<i>how a voice sounds</i> almost completely, and <i>what it feels</i> about half as well. That is
+the same asymmetry every generation-side experiment in this project has run into — timing control
+is solved to a median error of 0.08 s, emotional intensity is not — and it is now visible in the
+representation itself, before any generation happens.</p>
+
+<h3>The easiest and the hardest things to read</h3>
+
+<table>
+<tr><th>most legible</th><th class="n">R²</th><th>least legible</th><th class="n">R²</th></tr>
+<tr><td>gender (<code>GEND</code>)</td><td class="n">0.939</td>
+    <td>jealousy and envy</td><td class="n">0.209</td></tr>
+<tr><td>speech register (<code>REGS</code>)</td><td class="n">0.924</td>
+    <td>awe</td><td class="n">0.239</td></tr>
+<tr><td>monotone delivery (<code>S_MONO</code>)</td><td class="n">0.920</td>
+    <td>thankfulness / gratitude</td><td class="n">0.281</td></tr>
+</table>
+
+<p>The pattern is not random. What is legible is what a listener could name in the first second —
+gender, register, whether the voice is monotone. What is illegible is what needs the <i>situation</i>
+to be understood: envy, awe, gratitude. Those are the emotions you cannot identify from a second of
+sound without knowing what is being talked about, and the model does not encode them either.</p>
+
+<h3>Two findings that were not expected</h3>
+
+<div class="box ok">
+<b>Speaker memorisation is essentially absent.</b> The obvious way for these numbers to be fake is
+that the probe recognises the <i>speaker</i> and looks up their typical emotion. To test it, the
+split was made so that no test speaker appears in training at all — 0 of 13,757 test voices leak.
+Comparing that to a lax split that does leak speakers, the difference at each attribute's own best
+layer is <b>−0.004 for emotion and −0.003 for voice quality</b>: holding speakers out costs
+nothing measurable. The exceptions are specific and believable: <b>genuineness</b> (+0.042),
+<b>concentration</b> (+0.034), <b>sourness</b> (+0.017). Read "genuineness" under a lax split as
+inflated by speaker identity. Almost nothing else in the set is.
+</div>
+
+<div class="box">
+<b>The non-linear probe wins on all 99 attributes.</b> A linear probe assumes the attribute lives
+along one straight direction in the 2,560-dimensional space. A small neural probe does not. The
+neural probe is better on <b>every single one</b> of the 99, by a median of +0.043, and the biggest
+gap by far is <b>genuineness at +0.180</b>. This matters more than it looks: the entire steering
+idea (section 5) is built on straight directions, and this is the measurement saying those
+attributes are not straight.
+</div>
+
+<p class="note">Resolution: re-running a probe with a different random seed moves a score by 0.003
+on average and 0.011 at the 95th percentile. <b>Treat two layers whose scores differ by less than
+about 0.01 as tied</b> — for most attributes the "best layer" is a formality, with a plateau many
+layers wide.</p>
+
+<h2>3. W2 — does reading several layers at once help?</h2>
+
+<p>If layer 12 knows the voice and layer 20 knows the emotion, does feeding a probe <i>both</i> beat
+feeding it either? The search: greedy, beam and random selection over all 38 taps, for ensembles of
+2 to 6, on six attribute groups and two corpora — <b>4,888 fitted combinations, 13 GPU-hours</b>.</p>
+
+<div class="box warn">
+<b>The trap, and the control that avoids it.</b> Six layers means six times as many input numbers.
+A bigger probe scores better on almost anything, so a naive comparison would prove nothing. Every
+ensemble was therefore compared against two controls <b>at exactly the same input width</b>: the
+best single layer <i>repeated six times</i>, and the best single layer <i>padded with random
+noise</i>. All 60 winning combinations beat both. The gain is information from other layers, not
+capacity.
+</div>
+
+<table>
+<tr><th>group</th><th>best single</th><th class="n">R² one layer</th><th class="n">R² six layers</th>
+    <th class="n">gain (mean of 4 seeds)</th><th class="n">its own noise band</th><th>verdict</th></tr>
+<tr><td>Emotion, 40 dims</td><td><code>h20</code></td><td class="n">0.4663</td>
+    <td class="n">0.5067</td><td class="n"><b>+0.0385</b></td><td class="n">±0.0037</td>
+    <td class="good">solid — 10× the noise</td></tr>
+<tr><td>Voice quality, 57 dims</td><td><code>h12</code></td><td class="n">0.8529</td>
+    <td class="n">0.8695</td><td class="n"><b>+0.0166</b></td><td class="n">±0.0003</td>
+    <td class="good">solid</td></tr>
+<tr><td>Performance style, 16 dims</td><td><code>h12</code></td><td class="n">0.8518</td>
+    <td class="n">0.8701</td><td class="n">+0.0182</td><td class="n">±0.0005</td>
+    <td class="good">solid</td></tr>
+<tr><td>Time-independent, 19 dims</td><td><code>h12</code></td><td class="n">0.8403</td>
+    <td class="n">0.8581</td><td class="n">+0.0188</td><td class="n">±0.0018</td>
+    <td class="good">solid</td></tr>
+<tr><td>Vocal-burst blend</td><td><code>h33</code></td><td class="n">0.3841</td>
+    <td class="n">0.4551</td><td class="n">+0.0616</td><td class="n">±0.0554</td>
+    <td class="bad">borderline</td></tr>
+<tr><td>Genuineness</td><td><code>h23</code></td><td class="n">0.7086</td>
+    <td class="n">0.7388</td><td class="n">+0.0181</td><td class="n">±0.0244</td>
+    <td class="bad">not separable from noise</td></tr>
+</table>
+
+<p>The seed replicates are what make this table honest. The two attributes with the <i>largest</i>
+raw gains — blend at +0.071 and genuineness at +0.030 for a single seed — are also the two noisiest
+targets, and once you refit at four seeds their gains sit at or inside their own error bars. The
+two attributes with modest gains are the ones you can rely on. Emotion gains ten times its noise
+band; voice quality gains fifty times its own.</p>
+
+<h3>The layers chosen are informative in themselves</h3>
+
+<p>For emotion the winning six are <code>h06 · h12 · h18 · h20 · h21 · h23</code>. Note
+<code>h06</code>: on its own it ranks thirteenth and no sensible shortlist would have included it,
+yet it enters at size four and stays. And note that the best <i>pair</i>, <code>h18+h21</code>, are
+almost the same subspace — their representational similarity is 0.979 — and still gain +0.020
+together. Redundancy between two layers does not predict whether combining them helps.</p>
+
+<h3>An open question that got closed: performance style vs. time-independent traits</h3>
+
+<p>The 57 voice dimensions split naturally into two families: things about <i>the performance</i>
+(ranting, whispering, dramatic delivery, ASMR) and things about <i>the instrument</i> (age, gender,
+timbre, resonance). The hypothesis was that these live in different parts of the network.</p>
+
+<div class="box ok">
+<b>They do not.</b> Both families have the same best layer (<code>h12</code>) on both corpora. And
+when the tap set selected for one family is used to predict the other, the cost is
+<b>−0.0003 / +0.0004</b> — inside the noise. W1's independent grid says the same thing at
+single-attribute resolution: <code>h12</code> is the best layer for 16 of 16 performance axes and
+18 of 19 instrument axes; only gender prefers a different layer. <b>One mid-stack band serves
+both.</b> The apparent difference in which taps got selected is arbitrary tie-breaking between
+near-equivalent layers.
+</div>
+
+<p>The one attribute that genuinely lives somewhere else is <b>vocal-burst blend</b> — the only
+group whose ensembles reach past the semantic middle into <code>h32</code>, <code>h33</code> and the
+local transformer, and which loses 0.02–0.08 R² if forced onto another group's layers. It is also
+the noisiest target, so this is suggestive rather than settled.</p>
+
+<h2>4. W4 — the vocal bursts</h2>
+
+<p>A separate question with a separate method: a sigh, a gasp, a chuckle, a mumble. Can a layer tell
+that a burst is <i>present</i>, and can it tell <i>which</i> burst it is? Scored as AUC — 0.5 is
+coin-flipping, 1.0 is perfect.</p>
+
+<table>
+<tr><th>question</th><th>best layer</th><th class="n">AUC</th><th class="n">balanced accuracy</th></tr>
+<tr><td>Is there a burst at all? (burst clip vs. clean speech)</td><td><code>h19</code></td>
+    <td class="n"><b>0.9777</b></td><td class="n">0.923</td></tr>
+<tr><td>Which burst is it? (averaged over 8 classes)</td><td><code>h18</code></td>
+    <td class="n">—</td><td class="n">—</td></tr>
+<tr><td>metadata only (language, source, length)</td><td>—</td><td class="n">0.587</td><td class="n">—</td></tr>
+</table>
+
+<p>Both plateaus sit in layers 13–23 — <b>the same band as emotion</b> (layer 20), not the band of
+voice quality (layer 12). Presence and identity are read out of the same place, and that place is
+the emotional one. The blend <i>scalar</i>, by contrast, peaks six layers deeper at 25.</p>
+
+<h3>Per class</h3>
+
+<table>
+<tr><th>burst class</th><th class="n">usable clips</th><th>vs. plain speech</th><th class="n">AUC</th>
+    <th>vs. a <i>different</i> burst</th><th class="n">AUC</th></tr>
+<tr><td>Chuckle</td><td class="n">699</td><td><code>h20</code></td><td class="n">0.992</td>
+    <td><code>h19</code></td><td class="n">0.956</td></tr>
+<tr><td>Childlike giggle</td><td class="n">454</td><td><code>h19</code></td><td class="n">0.987</td>
+    <td><code>h18</code></td><td class="n">0.954</td></tr>
+<tr><td>Low mumble</td><td class="n">9,279</td><td><code>h20</code></td><td class="n">0.986</td>
+    <td><code>h13</code></td><td class="n">0.887</td></tr>
+<tr><td>Breathy giggle</td><td class="n">303</td><td><code>h19</code></td><td class="n">0.980</td>
+    <td><code>h18</code></td><td class="n">0.905</td></tr>
+<tr><td>Exhausted groan</td><td class="n">385</td><td><code>h13</code></td><td class="n">0.971</td>
+    <td><code>h19</code></td><td class="n">0.852</td></tr>
+<tr><td>Contented sigh</td><td class="n">1,591</td><td><code>h13</code></td><td class="n">0.959</td>
+    <td><code>h13</code></td><td class="n">0.922</td></tr>
+<tr><td>Surprised gasp</td><td class="n">942</td><td><code>h18</code></td><td class="n">0.954</td>
+    <td><code>h18</code></td><td class="n">0.813</td></tr>
+<tr><td>Ahem</td><td class="n">6,382</td><td><code>h18</code></td><td class="n">0.943</td>
+    <td><code>h13</code></td><td class="n">0.753</td></tr>
+</table>
+
+<p>Telling a burst from plain speech is close to solved (0.94–0.99). Telling one burst from another
+is genuinely harder and varies by class — laughter is nearly as separable as it is detectable
+(0.95), while "ahem" against another burst drops to 0.75. Twenty-three further classes had too few
+usable clips to report a number at all and are listed with their counts rather than given one.</p>
+
+<div class="box bad">
+<b>The finding that constrains all of the above: only 18.4 % of bursts are in the window.</b> The
+activations are captured over the last 20 % of the audio. Bursts are short (0.28 s median) and the
+window is long (2.41 s median), so a burst is either inside it or nowhere near it. Only 18.4 % of
+118,660 detected bursts fall at least half inside — and that fraction is strongly
+<b>class-dependent</b>: <code>Yawn</code> 49 %, <code>Scream</code> 37 %, <code>Chuckle</code> 24 %,
+<code>Contented Sigh</code> 8.7 %, <code>Sharp Inhale</code> 8.0 %.
+<br><br>
+That is not only a limitation, it is a <b>finding about performance</b>: sighs and inhales cluster
+near the <i>start</i> of a line, where the capture window never reaches; laughter and screams cluster
+at the <i>end</i>, where it does. Every probe above uses only in-window bursts; a clip whose burst
+is outside the window is a mislabelled negative.
+</div>
+
+<p>Three controls back the headline up. Clips whose bursts are all <i>outside</i> the window still
+separate at 0.778 — that is the clip-level confound floor, 0.20 below the headline, and it is why
+the window restriction is not optional. Burst-bearing clips on <i>both</i> sides, matched on burst
+count, still separate at 0.968. Strictly same-speaker negatives give 0.969, so speaker identity is
+not the signal.</p>
+
+<h2>5. W3 — the steering vectors, and the negative result</h2>
+
+<p>If an attribute is legible at layer 20, the obvious next move is to <i>write</i> it there: take
+the average hidden state of the angriest clips, subtract the average of the middling ones, and add
+the difference during generation. That library now exists — <b>156 archetype vectors × 38 layers ×
+2,560 numbers</b>, 61 MB, one per (attribute, tail): 40 emotions at their high end, 57 voice
+dimensions at both ends, plus genuineness and blend.</p>
+
+<p>Verification first: all 97 pre-existing vectors were recomputed from the raw activations and
+match the earlier export <b>bit for bit</b> (maximum difference exactly 0 over 97 × 38 × 3
+vectors).</p>
+
+<div class="box bad">
+<b>It does not work. At any strength, in any configuration tested.</b>
+</div>
+
+<table>
+<tr><th>what was injected</th><th class="n">strength</th><th class="n">word error rate</th>
+    <th class="n">duration error</th><th class="n">genuineness (of 6)</th></tr>
+<tr><td><b>nothing</b> (baseline, 336 samples)</td><td class="n">0</td>
+    <td class="n"><b>0.094</b></td><td class="n">0.09 s</td><td class="n"><b>3.67</b></td></tr>
+<tr><td>a real emotion direction at layer 20</td><td class="n">0.5</td>
+    <td class="n">1.139</td><td class="n">0.30 s</td><td class="n">1.85</td></tr>
+<tr><td>a real emotion direction at layer 20</td><td class="n">2.0</td>
+    <td class="n">0.989</td><td class="n">7.66 s</td><td class="n">0.82</td></tr>
+<tr><td>five layers at once</td><td class="n">1.0</td>
+    <td class="n">1.050</td><td class="n">11.39 s</td><td class="n">1.49</td></tr>
+<tr><td><b>a random direction of the same size</b></td><td class="n">1.0</td>
+    <td class="n"><b>2.065</b></td><td class="n">0.09 s</td><td class="n">2.19</td></tr>
+</table>
+
+<p>A word error rate of 0.094 means the model says what it was told to say. At 1.0 it is producing
+something else entirely. <b>The random direction is the decisive row</b>: it does as much damage as
+any meaningful one, and at strength 1.0 it does <i>more</i>. So the breakage is the act of pushing
+the hidden state off its manifold, not the content of the push. 27 configurations, 1,565 generated
+samples.</p>
+
+<div class="box warn">
+<b>Watch out for the apparent "gains".</b> At high strength the quality scorers report genuineness
+and blend at percentile 1.000 — looking like a huge win. The raw values behind those percentiles are
+<b>1.31 out of 6</b> and <b>1.97 out of 10</b>, against 3.67 and 4.48 unsteered. The scoring models
+saturate on broken audio. Any steering result reported as a percentile without its raw value should
+be disbelieved.
+</div>
+
+<h3>Why it probably fails — three measurements, not a story</h3>
+
+<ul>
+<li><b>The two tails of an attribute are not opposite directions.</b> "High arousal" and "low
+arousal", measured from the middle, are at a median cosine of <b>−0.0004</b> — they are
+<i>perpendicular</i>, not opposed. Pushing towards one is not pushing away from the other.</li>
+<li><b>The attributes are not linear</b>, and the neural-vs-linear probe gap says so on all 99 of
+them. Across the 57 voice dimensions the non-linearity correlates at <b>−0.41</b> with how opposed
+the two tails are: the more non-linear an attribute, the more both of its extremes sit on the same
+side of the middle. A difference-of-means vector is exactly the object that assumes the opposite.</li>
+<li><b>Emotion and perceived quality are anti-correlated inside the representation.</b> The cosine
+between an emotion direction and the "quality" axis runs <b>−0.62 to −0.95</b>. Moving a voice
+towards an emotion moves it away from what the quality scorers reward — in the model's own state,
+before any audio exists.</li>
+</ul>
+
+<p class="note">Also worth knowing before using the library: 32 of the 40 emotion heads have a
+"low" tail that is a tie at zero, and for 25 of them the low bucket and the middle bucket are the
+<i>same clips</i>. "Negative anger" is not defined by this library. 34 of the 156 rows carry a
+small-bucket warning flag.</p>
+
+<h2>6. The one thing that does not fit</h2>
+
+<div class="box">
+<p><b>Decodability and leverage point in opposite directions.</b> The layer nearest the audio
+decoder — <code>h36</code>, the final normalisation, and <code>loc</code>, the local transformer —
+is where the information <i>has</i> to be if the model is going to act on it. Those are also the
+<b>weakest</b> taps for emotion: 0.342 and 0.339, against 0.473 at layer 20.</p>
+<p>So the emotional information is clearest 16 layers before the point where it would have to be
+used, and by the time it reaches the decoder it has thinned out. Two readings fit the data equally
+well right now, and telling them apart is the most valuable open experiment in this programme:
+either the model <i>computes</i> emotion in the middle and then discards most of it, or the middle
+layers hold a rich description that the last layers compress into the few dimensions the audio
+codec actually needs. The first would be a defect worth fixing; the second would be normal and
+would mean steering has to happen early or not at all.</p>
+</div>
+
+<h2>7. What this changes in practice</h2>
+
+<ol>
+<li><b>Stop trying to fix emotional intensity with the training objective.</b> Five GRPO runs and
+seven preference runs did not move it; the representation now says the information is thin where it
+would have to be used. The only lever that has ever moved it is <b>more extreme training data</b> —
+the emotion adapters trained on the top 1 % moved the score from 0.408 to 0.492 monotonically in
+merge weight.</li>
+<li><b>If you probe, probe the middle, and probe several layers.</b> Layer 12 for anything about the
+voice, layer 20 for anything about feeling, layers 18–19 for bursts. Six layers instead of one is
+worth +0.039 on emotion and it is not a capacity artefact.</li>
+<li><b>Do not build a product on the steering vectors.</b> They are published as research material
+with the negative result attached. The random-direction control is the reason.</li>
+<li><b>The capture window needs to move</b> before vocal bursts can be studied properly. 82 % of
+bursts are invisible to the current extraction, and which ones are invisible depends on the class.</li>
+<li><b>Genuineness is the one attribute where speaker identity matters.</b> Any measurement of it
+under a lax split is inflated by about 0.04–0.07.</li>
+</ol>
+
+<h2>8. Where everything is</h2>
+
+<table>
+<tr><th>workstream</th><th>what it produced</th><th>where</th></tr>
+<tr><td><b>W1</b> per-layer, per-attribute decodability</td>
+    <td>the 38 × 99 matrix, best layer per attribute, seed noise, the reproduction check</td>
+    <td><code>layer-forensics/w1/</code> — start at <code>layer_suitability.html</code></td></tr>
+<tr><td><b>W2</b> layer ensembles</td>
+    <td>4,888 fitted combinations with controls and seed replicates</td>
+    <td><code>layer-forensics/w2/</code> — <code>ensembles.html</code></td></tr>
+<tr><td><b>W3</b> archetype vectors</td>
+    <td>156 × 38 × 2,560 float32, manifest, diagnostics, the reconstructed steering grid</td>
+    <td><code>layer-forensics/w3/</code> — <code>archetypes.html</code></td></tr>
+<tr><td><b>W4</b> vocal-burst classes</td>
+    <td>presence and identity by layer, five designs, window coverage</td>
+    <td><code>layer-forensics/w4/</code> — <code>bursts.html</code></td></tr>
+</table>
+
+<h2>9. Corrections made while writing this</h2>
+
+<p>Four things in the earlier write-ups were wrong and are now fixed in the repository. They are
+listed because a research log that only records successes is not one.</p>
+
+<ul>
+<li><b>The split labels were inverted.</b> The column called <code>split</code> is the
+speaker-disjoint one (0 of 13,757 test voices leak); <code>split_uid</code>, despite the name,
+splits on clip id and leaks 4,510 of 16,827. The probe page had them the other way round. All four
+agents found this independently.</li>
+<li><b>Two probe results carried the wrong split's number.</b> On the speaker-disjoint split the
+emotion probe reaches <b>0.4328 at h20</b> (not 0.4394 at h18) and genuineness <b>0.6685 at h23</b>
+(not 0.7309 at h20). The tell was that both splits showed an identical value.</li>
+<li><b>Two artefacts were described as the wrong thing.</b> <code>norm_stats.json</code> is the
+130,785,282-row annotation ladder, not the reward percentile scale (which is a separate 3,147,802-row
+object); <code>lora_bucket_index.json</code> holds one bucket, not the full list.</li>
+<li><b>"The preference run with the worst training reward produced the best model"</b> holds
+<i>within</i> a run and not between runs — the worst final value belongs to a run that ranks fifth
+on generation quality.</li>
+</ul>
+
+<p class="note">Method note carried over from W1: nothing — not a mean, not a standard deviation, not
+a regularisation strength, not an early-stopping decision — was ever fitted on test data, and the
+split was held fixed across all 38 taps.</p>
+
+</main>
