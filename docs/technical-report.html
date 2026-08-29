@@ -4800,6 +4800,83 @@ permissive and those tables stand as written.</b> Parakeet remains primary for a
 on identical audio it is <b>2.4&times; less noisy</b>, a real gain in resolution for any harness
 running few samples per cell.</p>
 
+<h3>24.10 Two things nobody has measured yet</h3>
+
+<p><b>Blending two emotions.</b></p>
+
+<p>Nothing in any of the studies has tested what happens when you ask for <i>two</i> feelings at
+once &mdash; bitter but amused, frightened but trying to sound calm &mdash; or for a point somewhere
+between them. Everything measured so far pushes towards exactly one attribute. This is a real gap,
+because a blend is what most direction notes actually are.</p>
+
+<p>What we do know constrains how it should be attempted, and rules out the obvious version.</p>
+
+<ul>
+<li><b>Adding two scaled directions is not interpolation.</b> When two components share a layer they
+are summed and the result re-normalised, and the realised push is <b>not</b> the nominal one: anger
+at 0.10 plus genuineness at 0.10 realises <b>0.1604</b> at the layer they share, because the two
+directions are not parallel. A 50/50 blend of two emotions at &alpha; = 0.10 each is therefore a
+<i>stronger</i> push than either alone, in a direction that is neither. The correct construction is
+to interpolate the <b>unit</b> directions first &mdash; a spherical interpolation between the two
+normalised vectors &mdash; and then apply a single &alpha;. That keeps the magnitude constant along
+the path. It has not been tried.</li>
+<li><b>Some pairs are destructive, and we have one measured example.</b> The aesthetic axis and the
+ranting axis cancel almost exactly: ranting alone +0.464 (t 7.01, on 12 of 12 prompts), both
+together &minus;0.012. A naive path between two such directions passes through a dead zone where
+neither attribute is expressed. Before blending anything, the pairwise cosine between the two
+directions is worth reading &mdash; it is a two-line calculation on vectors we already have, and it
+predicts which blends are even possible.</li>
+<li><b>The response is not uniform across emotions</b>, so a blend inherits the worse half. At the
+free operating point, <code>Sexual_Lust</code> gains +0.487 and <code>Affection</code> +0.476, but
+<code>Fatigue_Exhaustion</code> goes <i>down</i> by 0.113 and <code>Doubt</code> by 0.070. Blending
+a strong responder with a negative one may well be worse than either alone.</li>
+<li><b>The two tails of one attribute are orthogonal, not opposite</b> (median cosine
+&minus;0.0004). So "halfway between anger and calm" is not "anger at half strength", and there is no
+reason to expect the space between two emotions to behave linearly either.</li>
+</ul>
+
+<div class="box ok">
+<b>The cheapest version is also the most likely to work, and it is not a vector at all.</b> The
+corpus captions already contain blends: a real <code>GENERAL:</code> line from the training data
+reads <i>&ldquo;affect is mildly positive &hellip; reads as amusement, teasing, interest&rdquo;</i>
+&mdash; three emotions named in one brief, in prose, thousands of times over. <b>Blending at the
+prompt level is therefore in-distribution, and blending at the vector level is not.</b> The model
+was trained on mixed briefs; it has never seen a hidden state that is the average of two archetypes.
+The first experiment should be the prompt one: name both emotions in the brief, sweep the wording
+from one to the other, and measure both target heads. Only if that plateaus is there a case for
+interpolating vectors.
+</div>
+
+<p>There is a LoRA version of the question too &mdash; two emotion adapters at half weight each, or
+PEFT's weighted adapter combination &mdash; and a guidance version, where the conditioned branch
+carries the blend and the unconditional branch carries neither. All three levers can express a
+blend, and which of them does it best is unmeasured. Given what &sect;24.2 found, the honest
+expectation is that blending two <i>delivery</i> axes will work far better than blending two
+emotions, for the same reason everything else does.</p>
+
+<p><b>Spectral content.</b></p>
+
+<p>Every score in this project &mdash; naturalness, blend, aesthetics, word error, emotion &mdash;
+comes from a model, and <b>not one of them would notice a gentle low-pass</b>. If a configuration
+quietly loses its high frequencies, nothing in the harness reports it. That is a hole in the
+instrument, not a hypothesis about a particular result.</p>
+
+<p>It matters because of how the audio codec works. The MOSS tokenizer is a <b>residual</b>
+quantiser: codebook 0 carries the coarse structure and each of the eleven that follow carries the
+residual of the ones before it &mdash; that is, progressively finer detail, which in practice means
+sibilance, breath, and the band above roughly 6 kHz that separates &ldquo;crisp&rdquo; from
+&ldquo;fine&rdquo;. Those deep channels are also the most fragile: they are predicted last,
+conditioned on every earlier channel of the same frame, their signal is weakest and their errors are
+least conspicuous. <b>Anything that degrades them shows up as dullness rather than as an
+artefact.</b> Every adapter in this project targets all twelve audio heads, and stacked adapters sum
+their deltas linearly, so the load on those channels grows with the number of adapters &mdash; which
+is the same quantity the demo server measured driving word error from 0.013 to 0.258.</p>
+
+<p>A band-energy ratio &mdash; say 6&ndash;16 kHz against 0&ndash;6 kHz, on a fixed line &mdash;
+would be a few lines of code and would close the hole. Two things worth measuring with it: the
+ratio as a function of how many adapters are loaded, and the ratio at turn 1 against turn 24 of a
+long session, which separates adapter load from accumulated numerical drift.</p>
+
 <h3>24.9 What this section does not settle</h3>
 
 <ul>
