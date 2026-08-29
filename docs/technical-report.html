@@ -4547,6 +4547,273 @@ Meanwhile the older LoRA-merging agent produces more emotional
 performances than any of this, and is not reliable on character consistency. Every one of those
 statements is the output of a learned scorer, and no human has listened.</p>
 
+<h2 id="levers">24. Three inference-time levers, measured end to end</h2>
+
+<p>Sections 1&ndash;23 are about making the model <em>learn</em> to follow an intensity instruction.
+That programme reached a wall: five GRPO runs and seven preference runs did not move emotional
+intensity. This section is about the other approach &mdash; leaving the trained weights alone and
+pushing the model <b>at the moment it speaks</b>. Three such levers exist, all three have now been
+measured across every adapter and dimension the project has, and the picture they produce is
+consistent enough to be a property of the model rather than of any one method.</p>
+
+<h3>24.1 The levers</h3>
+
+<table>
+<tr><th>lever</th><th>what it does</th><th>dial</th><th>cost structure</th></tr>
+<tr><td><b>LoRA adapter</b></td>
+    <td>rank-16 weights trained on the top 1 % of one attribute, added at run time</td>
+    <td>merge weight <code>w</code>; 0 = base, 1.0 = as trained</td>
+    <td>free at inference; must not be merged (&sect;24.6)</td></tr>
+<tr><td><b>Steering vector</b></td>
+    <td>a difference-of-means direction added to the hidden state,
+        <code>h &larr; h + &alpha;&middot;(v/&#8214;v&#8214;)&middot;&#8214;h&#8214;</code></td>
+    <td>&alpha;, dimensionless</td>
+    <td>negligible compute; breaks the output above &alpha; = 0.3</td></tr>
+<tr><td><b>Classifier-free guidance</b></td>
+    <td>two forward passes per frame, one with the emotion condition neutralised;
+        <code>logits = logits_uncond + g&middot;(logits_cond &minus; logits_uncond)</code></td>
+    <td><i>g</i>; 1.0 = ordinary sampling</td>
+    <td><b>1.93&times; wall clock</b></td></tr>
+</table>
+
+<p>Scale: <b>7,419 CFG cells / 29,676 clips</b>, <b>5,740 adapter dose cells</b> over 79 adapters,
+<b>10,459 combination cells / 31,377 clips</b> over 60 attributes. Every figure is paired &mdash;
+the same prompts with and without the intervention, a prompt's samples averaged before averaging
+across prompts, so <i>n</i> counts prompts. Word error is Parakeet-TDT-0.6b-v3 (&sect;24.8).</p>
+
+<h3>24.2 The central result: manner is writable, feeling is not</h3>
+
+<table>
+<tr><th>lever, at its best setting</th><th class="n">40 emotion heads</th>
+    <th class="n">delivery axes</th><th class="n">ratio</th></tr>
+<tr><td>steering, &alpha; = 0.10</td><td class="n">+0.10</td>
+    <td class="n">+1.78 (<code>S_DRAM</code>, t 8.58)</td><td class="n">18&times;</td></tr>
+<tr><td>adapter, at its saturation weight</td><td class="n">+0.035 (t 4.82)</td>
+    <td class="n">+0.690, 17/17 improving</td><td class="n">20&times;</td></tr>
+<tr><td>guidance, at WER &le; 0.20</td><td class="n">+0.0254 (g = 3.0, t 2.18)</td>
+    <td class="n">+0.0569 (g = 2.5, t 3.12)</td><td class="n">2.2&times;</td></tr>
+</table>
+
+<p>Three mechanisms with nothing in common &mdash; a weight patch, a hidden-state nudge, a logit
+extrapolation &mdash; all move the delivery axes several times further than the emotion heads. The
+ordering matches what a probe can <em>read</em> from the same activations: R&sup2; 0.85 for the 57
+VoiceNet dimensions against 0.47 for the 40 emotion heads (&sect;16). <b>The model has a rich,
+writable representation of how a line is delivered and a thin one of what it feels</b>, and no
+amount of inference-time pressure changes that ratio.</p>
+
+<p>Decodability nevertheless fails to predict steerability per attribute: <code>Anger</code>
+(R&sup2; 0.523) gains +0.088 from a steering push while <code>Elation</code> (0.503) gains +0.311,
+and <code>Jealousy_and_Envy</code> &mdash; the least decodable head at 0.209 &mdash; gains +0.070.
+Reading a layer and writing to it are different operations.</p>
+
+<h3>24.3 The dose-response of the adapters</h3>
+
+<p>79 adapters swept at six merge weights. <b>33 have a usable weight; none is harmful at any
+weight.</b> Every failure is a failure to move the target, not a broken guardrail.</p>
+
+<table>
+<tr><th>family</th><th class="n">n</th><th class="n">usable</th><th class="n">median safe w</th>
+    <th>shape</th></tr>
+<tr><td>emotion</td><td class="n">40</td><td class="n">11</td><td class="n"><b>1.0</b></td>
+    <td>climbs to 1.0 (t 4.82) then flat: 1.5 &minus; 1.0 = &minus;0.007 (t &minus;0.90)</td></tr>
+<tr><td>VoiceNet delivery</td><td class="n">17</td><td class="n"><b>16</b></td>
+    <td class="n"><b>1.5</b></td><td>12 monotone, 4 saturating &mdash; the best behaved family</td></tr>
+<tr><td>quality</td><td class="n">3</td><td class="n">1</td><td class="n">1.5</td>
+    <td>right direction at every weight, misses significance</td></tr>
+<tr><td>vocal burst</td><td class="n">19</td><td class="n">4</td><td class="n">1.5</td><td>mixed</td></tr>
+</table>
+
+<p>Two cautions the table cannot carry alone. <b>&ldquo;Below resolution&rdquo; is not &ldquo;no
+effect&rdquo;</b>: the 24 quiet emotion adapters still move pooled (+0.024 at w = 1.0, t 2.70); ten
+prompts each is not enough to prove it one at a time. And <b>20 of the 71 burst adapters cannot be
+evaluated at all</b> &mdash; trained almost entirely on isolated snippets under two seconds, with no
+speech row in the corpus carrying the class.</p>
+
+<p>The most actionable number: raising the delivery clamp from 0.75 to 1.5 buys <b>+0.375</b> on the
+target axis (t 5.18, better on 15 of 17) for a word-error change of <b>+0.003</b> (t 0.55, i.e.
+none). The clamp was chosen when several delivery adapters ran at once; it is not justified for one
+at a time.</p>
+
+<h3>24.4 Guidance, and its true cost</h3>
+
+<p>Best guidance at a pre-registered threshold of Parakeet WER &le; 0.20: <b>g = 3.0</b> for emotion
+(+0.0254, t 2.18), <b>g = 2.5</b> for delivery (+0.0569, t 3.12). Below g = 1 guidance actively
+hurts (&minus;0.0370 at g = 0.5, t &minus;2.56), the directional control the arm needed. Side
+effects are mild and partly favourable: genuineness <em>rises</em> with guidance on the emotion
+family (3.85 &rarr; 3.94), blend is flat, duration error unmoved; burst realisation falls slightly
+(0.414 &rarr; 0.392) and the delivery family pays intelligibility above g = 2 (share at WER &le; 0.2
+falls 0.828 &rarr; 0.744 by g = 3).</p>
+
+<div class="box warn">
+<b>CFG costs 1.93&times;, not the 1.2&ndash;1.5&times; the architecture suggests.</b> Measured
+1.889&times; at batch 1, 1.947&times; at batch 4. The premise was that only the semantic transformer
+doubles while the local (talker) transformer and the codec decode run once. The talker doubles too
+&mdash; twelve calls per frame <em>per branch</em>, because the unconditional branch needs its own
+local KV state to predict the next channel. Semantic 72&ndash;77 %, talker 18&ndash;19 %, heads
+4&ndash;7 %, codec decode <b>1.6 %</b> &mdash; and the decode is the only genuinely shared
+component, so sharing it saves nothing. The model is at RTF 0.66 solo; CFG consumes that headroom.
+</div>
+
+<p><b>The LoRA difference vector as a guidance signal.</b> With SFT3+DPO-v2 as the unconditional
+branch and SFT3+DPO-v2+LoRA as the conditioned one, the same arithmetic applies at the logit level.
+At equal nominal factor, weight-scaling reaches further &mdash; but at 3.0 it hits WER 0.310 and
+collapses burst realisation to 0.287, where logit guidance stays at 0.111 and 0.400. <b>At matched
+intelligibility the ranking reverses for the delivery axes</b> (0.5827 against 0.5634) and ties for
+emotion. Two independent estimates of the adapter's own effect, through different code paths, agree
+to four decimals (+0.0878 vs +0.0879).</p>
+
+<h3>24.5 Combining the three</h3>
+
+<p>The levers are cumulative on the target and <em>more</em> than cumulative on the cost. Excess
+over the sum of the parts, over 60 attributes:</p>
+
+<table>
+<tr><th>quantity</th><th class="n">excess</th><th class="n">ratio to sum-of-parts</th></tr>
+<tr><td>target attribute</td><td class="n">+0.156 SD (t 3.21)</td><td class="n">1.24</td></tr>
+<tr><td>word error</td><td class="n">+0.142 (t 15.8)</td><td class="n"><b>1.91</b></td></tr>
+<tr><td>genuineness loss</td><td class="n">&minus;0.77 (t &minus;17.4)</td><td class="n"><b>1.80</b></td></tr>
+<tr><td>duration error</td><td class="n">&mdash;</td><td class="n"><b>2.69</b></td></tr>
+</table>
+
+<p>The super-additivity is specifically an emotion phenomenon (1.52); delivery axes are almost
+exactly additive (0.97) and the quality attributes saturate (0.42). The dominant interaction is
+<b>steering &times; CFG</b> (+0.208, t 6.30), and it is a wiring choice rather than a fact: steering
+<em>both</em> CFG branches instead of only the conditioned one costs 18 % of the effect and returns
+0.209 of word error and 0.75 of genuineness.</p>
+
+<div class="box ok">
+<b>The most useful single trick: subtract flatness rather than add feeling.</b> Emotion and
+perceived authenticity are anti-correlated inside the representation at a cosine of &minus;0.62 to
+&minus;0.95, and causally a +0.10 emotion push costs &minus;0.86 of genuineness out of 6. Pushing
+<em>away from</em> <code>Emotional_Numbness</code> at &minus;0.10 returns <b>+0.60 of genuineness
+(t 9.64, 67 of 80 prompts) at no cost in emotion</b> when an adapter carries the emotion; on the
+steering-only version it removed essentially the whole cost (&minus;0.86 &rarr; +0.04). It stacks
+with CFG at &minus;0.05 (+0.68, t 10.94) but not at &minus;0.10. Adding the genuineness vector back
+instead is the weaker but still favourable trade: 16 % of the emotion gain buys 56 % of the loss.
+</div>
+
+<p>Two further results close open questions. <b>Re-extracting the steering vector with the adapter
+loaded does not help</b>: the adapter shifts the bucket mean by 3.8 % of its norm but shifts the
+shared reference nearly as much, so the direction survives at cosine 0.9958 &mdash; below the
+split-half noise floor at 60 of 60 attributes. It contributes a small correctly-signed extra only
+when the adapter is also loaded at generation (+0.095 z, t 2.16, against &minus;0.041 without).
+Conversely <b>steering is not made redundant by the adapter</b>: it adds +0.864 SD (t 12.12) on top
+of the adapter-only cell.</p>
+
+<p><b>Where the recipe lands.</b> A balanced operating point exists for <b>53 of 60</b> attributes,
+a high-effect one for 56. Commonest balanced recipe: <code>adapter 1.0 + CFG 2.0</code> (19
+attributes); commonest high-effect: <code>adapter 1.0 + steering +0.10 at one layer</code> (12).
+Median balanced cell: WER 0.086, genuineness 3.92/6, blend 4.95/10, burst realisation 0.436,
+|duration error| 0.07 s. Two composition rules are measurements rather than preferences:
+<code>ESTH</code> and <code>S_RANT</code> cancel (ranting alone +0.464, t 7.01 on 12 of 12 prompts;
+with aesthetics added, &minus;0.012), and the matched random direction is null alone (&minus;0.033)
+but <b>not</b> null at the combined operating point (+0.106, t 2.78), so every recommendation must
+beat a random push of the same magnitude.</p>
+
+<h3>24.6 A defect in merging adapters, found in a sister project</h3>
+
+<p>The demo server at <code>LAION-AI/Humaneness-Voice-Demo-Server</code> loads adapters by parsing
+the tensors itself and adding the product straight into each module's stored weight
+(<code>lora_bank.py:274</code>), undone by subtracting the recomputed product at end of turn
+(<code>:305</code>). <code>PeftModel</code> is never constructed. In this architecture that collides
+with a detail of the model:</p>
+
+<pre><code>def tie_weights(self):                                  # modeling_moss_tts.py:114
+    self.text_lm_head.weight = self.transformer.embed_tokens.weight
+    for embedding, head in zip(self.audio_embeddings, self.audio_lm_heads):
+        head.weight = embedding.weight                  # the same tensor object</code></pre>
+
+<p>Every adapter in this project targets <code>audio_lm_heads.0&hellip;11</code>, and those twelve
+tensors <b>are</b> <code>audio_embeddings.0&hellip;11</code>. Three consequences, none externally
+visible:</p>
+
+<ol>
+<li><b>Head and embedding table are modified together.</b> In training the adapter sat on a frozen
+weight and the table never moved; at merge time it does, so the merged model is not the model that
+was trained or evaluated. Measured: both tensors moved by exactly
+<code>6.103515625e-05</code>.</li>
+<li><b>It is inside the generation loop.</b> <code>modeling_moss_tts.py:578</code> reads
+<code>audio_embeddings[channel](channel_token)</code> to feed each generated channel back as the
+input for the next, twelve times per frame.</li>
+<li><b>Merge/unmerge does not restore the weights.</b> float16 deltas added into bf16 weights
+(~8 mantissa bits): <code>w + d &minus; d &ne; w</code>, because the addition already discarded bits
+the subtraction cannot recover. Every turn drifts further, and via the tie, so does the embedding
+table. This is the &ldquo;rounding drift&rdquo; their own investigation listed as never confirmed;
+the mechanism is real, its magnitude over a long session unmeasured.</li>
+</ol>
+
+<p><b>Fix:</b> load through PEFT and leave unmerged, scaling by multiplying the stored
+<code>scaling</code> &mdash; identical in effect to a merge at that weight, with the base weights
+never written. Keeping a custom loader requires at minimum excluding <code>audio_lm_heads.*</code>
+from the merge and applying those modules as forward hooks, and restoring from a snapshot rather
+than subtracting.</p>
+
+<h3>24.7 The stop-talking bug, and what it says about duration</h3>
+
+<p>The same project chased a different symptom: the model said its line and then kept going, a few
+often-invented words on every second or third reply. Their conclusion constrains our own work.</p>
+
+<ul>
+<li><b>Not the stop token.</b> Swept across its range, three settings of the stop bias produced
+<b>bit-identical output</b> through two code paths &mdash; only possible if the stop-or-continue
+decision is never close.</li>
+<li><b>The clock.</b> Across every configuration the audio matched the requested duration to within
+<b>0.02 s</b>. The model was not overrunning its budget; it was honouring it exactly and filling
+unneeded time with invented speech.</li>
+<li><b>Two inflators, neither sufficient alone:</b> the render rate (4.5 audio frames per word, the
+rate in the format's own worked example) and a closing pause tag after the last word. At the old
+rate, dropping the closing pause still left invented words in 20&ndash;40 % of takes; at the tighter
+rate, keeping it left 10&ndash;20 %. Together: 0 % in the final measurement across three seeds.</li>
+<li><b>Removing the timing tags is the worst configuration measured</b> &mdash; 0.9 invented words
+per take and nearly four times the trailing audio. The timed format is not the problem; an
+over-generous budget inside it is.</li>
+<li><b>Adapters contribute:</b> base plus quality adapter gives WER 0.013 and zero invented words in
+ten takes; the full shipped stack gives 0.258 and roughly two per take. Turning the same adapters
+<em>down</em> recovered most of it (0.273 &rarr; 0.018) at a cost in the naturalness score, which
+was highest on the heavy stack.</li>
+</ul>
+
+<div class="box">
+<b>The constraint this places on the rest of this report:</b> the model treats the duration budget
+as a <em>contract</em>, not a ceiling. Our own duration errors are small because our budgets are
+tight, not because the model stops well &mdash; and any future work that loosens a budget should
+expect filler rather than silence. Their <code>extra_w</code> metric, counting words after the last
+one that still matches the reference, is a more direct measure of over-generation than anything in
+our harness and should be adopted.
+</div>
+
+<h3>24.8 The word-error instrument</h3>
+
+<p>Every WER in sections 1&ndash;23 comes from <code>openai/whisper-large-v3-turbo</code>. From
+2026-08-29 the primary instrument is <b><code>nvidia/parakeet-tdt-0.6b-v3</code></b>, a transducer
+with no language decoder, chosen on the theory that Whisper would hallucinate fluent text on
+over-driven audio and therefore flatter exactly the failures these levers produce.</p>
+
+<p><b>The theory was wrong, and measuring it is the useful part.</b> Pooled offset &minus;0.0177
+over 29,676 clips (independently &minus;0.0237 and &minus;0.0231 in the other two studies), and the
+offset <b>does not grow with guidance</b>: slope &minus;0.00081 per unit <i>g</i>, t &minus;0.19,
+n = 1,863 cells, with the flattered share flat between 3.4 % and 4.5 % at every guidance value.
+Whisper is the <em>harsher</em> instrument here, worst where the audio is worst &mdash; on the most
+broken clips it returns mean WER above 1.0, hallucinated insertions rather than the plausible
+substitutions that were feared. <b>The Whisper thresholds in sections 1&ndash;23 were not too
+permissive and those tables stand as written.</b> Parakeet remains primary for a different reason:
+on identical audio it is <b>2.4&times; less noisy</b>, a real gain in resolution for any harness
+running few samples per cell.</p>
+
+<h3>24.9 What this section does not settle</h3>
+
+<ul>
+<li><b>The emotion problem.</b> A balanced operating point for 53 of 60 attributes is a usable
+system, not a solution. Every lever moves delivery several times further than feeling; the next real
+step is data rather than inference.</li>
+<li><b>Nobody has listened.</b> Every number here is one model's judgement of another model's
+output, and several of the scorers produced the training labels in the first place.</li>
+<li><b>Stacking is untested.</b> All adapter measurements are one adapter at a time.</li>
+<li><b>Total injected magnitude was never held constant</b> in the layer-count ladder, so
+&ldquo;more layers&rdquo; is confounded with &ldquo;more push&rdquo;. The realised per-tap
+magnitudes are logged, so a matched-budget re-analysis needs no new generation.</li>
+</ul>
+
 <hr>
 
 <p class="small">Written 26 August 2026 and expanded on 28 August from the project's running
